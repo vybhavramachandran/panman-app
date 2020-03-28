@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "894070686891",
+    "firebase_url": "https://thewarroom-98e6d.firebaseio.com",
+    "project_id": "thewarroom-98e6d",
+    "storage_bucket": "thewarroom-98e6d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:894070686891:android:4fd3feb155d7d3bb4f63ee",
+        "android_client_info": {
+          "package_name": "panman.panman"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "894070686891-m55jqdumkcgm3r4cjnmro9uochrmvnpt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6OJnv4fhw6cnwKhz6vbZFCxW1kqNt9Ec"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "894070686891-m55jqdumkcgm3r4cjnmro9uochrmvnpt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
