@@ -2,22 +2,22 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
 
 class locationInHospital {
-  int levelNumber;
+  String id;
   String name;
   int count;
 
-  locationInHospital({this.levelNumber, this.name, this.count});
+  locationInHospital({this.id, this.name, this.count});
 
   locationInHospital.fromMap(Map data)
       : this(
-          levelNumber: data['levelNumber'],
+          id: data['id'],
           name: data['name'],
           count: data['count'],
         );
 
   Map<String, dynamic> toMap() {
     return {
-      'level': levelNumber,
+      'id': id,
       'name': name,
       'count': count,
     };

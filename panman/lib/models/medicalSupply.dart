@@ -1,6 +1,5 @@
 class medicalSupply {
   String id;
-
   int qty;
 
   medicalSupply({this.id, this.qty});

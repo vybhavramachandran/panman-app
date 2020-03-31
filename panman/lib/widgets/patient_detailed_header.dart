@@ -106,12 +106,12 @@ class PatientDetailedHeader extends StatelessWidget {
                 ),
               ],
             ),
-            C19StateBox(
+            Provider.of<Patients>(context, listen: true).selectedPatient.currentLocation>2?C19StateBox(
               patientState: Provider.of<Patients>(context, listen: true)
                   .selectedPatient
                   .state
                   .state,
-            ),
+            ):Container(),
           ],
         ),
       ),

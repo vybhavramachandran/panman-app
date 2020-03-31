@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 
 import '../widgets/home_page_inventory_widget.dart';
 import '../widgets/home_page_patients_widget.dart';
+import './home_page_dashboard.dart';
 
 import '../providers/hospital.dart';
 import '../providers/patients.dart';
@@ -26,7 +27,11 @@ class _HomeScreenState extends State<HomeScreen> {
   int age;
   Sex patientSex;
   String hospitalID;
-  FullAddress patientAddress = FullAddress(address: "Chandra Layout",city: "Bangalore",state: "Karnataka", zipcode: "560060");
+  FullAddress patientAddress = FullAddress(
+      address: "Chandra Layout",
+      city: "Bangalore",
+      state: "Karnataka",
+      zipcode: "560060");
 
   @override
   void initState() {
@@ -34,6 +39,8 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     Provider.of<Hospitals>(context, listen: false)
         .getHospitalDetailsFromServer("bGxFisQYmYl8ypnsBDtN");
+    Provider.of<Hospitals>(context,listen:false).getReferenceMedicalSupplyList();
+    Provider.of<Hospitals>(context,listen:false).getReferenceHospitalLocationList();
   }
 
   void enterFirstName(String newName) {
@@ -49,9 +56,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void enterAge(int newage) {
-   setState(() {
-     age = newage;
-   });
+    setState(() {
+      age = newage;
+    });
   }
 
   void enterSex(Sex newSex) {
@@ -61,7 +68,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void AddPatient() {
-
     print("$firstName, $lastName, ${patientSex.toString()}, ${age.toString()}");
     Provider.of<Patients>(context, listen: false).addPatient(Patient(
       Firstname: firstName,
@@ -83,6 +89,51 @@ class _HomeScreenState extends State<HomeScreen> {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
+        drawer: SafeArea(
+                  child: Drawer  (
+
+          // Add a ListView to the drawer. This ensures the user can scroll
+          // through the options in the drawer if there isn't enough vertical
+          // space to fit everything.
+          child: ListView(
+            // Important: Remove any padding from the ListView.
+            padding: EdgeInsets.zero,
+            children: <Widget>[
+              DrawerHeader(
+                
+                child: Text('Navigation',style: Theme.of(context).textTheme.headline5,),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).accentColor,
+                ),
+              ), ListTile(
+                title: Text('Dashboards'),
+                onTap: () {
+                  // Update the state of the app
+                  // ...
+                  // Then close the drawer
+                  Navigator.pop(context);
+                  return Navigator.pushNamed(
+                    context,
+                    DashboardScreen.routeName,
+                  );
+                },
+              ),
+              ListTile(
+                title: Text('Treatment'),
+                onTap: () {
+                  // Update the state of the app
+                  // ...
+                  // Then close the drawer
+                  Navigator.pop(context);
+                  return Navigator.pushNamed(
+                    context,
+                    HomeScreen.routeName,
+                  );
+                },
+              ),
+            ],
+          ),),
+        ),
         floatingActionButton: FloatingActionButton(
           backgroundColor: Theme.of(context).accentColor,
           child: Icon(Icons.add),

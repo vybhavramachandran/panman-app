@@ -9,13 +9,68 @@ import '../models/patient.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+class FetchedMedicalSupply {
+  String id;
+  String name;
+
+  FetchedMedicalSupply({this.id, this.name});
+}
+
+class FetchedHospitalLocationReference {
+  String id;
+  String name;
+
+  FetchedHospitalLocationReference({this.id, this.name});
+}
+
 class Hospitals with ChangeNotifier {
   var hospitalsCollection = Firestore.instance.collection('hospitals');
   var hospitalSnapshot;
 
+  List<FetchedMedicalSupply> referenceMedicalSupplyList = [];
+  List<FetchedHospitalLocationReference> referenceHospitalLocationList = [];
+
   Hospital fetchedHospital = Hospital(hospitalName: "loading..");
 
   bool isUpdating = false;
+
+  Future getReferenceMedicalSupplyList() async {
+    var medicalSupplyCollection =
+        Firestore.instance.collection('medicalSupplyDetails');
+
+    var newList = await medicalSupplyCollection.getDocuments();
+    //  print(newList.documents);
+    newList.documents.forEach((element) {
+      print(element['Name'] + element['id']);
+      referenceMedicalSupplyList
+          .add(FetchedMedicalSupply(name: element['Name'], id: element['id']));
+    });
+
+    notifyListeners();
+  }
+
+  Future getReferenceHospitalLocationList() async {
+    var hospitalReferenceCollection =
+        Firestore.instance.collection('hospitalLocationReference');
+
+    var newList = await hospitalReferenceCollection.getDocuments();
+    //  print(newList.documents);
+    newList.documents.forEach((element) {
+      print(element['name'] + element['id']);
+      referenceHospitalLocationList.add(FetchedHospitalLocationReference(
+          name: element['name'], id: element['id']));
+    });
+
+    notifyListeners();
+  }
+
+  String getMedicalSupplyNameFromId(String id) {
+    var gotcha =
+        referenceMedicalSupplyList.firstWhere((element) => element.id == id);
+    return gotcha.name;
+  }
+
+  
 
   Future getHospitalDetailsFromServer(String hospitalID) async {
     hospitalSnapshot = await hospitalsCollection.document(hospitalID).get();
@@ -38,6 +93,22 @@ class Hospitals with ChangeNotifier {
 
     //   ventilatorCountAvailable = ventilatorCountAvailable+1;
     notifyListeners();
+  }
+
+  Future changeLocationInHospitalCount(
+      String locationToBeIncremented, String locationToBeDecremented) async {
+    var oldLocation = fetchedHospital.locations
+        .indexWhere((element) => element.id == locationToBeDecremented);
+    var newLocation = fetchedHospital.locations
+        .indexWhere((element) => element.id == locationToBeIncremented);
+
+    fetchedHospital.locations[oldLocation].count =
+        fetchedHospital.locations[oldLocation].count - 1;
+    fetchedHospital.locations[newLocation].count =
+        fetchedHospital.locations[newLocation].count + 1;
+
+    //print(fetchedHospital.medicalSupplies[itemToUpdate].qty);
+    await updateHospital();
   }
 
   Future updateQuantity(medicalSupply item, int newQuantity) async {

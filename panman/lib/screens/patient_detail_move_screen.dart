@@ -7,6 +7,7 @@ import '../widgets/patient_detailed_header.dart';
 import '../models/locationInHospital.dart';
 
 import '../providers/patients.dart';
+import '../providers/hospital.dart';
 
 class PatientDetailMoveScreen extends StatefulWidget {
   static const routeName = '/patient_detail_move_screen';
@@ -106,9 +107,9 @@ class _PatientDetailMoveScreenState extends State<PatientDetailMoveScreen> {
               iconTheme: IconThemeData(color: Colors.white),
               backgroundColor: Theme.of(context).accentColor,
               title: Text(
-                      "PATIENT / MOVE",
-                      style: Theme.of(context).textTheme.caption,
-                    ),
+                "PATIENT / MOVE",
+                style: Theme.of(context).textTheme.caption,
+              ),
               centerTitle: true,
               flexibleSpace: PatientDetailedHeader(
                 textColor: Colors.white,
@@ -182,18 +183,30 @@ class _PatientDetailMoveScreenState extends State<PatientDetailMoveScreen> {
                         width: MediaQuery.of(context).size.width,
                         child: RaisedButton(
                           color: Theme.of(context).accentColor,
-                          child: Provider.of<Patients>(context, listen: true).isUpdating
-                  ? CircularProgressIndicator(
-                      backgroundColor: Colors.white30,
-                    )
-                  : Text(
-                            "CHANGE STATE",
-                            style: Theme.of(context).textTheme.caption,
-                          ),
+                          child: Provider.of<Patients>(context, listen: true)
+                                  .isUpdating
+                              ? CircularProgressIndicator(
+                                  backgroundColor: Colors.white30,
+                                )
+                              : Text(
+                                  "MOVE PATIENT",
+                                  style: Theme.of(context).textTheme.caption,
+                                ),
                           onPressed: () async {
-                            if ( await Provider.of<Patients>(context, listen: false)
+                            var oldState =
+                                Provider.of<Patients>(context, listen: false)
+                                    .selectedPatient
+                                    .currentLocation;
+                            var newState = selectedRadio - 1;
+                            if (await Provider.of<Patients>(context,
+                                        listen: false)
                                     .movePatient(selectedRadio - 1) ==
                                 true) {
+                              await Provider.of<Hospitals>(context,
+                                      listen: false)
+                                  .changeLocationInHospitalCount(
+                                      Provider.of<Hospitals>(context,listen:false).referenceHospitalLocationList[newState].id,
+                                      Provider.of<Hospitals>(context,listen:false).referenceHospitalLocationList[oldState].id);
                               setState(() {
                                 showConfirmButton = false;
                               });

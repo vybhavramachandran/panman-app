@@ -14,6 +14,7 @@ import './screens/patient_detail_screen.dart';
 import './screens/patient_detail_cov19_screen.dart';
 import './screens/patient_detail_move_screen.dart';
 import './screens/patient_detail_assign_equipment_screen.dart';
+import './screens/home_page_dashboard.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,13 +36,14 @@ class MyApp extends StatelessWidget {
         // ChangeNotifierProvider.value(
         //   value: Equipment(),
         // ),
-       
+
         ChangeNotifierProvider.value(
           value: Hospitals(),
         ),
       ],
       child: MaterialApp(
         title: 'PanMan',
+         debugShowCheckedModeBanner: false,
         theme: ThemeData(
             accentColor: Color.fromRGBO(35, 71, 162, 1),
             primaryColor: Colors.white,
@@ -62,6 +64,7 @@ class MyApp extends StatelessWidget {
           PatientDetailMoveScreen.routeName: (ctx) => PatientDetailMoveScreen(),
           PatientDetailAssignEquipment.routeName: (ctx) =>
               PatientDetailAssignEquipment(),
+          DashboardScreen.routeName: (ctx) => DashboardScreen(),
         },
       ),
     );

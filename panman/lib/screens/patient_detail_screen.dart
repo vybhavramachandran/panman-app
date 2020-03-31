@@ -31,8 +31,8 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
       child: InkWell(
         onTap: () {
           Navigator.pushNamed(context, moveToPage,
-                  arguments: PatientDetailArguments(localPatient))
-              .then((isChanged) => isChanged ? _refreshPatient() :null);
+                  arguments: PatientDetailArguments(localPatient));
+              // .then((isChanged) => isChanged ? _refreshPatient():"");
         },
         child: Container(
           width: 200,

@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/patients.dart';
+import '../providers/hospital.dart';
 
 import '../models/patient.dart';
 import '../models/arguments/patient_detail_arguments.dart';
@@ -23,7 +24,8 @@ class PatientSummaryWidget extends StatelessWidget {
       margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
       child: InkWell(
         onTap: () {
-          Provider.of<Patients>(context,listen:false).selectPatient(patient.id);
+          Provider.of<Patients>(context, listen: false)
+              .selectPatient(patient.id);
           return Navigator.pushNamed(context, PatientDetailScreen.routeName,
               arguments: PatientDetailArguments(patient));
         },
@@ -75,7 +77,7 @@ class PatientSummaryWidget extends StatelessWidget {
                             SizedBox(
                               width: 5,
                             ),
-                            Text("32 YEARS"),
+                            Text(patient.age.toString() + " YEARS"),
                           ],
                         ),
                       ],
@@ -89,14 +91,20 @@ class PatientSummaryWidget extends StatelessWidget {
                         SizedBox(
                           width: 10,
                         ),
-                        Text("Isolation-ward"),
+                        Container(
+                          width:200,
+                          child: Text(Provider.of<Hospitals>(context, listen: true)
+                              .referenceHospitalLocationList[
+                                  patient.currentLocation]
+                              .name),
+                        ),
                       ],
                     ),
                   ],
                 ),
-                C19StateBox(
+               patient.currentLocation!=1?C19StateBox(
                   patientState: patient.state.state,
-                ),
+                ):Container(),
                 FaIcon(
                   FontAwesomeIcons.arrowRight,
                   size: 20,

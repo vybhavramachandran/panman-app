@@ -15,6 +15,7 @@ class _HomePageInvetoryWidgetState extends State<HomePageInvetoryWidget> {
   final formKey = GlobalKey<FormState>();
   int value_to_submit = 0;
   bool waitingForResult = false;
+  var cardKey = UniqueKey();
   // final tripleLayerMask = TextEditingController();
   // final n95MaskController = TextEditingController();
   // final faceShieldController = TextEditingController();
@@ -26,6 +27,7 @@ class _HomePageInvetoryWidgetState extends State<HomePageInvetoryWidget> {
   @override
   medicalSupplyCard(medicalSupply item) {
     return Card(
+      key:cardKey,
       //  margin: EdgeInsets.symmetric(vertical: 0, horizontal: 0),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 0),
@@ -41,7 +43,8 @@ class _HomePageInvetoryWidgetState extends State<HomePageInvetoryWidget> {
                       fit: FlexFit.tight,
                       flex: 5,
                       child: Text(
-                        item.id,
+                        Provider.of<Hospitals>(context, listen: false)
+                            .getMedicalSupplyNameFromId(item.id),
                         style: Theme.of(context).textTheme.bodyText1,
                       )),
                   SizedBox(
