@@ -21,11 +21,18 @@ class _HomePagePatientsWidgetState extends State<HomePagePatientsWidget> {
   }
 
   Future refreshListOfPatients(BuildContext context) async {
-    var hospitalID = Provider.of<HealthCareWorkers>(context,listen:true).hcwloggedin.hospitalID;
+    var hospitalID = Provider.of<HealthCareWorkers>(context,listen:false).hcwloggedin.hospitalID;
 
     print("refreshListOfPatients called");
     return await Provider.of<Patients>(context, listen: false)
         .fetchPatientsListFromServer(hospitalID);
+  }
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+     //   fetchFuture = refreshListOfPatients(context);
   }
 
   @override

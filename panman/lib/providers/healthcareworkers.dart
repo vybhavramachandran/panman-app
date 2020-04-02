@@ -8,6 +8,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class HealthCareWorkers with ChangeNotifier {
   HealthCareWorker hcwloggedin;
 
+  Future logoutHCW(){
+    hcwloggedin = null;
+    notifyListeners();
+  }
+
   Future getHCWDetailsFromServer(String uidQuery) async {
     print('getHCWDetails called');
     var hcwCollection = Firestore.instance.collection('healthcareworkers');
