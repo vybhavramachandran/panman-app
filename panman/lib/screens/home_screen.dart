@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:panman/models/address.dart';
 import 'package:panman/models/c19data.dart';
+import 'package:panman/models/healthcareworker.dart';
 import 'package:panman/models/hospital.dart';
 import 'package:panman/models/patient.dart';
 import 'package:provider/provider.dart';
@@ -13,6 +14,9 @@ import './home_page_dashboard.dart';
 
 import '../providers/hospital.dart';
 import '../providers/patients.dart';
+import '../providers/covid19.dart';
+import '../providers/auth.dart';
+import '../providers/healthcareworkers.dart';
 
 class HomeScreen extends StatefulWidget {
   static const routeName = '/home_screen';
@@ -33,14 +37,32 @@ class _HomeScreenState extends State<HomeScreen> {
       state: "Karnataka",
       zipcode: "560060");
 
+  Future fetchFuture;
+  bool _isLoading = false;
+
   @override
   void initState() {
-    // TODO: implement initState
-    super.initState();
     Provider.of<Hospitals>(context, listen: false)
-        .getHospitalDetailsFromServer("bGxFisQYmYl8ypnsBDtN");
-    Provider.of<Hospitals>(context,listen:false).getReferenceMedicalSupplyList();
-    Provider.of<Hospitals>(context,listen:false).getReferenceHospitalLocationList();
+        .getReferenceMedicalSupplyList();
+    Provider.of<Hospitals>(context, listen: false)
+        .getReferenceHospitalLocationList();
+    fetchFuture = fetchDoctorAndHospitalDetails();
+    super.initState();
+  }
+
+  Future fetchDoctorAndHospitalDetails() async {
+    print("fetchingDoctorAndHospitalDetials");
+    await Provider.of<HealthCareWorkers>(context, listen: false)
+        .getHCWDetailsFromServer(
+            Provider.of<Auth>(context, listen: false).loggedinUser.uid);
+
+    await Provider.of<Hospitals>(context, listen: false)
+        .getHospitalDetailsFromServer(
+            Provider.of<HealthCareWorkers>(context, listen: false)
+                .hcwloggedin
+                .hospitalID);
+
+    return true;
   }
 
   void enterFirstName(String newName) {
@@ -86,112 +108,149 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        drawer: SafeArea(
-                  child: Drawer  (
-
-          // Add a ListView to the drawer. This ensures the user can scroll
-          // through the options in the drawer if there isn't enough vertical
-          // space to fit everything.
-          child: ListView(
-            // Important: Remove any padding from the ListView.
-            padding: EdgeInsets.zero,
-            children: <Widget>[
-              DrawerHeader(
-                
-                child: Text('Navigation',style: Theme.of(context).textTheme.headline5,),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).accentColor,
+    return FutureBuilder(
+      future: fetchFuture,
+      builder: (ctx, snapshot) =>
+          snapshot.connectionState != ConnectionState.done && snapshot.hasError
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : DefaultTabController(
+                  length: 2,
+                  child: Scaffold(
+                    drawer: SafeArea(
+                      child: Drawer(
+                        // Add a ListView to the drawer. This ensures the user can scroll
+                        // through the options in the drawer if there isn't enough vertical
+                        // space to fit everything.
+                        child: ListView(
+                          // Important: Remove any padding from the ListView.
+                          padding: EdgeInsets.zero,
+                          children: <Widget>[
+                            DrawerHeader(
+                              child: Text(
+                                'Menu',
+                                style: Theme.of(context).textTheme.headline5,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).accentColor,
+                              ),
+                            ),
+                            ListTile(
+                              title: Text('Dashboards'),
+                              onTap: () {
+                                // Update the state of the app
+                                // ...
+                                // Then close the drawer
+                                Navigator.pop(context);
+                                return Navigator.pushNamed(
+                                  context,
+                                  DashboardScreen.routeName,
+                                );
+                              },
+                            ),
+                            ListTile(
+                              title: Text('Treatment'),
+                              onTap: () {
+                                // Update the state of the app
+                                // ...
+                                // Then close the drawer
+                                Navigator.pop(context);
+                                return Navigator.pushNamed(
+                                  context,
+                                  HomeScreen.routeName,
+                                );
+                              },
+                            ),
+                            ListTile(
+                              title: Text(
+                                'Logout',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyText1
+                                    .copyWith(color: Colors.red),
+                              ),
+                              onTap: () {
+                                // Update the state of the app
+                                // ...
+                                // Then close the drawer
+                                Provider.of<Auth>(context, listen: false)
+                                    .logout();
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    floatingActionButton: FloatingActionButton(
+                      backgroundColor: Theme.of(context).accentColor,
+                      child: Icon(Icons.add),
+                      onPressed: () {
+                        //  _showDialog();
+                        showDialog(
+                            context: context,
+                            child: new MyDialog(
+                              ageChanged: enterAge,
+                              firstNameChanged: enterFirstName,
+                              lastNameChanged: enterLastName,
+                              sexChanged: enterSex,
+                              addPatient: AddPatient,
+                            ));
+                      },
+                    ),
+                    appBar: AppBar(
+                      backgroundColor: Theme.of(context).accentColor,
+                      title: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          SizedBox(
+                            width: 200.0,
+                            child: FittedBox(
+                              child: Text(
+                                  Provider.of<Hospitals>(context, listen: true)
+                                      .fetchedHospital
+                                      .hospitalName,
+                                  style: Theme.of(context).textTheme.headline6),
+                              fit: BoxFit.scaleDown,
+                            ),
+                          ),
+                          Row(
+                            children: <Widget>[
+                              FaIcon(
+                                FontAwesomeIcons.userMd,
+                                color: Colors.white,
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                  Provider.of<HealthCareWorkers>(context,
+                                          listen: true)
+                                      .hcwloggedin
+                                      .firstName,
+                                  style: Theme.of(context).textTheme.headline6),
+                            ],
+                          )
+                        ],
+                      ),
+                      bottom: TabBar(
+                        labelStyle: Theme.of(context).textTheme.caption,
+                        labelColor: Colors.white,
+                        //  isScrollable: true,
+                        tabs: <Widget>[
+                          Tab(text: "PATIENTS"),
+                          Tab(text: "MEDICAL SUPPLIES"),
+                        ],
+                      ),
+                    ),
+                    body: TabBarView(
+                      children: <Widget>[
+                        HomePagePatientsWidget(),
+                        HomePageInvetoryWidget(),
+                      ],
+                    ),
+                  ),
                 ),
-              ), ListTile(
-                title: Text('Dashboards'),
-                onTap: () {
-                  // Update the state of the app
-                  // ...
-                  // Then close the drawer
-                  Navigator.pop(context);
-                  return Navigator.pushNamed(
-                    context,
-                    DashboardScreen.routeName,
-                  );
-                },
-              ),
-              ListTile(
-                title: Text('Treatment'),
-                onTap: () {
-                  // Update the state of the app
-                  // ...
-                  // Then close the drawer
-                  Navigator.pop(context);
-                  return Navigator.pushNamed(
-                    context,
-                    HomeScreen.routeName,
-                  );
-                },
-              ),
-            ],
-          ),),
-        ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Theme.of(context).accentColor,
-          child: Icon(Icons.add),
-          onPressed: () {
-            //  _showDialog();
-            showDialog(
-                context: context,
-                child: new MyDialog(
-                  ageChanged: enterAge,
-                  firstNameChanged: enterFirstName,
-                  lastNameChanged: enterLastName,
-                  sexChanged: enterSex,
-                  addPatient: AddPatient,
-                ));
-          },
-        ),
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).accentColor,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Text(
-                  Provider.of<Hospitals>(context, listen: true)
-                      .fetchedHospital
-                      .hospitalName,
-                  style: Theme.of(context).textTheme.headline6),
-              Row(
-                children: <Widget>[
-                  FaIcon(
-                    FontAwesomeIcons.userMd,
-                    color: Colors.white,
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Text("Dr.Joshi",
-                      style: Theme.of(context).textTheme.headline6),
-                ],
-              )
-            ],
-          ),
-          bottom: TabBar(
-            labelStyle: Theme.of(context).textTheme.caption,
-            labelColor: Colors.white,
-            //  isScrollable: true,
-            tabs: <Widget>[
-              Tab(text: "PATIENTS"),
-              Tab(text: "MEDICAL SUPPLIES"),
-            ],
-          ),
-        ),
-        body: TabBarView(
-          children: <Widget>[
-            HomePagePatientsWidget(),
-            HomePageInvetoryWidget(),
-          ],
-        ),
-      ),
     );
   }
 }

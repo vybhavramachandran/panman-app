@@ -43,7 +43,7 @@ class Patient {
       'ventilatorUsed': ventilatorUsed,
       'locationInHospital': this.currentLocation,
       'hospitalID': this.hospitalID,
-      'covidStatus': state!=null?state.state.index:"",
+      'covidStatus': this.state.abbrv,
       'fullAddress': fullAddress!=null?fullAddress.toMap():"",
       'firstName': Firstname,
       'lastName': LastName,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:panman/providers/healthcareworkers.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/patients.dart';
@@ -16,27 +17,15 @@ class _HomePagePatientsWidgetState extends State<HomePagePatientsWidget> {
 
   initState() {
     fetchFuture = refreshListOfPatients(context);
+    super.initState();
   }
 
-  Future<void> refreshListOfPatients(BuildContext context) async {
-    setState(() {
-      _isLoading = true;
-    });
-    await Provider.of<Patients>(context, listen: false)
-        .fetchPatientsListFromServer('bGxFisQYmYl8ypnsBDtN');
-    setState(() {
-      _isLoading = false;
-    });
-    // await Provider.of<Appointments>(context, listen: false)
-    //     .fetchAppointmentsFromFirebase();
+  Future refreshListOfPatients(BuildContext context) async {
+    var hospitalID = Provider.of<HealthCareWorkers>(context,listen:true).hcwloggedin.hospitalID;
 
     print("refreshListOfPatients called");
-    // setState(() {
-    //   _isLoading = false;
-    //   // appointments = Provider.of<Appointments>(context, listen: false)
-    //   //     .fetchedAppointmentList;
-    // });
-    return true;
+    return await Provider.of<Patients>(context, listen: false)
+        .fetchPatientsListFromServer(hospitalID);
   }
 
   @override
@@ -62,29 +51,37 @@ class _HomePagePatientsWidgetState extends State<HomePagePatientsWidget> {
                 ),
               ),
             ),
-            Provider.of<Patients>(context,listen:true).isFetching==true?Center(child: CircularProgressIndicator(backgroundColor: Colors.black,)):
-           Flexible(
-                flex: 8,
-                child: RefreshIndicator(
-              onRefresh: () => refreshListOfPatients(context),
-              child:  Container(
-             //     height:MediaQuery.of(context).size.height,
-                  // color: Colors.red,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ListView.builder(
-                      itemCount: Provider.of<Patients>(context, listen: true)
-                          .fetchedPatientsList
-                          .length,
-                      itemBuilder: (context, position) {
-                        return PatientSummaryWidget(
-                            patient:
-                                Provider.of<Patients>(context, listen: true)
-                                    .fetchedPatientsList[position]);
-                      },
-                    ),
-                  ),
-                ),
+            Flexible(
+              flex: 8,
+              child: FutureBuilder(
+                future: fetchFuture,
+                builder: (ctx, snapshot) => snapshot.connectionState !=
+                        ConnectionState.done && !snapshot.hasData
+                    ? Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : RefreshIndicator(
+                        onRefresh: () => refreshListOfPatients(context),
+                        child: Container(
+                          //     height:MediaQuery.of(context).size.height,
+                          // color: Colors.red,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: ListView.builder(
+                              itemCount:
+                                  Provider.of<Patients>(context, listen: true)
+                                      .fetchedPatientsList
+                                      .length,
+                              itemBuilder: (context, position) {
+                                return PatientSummaryWidget(
+                                    patient: Provider.of<Patients>(context,
+                                            listen: true)
+                                        .fetchedPatientsList[position]);
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
               ),
             )
           ],
@@ -93,5 +90,3 @@ class _HomePagePatientsWidgetState extends State<HomePagePatientsWidget> {
     );
   }
 }
-
-

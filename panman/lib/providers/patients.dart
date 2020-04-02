@@ -4,7 +4,6 @@ import '../models/patient.dart';
 import '../models/c19data.dart';
 import '../models/address.dart';
 
-import '../models/locationInHospital.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:flutter/foundation.dart';
@@ -22,19 +21,22 @@ class Patients with ChangeNotifier {
 
   Future fetchPatientsListFromServer(String hospitalID) async {
     print("fetchPatientsList Called");
+
     isFetching = true;
-    notifyListeners();
+    //notifyListeners();
     fetchedPatientsList.clear();
     patientSnapshot = await patientsCollection
         .where('hospitalID', isEqualTo: hospitalID)
         .getDocuments();
     patientSnapshot.documents.forEach((patient) async {
+      print(patient['firstName'] + patient['covidStatus']);
       fetchedPatientsList.add(Patient(
         Firstname: patient['firstName'],
         LastName: patient['lastName'],
         age: patient['age'],
         currentLocation: patient['locationInHospital'],
-        state: c19states[patient['covidStatus']],
+        state: referenceCovid19SeverityLevelsList
+            .firstWhere((element) => element.abbrv == patient['covidStatus']),
         fullAddress: FullAddress.fromMap(patient['fullAddress']),
         sex: patient['sex'] == "Male" ? Sex.Male : Sex.Female,
         ventilatorUsed: patient['ventilatorUsed'],
@@ -64,8 +66,8 @@ class Patients with ChangeNotifier {
     return true;
   }
 
-  Future<bool> changePatientState(C19PatientState newState) async {
-    selectedPatient.state = c19states[newState.index];
+  Future<bool> changePatientState(int newStateIndex) async {
+    selectedPatient.state = referenceCovid19SeverityLevelsList[newStateIndex];
     await updatePatientProfileInFirebase();
     notifyListeners();
     return true;
@@ -84,8 +86,9 @@ class Patients with ChangeNotifier {
       patientToAdd.toMap(),
     );
 
-    await patientsCollection.document(patient_id.documentID).updateData({
-      'id': patient_id.documentID});
+    await patientsCollection
+        .document(patient_id.documentID)
+        .updateData({'id': patient_id.documentID});
 
     return true;
   }

@@ -88,13 +88,14 @@ class _PatientDetailCov19ScreenState extends State<PatientDetailCov19Screen> {
         ));
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     // PatientDetailArguments args = ModalRoute.of(context).settings.arguments;
     if (setOnce == false) {
       this.selectedRadio = Provider.of<Patients>(context, listen: true)
               .selectedPatient
-              .state
               .state
               .index +
           1;
@@ -210,8 +211,7 @@ class _PatientDetailCov19ScreenState extends State<PatientDetailCov19Screen> {
                                 ),
                           onPressed: () {
                             if (Provider.of<Patients>(context, listen: false)
-                                    .changePatientState(C19PatientState
-                                        .values[selectedRadio - 1]) ==
+                                    .changePatientState(selectedRadio-1) ==
                                 true) {
                               setState(() {
                                 showConfirmButton = false;

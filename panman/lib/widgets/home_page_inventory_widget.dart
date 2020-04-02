@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:panman/models/hospital.dart';
+import 'package:panman/providers/healthcareworkers.dart';
 import 'package:provider/provider.dart';
 
 import '../models/medicalSupply.dart';
@@ -27,7 +28,7 @@ class _HomePageInvetoryWidgetState extends State<HomePageInvetoryWidget> {
   @override
   medicalSupplyCard(medicalSupply item) {
     return Card(
-      key:cardKey,
+      key: cardKey,
       //  margin: EdgeInsets.symmetric(vertical: 0, horizontal: 0),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 0),
@@ -145,7 +146,10 @@ class _HomePageInvetoryWidgetState extends State<HomePageInvetoryWidget> {
       _isLoading = true;
     });
     await Provider.of<Hospitals>(context, listen: false)
-        .getHospitalDetailsFromServer('bGxFisQYmYl8ypnsBDtN');
+        .getHospitalDetailsFromServer(
+            Provider.of<HealthCareWorkers>(context, listen: false)
+                .hcwloggedin
+                .hospitalID);
     setState(() {
       _isLoading = false;
     });

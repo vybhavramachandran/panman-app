@@ -70,12 +70,13 @@ class Hospitals with ChangeNotifier {
     return gotcha.name;
   }
 
-  
-
   Future getHospitalDetailsFromServer(String hospitalID) async {
+    print("Calling getHospitalDetails");
     hospitalSnapshot = await hospitalsCollection.document(hospitalID).get();
     fetchedHospital = Hospital.fromMap(hospitalSnapshot.data);
+    print("Fetched Hospital Name is" + fetchedHospital.hospitalName);
     notifyListeners();
+    return true;
   }
 
   Future<bool> decrementVentilatorCount() async {

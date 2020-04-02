@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/c19data.dart';
 
+import '../providers/covid19.dart';
+
 class C19StateBox extends StatelessWidget {
-  C19PatientState patientState;
+  c19 patientState;
 
   C19StateBox({this.patientState});
 
   @override
   Widget build(BuildContext context) {
-    c19 currentState;
+ //   c19 currentState;
 
-    currentState =
-        c19states.firstWhere((element) => element.state == patientState);
+ // currentState = patientState
+    //     Provider.of<Covid19>(context,listen:true).referenceCovid19SeverityLevelsList.firstWhere((element) => element.abbrv == currentState.abbrv);
 
     return Container(
       width: 50,
@@ -20,12 +23,12 @@ class C19StateBox extends StatelessWidget {
         color: Colors.white70,
           borderRadius: BorderRadius.circular(5),
           border: Border.all(
-            color: currentState.stateColor,
+            color: patientState.stateColor,
             width: 3,
           )),
       child: Center(
         child: Text(
-          currentState.abbrv.toString(),
+          patientState.abbrv.toString(),
           style: Theme.of(context).textTheme.bodyText2,
         ),
       ),

@@ -103,7 +103,7 @@ class PatientSummaryWidget extends StatelessWidget {
                   ],
                 ),
                patient.currentLocation!=1?C19StateBox(
-                  patientState: patient.state.state,
+                  patientState: patient.state,
                 ):Container(),
                 FaIcon(
                   FontAwesomeIcons.arrowRight,
