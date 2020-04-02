@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 // import 'package:font_awesome_flutter/fa_icon.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:panman/models/address.dart';
+
+import 'package:random_string/random_string.dart';
+import 'dart:math' show Random;
+
 import 'package:panman/models/c19data.dart';
 import 'package:panman/models/healthcareworker.dart';
 import 'package:panman/models/hospital.dart';
@@ -31,6 +35,10 @@ class _HomeScreenState extends State<HomeScreen> {
   int age;
   Sex patientSex;
   String hospitalID;
+  String newPatientID;
+  bool isAdding = false;
+  bool triggerRefreshOfPatientList = false;
+
   FullAddress patientAddress = FullAddress(
       address: "Chandra Layout",
       city: "Bangalore",
@@ -89,21 +97,34 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void AddPatient() {
+  void patientListRefreshed(){
+    setState(){
+      triggerRefreshOfPatientList = false;
+    }
+  }
+
+  void AddPatient() async {
+  
     print("$firstName, $lastName, ${patientSex.toString()}, ${age.toString()}");
-    Provider.of<Patients>(context, listen: false).addPatient(Patient(
-      Firstname: firstName,
-      LastName: lastName,
-      age: age,
-      fullAddress: patientAddress,
-      id: null,
-      currentLocation: 1,
-      hospitalID:
-          Provider.of<Hospitals>(context, listen: false).fetchedHospital.id,
-      sex: patientSex,
-      state: null,
-      ventilatorUsed: false,
-    ));
+    try {
+      await Provider.of<Patients>(context, listen: false).addPatient(Patient(
+        Firstname: firstName,
+        LastName: lastName,
+        age: age,
+        fullAddress: patientAddress,
+        id: newPatientID,
+        currentLocation: 1,
+        hospitalID:
+            Provider.of<Hospitals>(context, listen: false).fetchedHospital.id,
+        sex: patientSex,
+        state: referenceCovid19SeverityLevelsList[0],
+        ventilatorUsed: false,
+      ));
+      Navigator.pop(context);
+      setState(() {
+        triggerRefreshOfPatientList = true;
+      });
+    } catch (error) {}
   }
 
   @override
@@ -113,7 +134,10 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (ctx, snapshot) {
           if (snapshot.connectionState != ConnectionState.done ||
               snapshot.hasError) {
-            return Center(child: CircularProgressIndicator(backgroundColor: Colors.white,));
+            return Center(
+                child: CircularProgressIndicator(
+              backgroundColor: Colors.white,
+            ));
           } else if (snapshot.connectionState == ConnectionState.done ||
               snapshot.hasData) {
             return DefaultTabController(
@@ -189,10 +213,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   backgroundColor: Theme.of(context).accentColor,
                   child: Icon(Icons.add),
                   onPressed: () {
+                    setState(() {
+                      newPatientID = randomAlphaNumeric(10);
+                    });
                     //  _showDialog();
                     showDialog(
                         context: context,
                         child: new MyDialog(
+                          patientID: newPatientID,
                           ageChanged: enterAge,
                           firstNameChanged: enterFirstName,
                           lastNameChanged: enterLastName,
@@ -248,7 +276,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 body: TabBarView(
                   children: <Widget>[
-                    HomePagePatientsWidget(),
+                    HomePagePatientsWidget(
+                        triggerRefreshOfPatientList:
+                            triggerRefreshOfPatientList,
+                        ),
                     HomePageInvetoryWidget(),
                   ],
                 ),
@@ -263,18 +294,21 @@ class _HomeScreenState extends State<HomeScreen> {
 ///
 
 class MyDialog extends StatefulWidget {
+  String patientID;
   Function firstNameChanged;
   Function lastNameChanged;
   Function ageChanged;
   Function sexChanged;
   Function addPatient;
 
-  MyDialog(
-      {this.firstNameChanged,
-      this.lastNameChanged,
-      this.ageChanged,
-      this.sexChanged,
-      this.addPatient});
+  MyDialog({
+    this.patientID,
+    this.firstNameChanged,
+    this.lastNameChanged,
+    this.ageChanged,
+    this.sexChanged,
+    this.addPatient,
+  });
 
   @override
   State createState() => new MyDialogState();
@@ -316,6 +350,29 @@ class MyDialogState extends State<MyDialog> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
+                Container(
+                    child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(
+                      "PatientID",
+                      style: Theme.of(context)
+                          .textTheme
+                          .headline6
+                          .copyWith(color: Colors.black),
+                    ),
+                    Container(
+                      width: 150,
+                      child: Text(
+                        widget.patientID,
+                        style: Theme.of(context)
+                            .textTheme
+                            .headline6
+                            .copyWith(color: Colors.red),
+                      ),
+                    ),
+                  ],
+                )),
                 Container(
                     child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -447,17 +504,21 @@ class MyDialogState extends State<MyDialog> {
             Navigator.of(context).pop();
           },
         ),
-        new RaisedButton(
-          color: Theme.of(context).accentColor,
-          child: new Text(
-            "Add Patient",
-            style: Theme.of(context).textTheme.caption,
-          ),
-          onPressed: () {
-            _formKey.currentState.save();
-            widget.addPatient();
-          },
-        ),
+        Provider.of<Patients>(context, listen: true).isAddingPatient == false
+            ? new RaisedButton(
+                color: Theme.of(context).accentColor,
+                child: new Text(
+                  "Add Patient",
+                  style: Theme.of(context).textTheme.caption,
+                ),
+                onPressed: () {
+                  _formKey.currentState.save();
+                  widget.addPatient();
+                },
+              )
+            : CircularProgressIndicator(
+                backgroundColor: Colors.black,
+              ),
       ],
     );
   }

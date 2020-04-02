@@ -14,6 +14,7 @@ class Patients with ChangeNotifier {
   bool stateChanged = true;
   bool isUpdating = false;
   bool isFetching = false;
+  bool isAddingPatient = false;
 
   var patientsCollection = Firestore.instance.collection('patients');
 
@@ -67,7 +68,7 @@ class Patients with ChangeNotifier {
   }
 
   Future<bool> changePatientState(int newStateIndex) async {
-    selectedPatient.state = referenceCovid19SeverityLevelsList[newStateIndex];
+    selectedPatient.state = referenceCovid19SeverityLevelsList[newStateIndex+2];
     await updatePatientProfileInFirebase();
     notifyListeners();
     return true;
@@ -81,15 +82,18 @@ class Patients with ChangeNotifier {
   }
 
   Future<bool> addPatient(Patient patientToAdd) async {
+    isAddingPatient = true;
+    notifyListeners();
     var patientsCollection = Firestore.instance.collection('patients');
-    var patient_id = await patientsCollection.add(
-      patientToAdd.toMap(),
-    );
+    await patientsCollection.document(patientToAdd.id).setData(
+          patientToAdd.toMap(),
+        );
 
-    await patientsCollection
-        .document(patient_id.documentID)
-        .updateData({'id': patient_id.documentID});
-
+    // await patientsCollection
+    //     .document(patient_id.documentID)
+    //     .updateData({'id': patient_id.documentID});
+    isAddingPatient = false;
+    notifyListeners();
     return true;
   }
 
@@ -108,6 +112,20 @@ class Patients with ChangeNotifier {
     // updatingInFirebase = false;
     // finishedUpdatingFirebase = true;
     // notifyListeners();
+  }
+
+  onSearchTextChanged(String searchTerm) {
+    filteredPatientsList.clear();
+    notifyListeners();
+    print("Calling this, $searchTerm");
+    fetchedPatientsList.forEach((patient) {
+      if (patient.Firstname.contains(searchTerm) ||
+          patient.LastName.contains(searchTerm)) {
+        filteredPatientsList.add(patient);
+        print(patient.Firstname);
+      }
+    });
+    notifyListeners();
   }
 
   List<Patient> filteredPatientsList = [
