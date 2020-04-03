@@ -1,8 +1,9 @@
-import 'dart:convert';
+import 'package:random_string/random_string.dart';
 
 import '../models/patient.dart';
 import '../models/c19data.dart';
 import '../models/address.dart';
+import '../models/event.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -43,6 +44,11 @@ class Patients with ChangeNotifier {
         ventilatorUsed: patient['ventilatorUsed'],
         id: patient['id'],
         hospitalID: patient['hospitalID'],
+        events: patient['events'] == null
+            ? []
+            : patient['events'].map<event>((eventToBeAdded) {
+                return event.fromMap(eventToBeAdded);
+              }).toList(),
       ));
     });
     isFetching = false;
@@ -53,29 +59,108 @@ class Patients with ChangeNotifier {
     print("Test");
   }
 
+  mapifyList(List input) {
+    List<Map> newList = [];
+
+    input.forEach((item) {
+      newList.add(item.toMap());
+    });
+
+    return newList.toList();
+  }
+
   selectPatient(String patientID) {
     selectedPatient =
         fetchedPatientsList.firstWhere((patient) => patient.id == patientID);
     notifyListeners();
   }
 
+  getCovidvsNonCovidforDashboard(){
+
+    var covidCount = fetchedPatientsList
+        .where((element) => !element.state.abbrv.contains("NP"))
+        .length;
+
+    var nonCovidCount = fetchedPatientsList
+        .where((element) => element.state.abbrv.contains("NP"))
+        .length;
+
+    return([covidCount,nonCovidCount]);
+  }
+
+
+  getCovid19SummaryForTheDashboard() {
+    List covid19Summary;
+    var AS1patientcount = fetchedPatientsList
+        .where((element) => element.state.abbrv == "AS-1")
+        .length;
+    var AS2patientcount = fetchedPatientsList
+        .where((element) => element.state.abbrv == "AS-2")
+        .length;
+    var S1patientcount = fetchedPatientsList
+        .where((element) => element.state.abbrv == "S-1")
+        .length;
+    var S2patientcount = fetchedPatientsList
+        .where((element) => element.state.abbrv == "S-2")
+        .length;
+    var S3patientcount = fetchedPatientsList
+        .where((element) => element.state.abbrv == "S-3")
+        .length;
+    var S4patientcount = fetchedPatientsList
+        .where((element) => element.state.abbrv == "S-4")
+        .length;
+    var S5patientcount = fetchedPatientsList
+        .where((element) => element.state.abbrv == "S-5")
+        .length;
+    var S6patientcount = fetchedPatientsList
+        .where((element) => element.state.abbrv == "S-6")
+        .length;
+
+    return ([
+      AS1patientcount,
+      AS2patientcount,
+      S1patientcount,
+      S2patientcount,
+      S3patientcount,
+      S4patientcount,
+      S5patientcount,
+      S6patientcount
+    ]);
+  }
+
   Future<bool> movePatient(int newLocation) async {
+    var oldLocation = selectedPatient.currentLocation;
     selectedPatient.currentLocation = newLocation;
+    await addEvent(
+        eventType: "hospital_movement",
+        eventTime: DateTime.now(),
+        eventData: "${oldLocation}->${newLocation}");
+    notifyListeners();
     await updatePatientProfileInFirebase();
 
-    notifyListeners();
     return true;
   }
 
   Future<bool> changePatientState(int newStateIndex) async {
-    selectedPatient.state = referenceCovid19SeverityLevelsList[newStateIndex+2];
+    c19 oldState = selectedPatient.state;
+    selectedPatient.state =
+        referenceCovid19SeverityLevelsList[newStateIndex + 2];
+    await addEvent(
+        eventType: "covid19_severity_change",
+        eventTime: DateTime.now(),
+        eventData: "${oldState.abbrv}->${selectedPatient.state.abbrv}");
     await updatePatientProfileInFirebase();
+
     notifyListeners();
     return true;
   }
 
   Future<bool> toggleVentilatorAssignment(bool newValue) async {
     selectedPatient.ventilatorUsed = newValue;
+    await addEvent(
+        eventType: "ventilator",
+        eventTime: DateTime.now(),
+        eventData: newValue.toString());
     await updatePatientProfileInFirebase();
     notifyListeners();
     return true;
@@ -85,15 +170,43 @@ class Patients with ChangeNotifier {
     isAddingPatient = true;
     notifyListeners();
     var patientsCollection = Firestore.instance.collection('patients');
+    event newEvent = event(
+        eventType: "hospital_admission",
+        eventData: patientToAdd.hospitalID,
+        eventDateTime: DateTime.now(),
+        eventID: randomAlphaNumeric(20));
+    patientToAdd.events.add(newEvent);
     await patientsCollection.document(patientToAdd.id).setData(
           patientToAdd.toMap(),
         );
-
-    // await patientsCollection
-    //     .document(patient_id.documentID)
-    //     .updateData({'id': patient_id.documentID});
     isAddingPatient = false;
     notifyListeners();
+    return true;
+  }
+
+  Future<bool> addEvent(
+      {String patientID,
+      String eventType,
+      DateTime eventTime,
+      String eventData}) async {
+    event newEvent = event(
+        eventType: eventType,
+        eventData: eventData,
+        eventDateTime: eventTime,
+        eventID: randomAlphaNumeric(20));
+    selectedPatient.events.add(newEvent);
+    notifyListeners();
+/*
+    if (eventType == "hospital_registration") {
+      await patientsCollection.document(patientID).updateData({
+        'events': FieldValue.arrayUnion([newEvent.toMap()])
+      });
+    } else {
+      await patientsCollection.document(selectedPatient.id).updateData({
+        'events': FieldValue.arrayUnion([newEvent.toMap()])
+      });
+    }*/
+
     return true;
   }
 

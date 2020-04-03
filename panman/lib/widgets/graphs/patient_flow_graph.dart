@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:provider/provider.dart';
+
+import '../../providers/hospital.dart';
+import '../../models/hospital.dart';
+
+
 
 class locationInHospitalCount {
   final String locationInHospitalName;
@@ -8,24 +14,24 @@ class locationInHospitalCount {
 }
 
 class returnPatientFlowGraph extends StatelessWidget {
-  graphMeUp() {
+  graphMeUp(BuildContext context) {
     List<charts.Series<locationInHospitalCount, String>> actualSeries = [];
-
+    
     @override
     final dummy_count_data = [
-      new locationInHospitalCount("Reg.", 200),
-      new locationInHospitalCount("Screening", 20),
-      new locationInHospitalCount("Holding", 30),
-      new locationInHospitalCount("Isolation", 100),
-      new locationInHospitalCount("ICU", 15),
+      new locationInHospitalCount("Reg.", Provider.of<Hospitals>(context,listen:false).fetchedHospital.locations[1].count),
+      new locationInHospitalCount("Screening", Provider.of<Hospitals>(context,listen:false).fetchedHospital.locations[2].count),
+      new locationInHospitalCount("Holding", Provider.of<Hospitals>(context,listen:false).fetchedHospital.locations[3].count),
+      new locationInHospitalCount("Isolation", Provider.of<Hospitals>(context,listen:false).fetchedHospital.locations[4].count),
+      new locationInHospitalCount("ICU", Provider.of<Hospitals>(context,listen:false).fetchedHospital.locations[5].count),
     ];
 
     final dummy_capacity_lines_data = [
-      new locationInHospitalCount("Reg.", 160),
-      new locationInHospitalCount("Screening", 15),
-      new locationInHospitalCount("Holding", 50),
-      new locationInHospitalCount("Isolation", 80),
-      new locationInHospitalCount("ICU", 10),
+      new locationInHospitalCount("Reg.", Provider.of<Hospitals>(context,listen:false).fetchedHospital.locations[1].capacity),
+      new locationInHospitalCount("Screening", Provider.of<Hospitals>(context,listen:false).fetchedHospital.locations[2].capacity),
+      new locationInHospitalCount("Holding", Provider.of<Hospitals>(context,listen:false).fetchedHospital.locations[3].capacity),
+      new locationInHospitalCount("Isolation", Provider.of<Hospitals>(context,listen:false).fetchedHospital.locations[4].capacity),
+      new locationInHospitalCount("ICU", Provider.of<Hospitals>(context,listen:false).fetchedHospital.locations[5].capacity),
     ];
 
     actualSeries.add(new charts.Series<locationInHospitalCount, String>(
@@ -94,7 +100,7 @@ class returnPatientFlowGraph extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.white,
-      child: graphMeUp(),
+      child: graphMeUp(context),
     );
   }
 }

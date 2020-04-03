@@ -96,6 +96,8 @@ class Hospitals with ChangeNotifier {
     notifyListeners();
   }
 
+  
+
   Future changeLocationInHospitalCount(
       String locationToBeIncremented, String locationToBeDecremented) async {
     var oldLocation = fetchedHospital.locations

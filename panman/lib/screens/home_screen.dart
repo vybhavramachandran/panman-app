@@ -43,6 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
       address: "Chandra Layout",
       city: "Bangalore",
       state: "Karnataka",
+      country:"India",
       zipcode: "560060");
 
   Future fetchFuture;
@@ -119,7 +120,10 @@ class _HomeScreenState extends State<HomeScreen> {
         sex: patientSex,
         state: referenceCovid19SeverityLevelsList[0],
         ventilatorUsed: false,
+        events: [],
       ));
+
+      // await Provider.of<Patients>(context, listen: false).addPatientEvent();
       Navigator.pop(context);
       setState(() {
         triggerRefreshOfPatientList = true;

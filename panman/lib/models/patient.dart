@@ -1,13 +1,10 @@
 import './address.dart';
 import './c19data.dart';
+import './event.dart';
 import './locationInHospital.dart';
 
 enum Sex { Male, Female }
 
-class patient_event {
-  DateTime timestamp;
-  String event;
-}
 
 class Patient {
   final String id;
@@ -19,8 +16,8 @@ class Patient {
   final String hospitalID;
   c19 state;
   int currentLocation;
-  List<patient_event> events;
   bool ventilatorUsed;
+  List<event> events;
 
   Patient({
     this.id,
@@ -33,7 +30,19 @@ class Patient {
     this.state,
     this.currentLocation,
     this.ventilatorUsed,
+    this.events,
   });
+
+   mapifyList(List input) {
+    List<Map> newList = [];
+
+    input.forEach((item) {
+      newList.add(item.toMap());
+    });
+
+    return newList.toList();
+  }
+
 
   Map<String, dynamic> toMap() {
     return {
@@ -47,6 +56,7 @@ class Patient {
       'fullAddress': fullAddress!=null?fullAddress.toMap():"",
       'firstName': Firstname,
       'lastName': LastName,
+      'events': mapifyList(events),
     };
   }
 }

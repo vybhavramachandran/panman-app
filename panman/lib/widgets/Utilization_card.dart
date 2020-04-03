@@ -1,5 +1,6 @@
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
+import 'package:panman/models/equipment.dart';
 
 import 'package:provider/provider.dart';
 
@@ -19,6 +20,13 @@ class UtilizationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     PageController pageController = PageController();
+
+    String fetchCardName(String id) {
+      var fetchedElement = Provider.of<Hospitals>(context, listen: false)
+          .referenceMedicalSupplyList
+          .singleWhere((element) => element.id == id);
+      return fetchedElement.name;
+    }
 
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -44,76 +52,37 @@ class UtilizationCard extends StatelessWidget {
                       Container(
                         //    padding: EdgeInsets.all(5),
                         // color: Colors.pink,
-                        child: Column(
-                          children: <Widget>[
-                            Flexible(
-                              flex: 2,
-                              child: Container(
-                                color: Colors.white,
-                                child: Row(
-                                  children: <Widget>[
-                                    Flexible(
-                                        flex: 2,
-                                        child: medicalSuplyGraphWidget(
-                                          medicalSupplyName: "Face Mask",
-                                          quantityLeft: 500,
-                                          willLastForInDays: 10,
-                                        )),
-                                    Flexible(
-                                        flex: 2,
-                                        child: medicalSuplyGraphWidget(
-                                          medicalSupplyName: "N95 Mask",
-                                          quantityLeft: 200,
-                                          willLastForInDays: 5,
-                                        )),
-                                    Flexible(
-                                        flex: 2,
-                                        child: medicalSuplyGraphWidget(
-                                          medicalSupplyName: "Goggles",
-                                          quantityLeft: 50,
-                                          willLastForInDays: 10,
-                                        )),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Flexible(
-                              flex: 2,
-                              child: Container(
-                                color: Colors.white,
-                                child: Row(
-                                  children: <Widget>[
-                                    Flexible(
-                                        flex: 2,
-                                       child: medicalSuplyGraphWidget(
-                                         medicalSupplyName: "Apron",
-                                         quantityLeft: 10,
-                                         willLastForInDays: 2,
-                                       )),
-                                    Flexible(
-                                        flex: 2,
-                                        child: medicalSuplyGraphWidget(
-                                          medicalSupplyName: "Head Cover",
-                                          quantityLeft: 600,
-                                          willLastForInDays: 20,
-                                        )),
-                                    Flexible(
-                                        flex: 2,
-                                        child: medicalSuplyGraphWidget(
-                                          medicalSupplyName: "Shoe Cover",
-                                          quantityLeft: 400,
-                                          willLastForInDays: 30,
-                                        )),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
+                        child: GridView.count(
+                          crossAxisCount: 3,
+                          children:
+                              Provider.of<Hospitals>(context, listen: false)
+                                  .fetchedHospital
+                                  .medicalSupplies
+                                  .map((item) {
+                            return Flexible(
+                                flex: 2,
+                                child: medicalSuplyGraphWidget(
+                                  medicalSupplyName: fetchCardName(item.id),
+                                  quantityLeft: item.qty,
+                                  willLastForInDays: 10,
+                                ));
+                          }).toList(),
                         ),
                       ),
-                      Container(
-                        color: Colors.cyan,
-                      ),
+                      Expanded(
+                        child: Container(
+                          color: Colors.cyan,
+                          child: medicalSuplyGraphWidget(
+                            medicalSupplyName: "Ventilators",
+                            quantityLeft:
+                                Provider.of<Hospitals>(context, listen: false)
+                                    .fetchedHospital
+                                    .equipments[0]
+                                    .qty,
+                            willLastForInDays: 10,
+                          ),
+                        ),
+                      )
                     ],
                   ),
                   // Align(

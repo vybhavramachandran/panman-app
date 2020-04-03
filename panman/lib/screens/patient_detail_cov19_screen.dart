@@ -27,7 +27,6 @@ class _PatientDetailCov19ScreenState extends State<PatientDetailCov19Screen> {
   radioOnTapped(int value) {
     setState(() {
       showConfirmButton = true;
-
       selectedRadio = value;
     });
   }
@@ -51,7 +50,10 @@ class _PatientDetailCov19ScreenState extends State<PatientDetailCov19Screen> {
                 width: 15,
                 color: cardColor,
               ),
-              Flexible(
+             Expanded(child: Container(
+               child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                 children: <Widget>[
+                  Flexible(
                 flex: 1,
                 child: Radio(
                   value: optionNo,
@@ -83,22 +85,30 @@ class _PatientDetailCov19ScreenState extends State<PatientDetailCov19Screen> {
                   size: 15,
                 ),
               ),
+               ],),
+             ),)
             ],
           ),
         ));
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     // PatientDetailArguments args = ModalRoute.of(context).settings.arguments;
     if (setOnce == false) {
-      this.selectedRadio = Provider.of<Patients>(context, listen: true)
+      if (Provider.of<Patients>(context, listen: true)
               .selectedPatient
               .state
-              .index +
-          1;
+              .index <=
+          1) {
+        this.selectedRadio = 0;
+      } else {
+        this.selectedRadio = Provider.of<Patients>(context, listen: true)
+                .selectedPatient
+                .state
+                .index -
+            1;
+      }
       setOnce = true;
     }
     // setState(() {
@@ -191,6 +201,11 @@ class _PatientDetailCov19ScreenState extends State<PatientDetailCov19Screen> {
                           "Symptomatic. Severe Pneumonia. With respiratory failure / MODS",
                       cardColor: Colors.red,
                       optionNo: 7),
+                  c19card(
+                      abbrv: "S-6",
+                      fullText: "Deceased",
+                      cardColor: Colors.black,
+                      optionNo: 8),
                 ],
               ),
               showConfirmButton == true
@@ -204,14 +219,16 @@ class _PatientDetailCov19ScreenState extends State<PatientDetailCov19Screen> {
                           color: Theme.of(context).accentColor,
                           child: Provider.of<Patients>(context, listen: true)
                                   .isUpdating
-                              ? CircularProgressIndicator(backgroundColor: Colors.white30,)
+                              ? CircularProgressIndicator(
+                                  backgroundColor: Colors.white30,
+                                )
                               : Text(
                                   "CHANGE STATE",
                                   style: Theme.of(context).textTheme.caption,
                                 ),
                           onPressed: () {
                             if (Provider.of<Patients>(context, listen: false)
-                                    .changePatientState(selectedRadio-1) ==
+                                    .changePatientState(selectedRadio - 1) ==
                                 true) {
                               setState(() {
                                 showConfirmButton = false;

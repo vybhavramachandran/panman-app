@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:provider/provider.dart';
+
+import '../../providers/patients.dart';
 
 class covidvsnoncovid {
   final String testResult;
@@ -8,13 +11,13 @@ class covidvsnoncovid {
 }
 
 class returncovidvsnoncovidgraph extends StatelessWidget {
-  graphMeUp() {
+  graphMeUp(BuildContext context) {
     List<charts.Series<covidvsnoncovid, String>> actualSeries = [];
-
+    List results = Provider.of<Patients>(context,listen:false).getCovidvsNonCovidforDashboard();
     @override
     final dummy_count_data = [
-      new covidvsnoncovid("Negative", 200),
-      new covidvsnoncovid("Positive", 20),
+      new covidvsnoncovid("Negative", results[1]),
+      new covidvsnoncovid("Positive", results[0]),
     ];
 
     actualSeries.add(new charts.Series<covidvsnoncovid, String>(
@@ -45,9 +48,10 @@ class returncovidvsnoncovidgraph extends StatelessWidget {
   }
 
   Widget build(BuildContext context) {
+
     return Container(
       color: Colors.white,
-      child: graphMeUp(),
+      child: graphMeUp(context),
     );
   }
 }

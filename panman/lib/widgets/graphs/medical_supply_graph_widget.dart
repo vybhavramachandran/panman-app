@@ -75,10 +75,10 @@ class medicalSuplyGraphWidget extends StatelessWidget {
                 this.quantityLeft.toString(),
                 style: TextStyle(fontSize: 30, fontWeight: FontWeight.w800,color: willLastForInDays>5?Colors.black:Colors.red),
               )),
-            Center(child:Text(
-                "$willLastForInDays Days supply left",
-                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w400),
-              )),
+            // Center(child:Text(
+            //     "$willLastForInDays Days supply left",
+            //     style: TextStyle(fontSize: 10, fontWeight: FontWeight.w400),
+            //   )),
             
           ],
         ),
