@@ -31,11 +31,11 @@ class PatientDetailedHeader extends StatelessWidget {
     String fullname = newPatient.Firstname + " " + newPatient.LastName;
 
     return Padding(
-      padding: const EdgeInsets.only(top: 60, bottom: 0, left: 20),
+      padding: const EdgeInsets.only(top: 60, bottom: 0, left: 20,right:20),
       child: Container(
         height: 80,
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,6 +46,13 @@ class PatientDetailedHeader extends StatelessWidget {
                   style: Theme.of(context)
                       .textTheme
                       .bodyText1
+                      .copyWith(color: Colors.white),
+                ),
+                 Text(
+                  "ID : ${newPatient.idGivenByHospital}",
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyText2
                       .copyWith(color: Colors.white),
                 ),
                 Row(

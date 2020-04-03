@@ -44,6 +44,13 @@ class PatientSummaryWidget extends StatelessWidget {
                       fullname,
                       style: Theme.of(context).textTheme.bodyText1,
                     ),
+                     Text(
+                  "ID : ${patient.idGivenByHospital}",
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyText2
+                      .copyWith(color: Colors.black),
+                ),
                     Row(
                       children: <Widget>[
                         Row(

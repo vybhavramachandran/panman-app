@@ -180,6 +180,8 @@ class _HomeScreenState extends State<HomeScreen> {
         events: [],
       ));
 
+      await Provider.of<Hospitals>(context,listen:false).addPatientToTheHospital();
+
       // await Provider.of<Patients>(context, listen: false).addPatientEvent();
       Navigator.pop(context);
      
@@ -228,7 +230,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             // ...
                             // Then close the drawer
                             Navigator.pop(context);
-                            return Navigator.pushNamed(
+                            return Navigator.popAndPushNamed(
                               context,
                               DashboardScreen.routeName,
                             );
@@ -241,7 +243,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             // ...
                             // Then close the drawer
                             Navigator.pop(context);
-                            return Navigator.pushNamed(
+                            return Navigator.popAndPushNamed(
                               context,
                               HomeScreen.routeName,
                             );

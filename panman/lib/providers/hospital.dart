@@ -35,6 +35,8 @@ class Hospitals with ChangeNotifier {
   bool isUpdating = false;
 
   Future getReferenceMedicalSupplyList() async {
+    referenceMedicalSupplyList.clear();
+    referenceHospitalLocationList.clear();
     var medicalSupplyCollection =
         Firestore.instance.collection('medicalSupplyDetails');
 
@@ -96,7 +98,13 @@ class Hospitals with ChangeNotifier {
     notifyListeners();
   }
 
-  
+  Future addPatientToTheHospital() async {
+    var location =
+        fetchedHospital.locations.indexWhere((element) => element.id == "1");
+
+    fetchedHospital.locations[location].count = fetchedHospital.locations[location].count + 1;
+    await updateHospital();
+  }
 
   Future changeLocationInHospitalCount(
       String locationToBeIncremented, String locationToBeDecremented) async {
@@ -105,11 +113,11 @@ class Hospitals with ChangeNotifier {
     var newLocation = fetchedHospital.locations
         .indexWhere((element) => element.id == locationToBeIncremented);
 
-    if(fetchedHospital.locations[oldLocation].count>0){
-fetchedHospital.locations[oldLocation].count =
-        fetchedHospital.locations[oldLocation].count - 1;
+    if (fetchedHospital.locations[oldLocation].count > 0) {
+      fetchedHospital.locations[oldLocation].count =
+          fetchedHospital.locations[oldLocation].count - 1;
     }
-    
+
     fetchedHospital.locations[newLocation].count =
         fetchedHospital.locations[newLocation].count + 1;
 
