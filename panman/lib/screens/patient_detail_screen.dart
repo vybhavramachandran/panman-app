@@ -77,11 +77,11 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
         crossAxisSpacing: 10,
         crossAxisCount: 2,
         children: <Widget>[
-          patientPageCard(
-            iconToDisplay: "assets/images/monitor.png",
-            titleOfCard: "PATIENT VITALS",
-            //  patient: selectedPatient,
-          ),
+          // patientPageCard(
+          //   iconToDisplay: "assets/images/monitor.png",
+          //   titleOfCard: "PATIENT VITALS",
+          //   //  patient: selectedPatient,
+          // ),
           patientPageCard(
             iconToDisplay: "assets/images/virus.png",
             titleOfCard: "PATIENT COVID CATEGORY",

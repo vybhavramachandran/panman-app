@@ -41,6 +41,12 @@ class _HomePagePatientsWidgetState extends State<HomePagePatientsWidget> {
 
   @override
   void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (Provider.of<Patients>(context, listen: true).shouldRefreshList ==
+        true) {
+      refreshListOfPatients(context);
+    }
+    // refreshListOfPatients(context);
     // if (shouldSkip == true) {
     //   shouldSkip = false;
     // } else {

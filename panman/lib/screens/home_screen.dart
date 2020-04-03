@@ -30,6 +30,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
   String firstName;
   String lastName;
   int age;
@@ -38,14 +39,15 @@ class _HomeScreenState extends State<HomeScreen> {
   String newPatientID;
   bool isAdding = false;
   bool triggerRefreshOfPatientList = false;
+  String patientPhoneNumber;
+  String streetAddress;
+  String zipcode;
+  String city;
+  String state;
+  String country;
+  String hospitalGivenID;
 
-  FullAddress patientAddress = FullAddress(
-      address: "Chandra Layout",
-      city: "Bangalore",
-      state: "Karnataka",
-      country:"India",
-      zipcode: "560060");
-
+  FullAddress patientAddress;
   Future fetchFuture;
   bool _isLoading = false;
 
@@ -57,6 +59,11 @@ class _HomeScreenState extends State<HomeScreen> {
         .getReferenceHospitalLocationList();
     fetchFuture = fetchDoctorAndHospitalDetails();
     super.initState();
+  }
+
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    print("didChangeDependencies called");
   }
 
   Future fetchDoctorAndHospitalDetails() async {
@@ -98,15 +105,64 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void patientListRefreshed(){
-    setState(){
+  void enterPhoneNumber(String phoneNumber) {
+    setState(() {
+      patientPhoneNumber = phoneNumber;
+    });
+  }
+
+  void enterAddress(String newAddress) {
+    setState(() {
+      streetAddress = newAddress;
+    });
+  }
+
+  void enterCity(String newcity) {
+    setState(() {
+      city = newcity;
+    });
+  }
+
+  void enterZipCode(String newZipCode) {
+    setState(() {
+      zipcode = newZipCode;
+    });
+  }
+
+  void enterHospitalGivenID(String id) {
+    setState(() {
+      hospitalGivenID = id;
+    });
+  }
+
+  void enterState(String newState) {
+    setState(() {
+      state = newState;
+    });
+  }
+
+  void enterCountry(String newCountry) {
+    setState(() {
+      country = newCountry;
+    });
+  }
+
+  void patientListRefreshed() {
+    setState(() {
       triggerRefreshOfPatientList = false;
-    }
+    });
   }
 
   void AddPatient() async {
-  
-    print("$firstName, $lastName, ${patientSex.toString()}, ${age.toString()}");
+    print("$streetAddress, $city");
+
+    patientAddress = FullAddress(
+      address: streetAddress,
+      city: city,
+      state: state,
+      zipcode: zipcode,
+      country: country,
+    );
     try {
       await Provider.of<Patients>(context, listen: false).addPatient(Patient(
         Firstname: firstName,
@@ -114,6 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
         age: age,
         fullAddress: patientAddress,
         id: newPatientID,
+        idGivenByHospital: hospitalGivenID,
         currentLocation: 1,
         hospitalID:
             Provider.of<Hospitals>(context, listen: false).fetchedHospital.id,
@@ -125,9 +182,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
       // await Provider.of<Patients>(context, listen: false).addPatientEvent();
       Navigator.pop(context);
-      setState(() {
-        triggerRefreshOfPatientList = true;
-      });
+     
+
     } catch (error) {}
   }
 
@@ -216,21 +272,31 @@ class _HomeScreenState extends State<HomeScreen> {
                 floatingActionButton: FloatingActionButton(
                   backgroundColor: Theme.of(context).accentColor,
                   child: Icon(Icons.add),
-                  onPressed: () {
+                  onPressed: () async {
                     setState(() {
                       newPatientID = randomAlphaNumeric(10);
                     });
                     //  _showDialog();
-                    showDialog(
+                    await showDialog(
                         context: context,
                         child: new MyDialog(
                           patientID: newPatientID,
+                          addHospitalGivenID: enterHospitalGivenID,
                           ageChanged: enterAge,
                           firstNameChanged: enterFirstName,
                           lastNameChanged: enterLastName,
                           sexChanged: enterSex,
+                          addressChanged: enterAddress,
+                          zipCodeChanged: enterZipCode,
+                          cityChanged: enterCity,
+                          stateChanged: enterState,
+                          countryChanged: enterCountry,
+                          phoneNumberChanged: enterPhoneNumber,
                           addPatient: AddPatient,
-                        ));
+                        )).then((value) {
+                      print("Popped with $value");
+                      return setState(() {});
+                    });
                   },
                 ),
                 appBar: AppBar(
@@ -281,9 +347,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 body: TabBarView(
                   children: <Widget>[
                     HomePagePatientsWidget(
-                        triggerRefreshOfPatientList:
-                            triggerRefreshOfPatientList,
-                        ),
+                      triggerRefreshOfPatientList: triggerRefreshOfPatientList,
+                    ),
                     HomePageInvetoryWidget(),
                   ],
                 ),
@@ -304,6 +369,13 @@ class MyDialog extends StatefulWidget {
   Function ageChanged;
   Function sexChanged;
   Function addPatient;
+  Function addHospitalGivenID;
+  Function addressChanged;
+  Function zipCodeChanged;
+  Function cityChanged;
+  Function stateChanged;
+  Function countryChanged;
+  Function phoneNumberChanged;
 
   MyDialog({
     this.patientID,
@@ -312,6 +384,13 @@ class MyDialog extends StatefulWidget {
     this.ageChanged,
     this.sexChanged,
     this.addPatient,
+    this.addHospitalGivenID,
+    this.addressChanged,
+    this.zipCodeChanged,
+    this.cityChanged,
+    this.stateChanged,
+    this.countryChanged,
+    this.phoneNumberChanged,
   });
 
   @override
@@ -346,152 +425,380 @@ class MyDialogState extends State<MyDialog> {
         ),
       ),
       content: Container(
-        width: MediaQuery.of(context).size.width - 100,
-        height: 300,
-        child: Container(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Container(
-                    child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Text(
-                      "PatientID",
-                      style: Theme.of(context)
-                          .textTheme
-                          .headline6
-                          .copyWith(color: Colors.black),
-                    ),
-                    Container(
-                      width: 150,
-                      child: Text(
-                        widget.patientID,
+        width: MediaQuery.of(context).size.width - 50,
+        height: MediaQuery.of(context).size.height - 100,
+        child: SingleChildScrollView(
+          child: Container(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Container(
+                      child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                        "PatientID",
                         style: Theme.of(context)
                             .textTheme
                             .headline6
-                            .copyWith(color: Colors.red),
+                            .copyWith(color: Colors.black),
                       ),
-                    ),
-                  ],
-                )),
-                Container(
-                    child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Text(
-                      "FirstName",
-                      style: Theme.of(context)
-                          .textTheme
-                          .headline6
-                          .copyWith(color: Colors.black),
-                    ),
-                    Container(
-                      width: 150,
-                      child: TextFormField(
-                        style: Theme.of(context).textTheme.bodyText1,
-                        onSaved: (String value) {
-                          widget.firstNameChanged(value);
-                        },
+                      Container(
+                        width: 150,
+                        child: Text(
+                          widget.patientID,
+                          style: Theme.of(context)
+                              .textTheme
+                              .headline6
+                              .copyWith(color: Colors.red),
+                        ),
                       ),
-                    ),
-                  ],
-                )),
-                Container(
-                    child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Text(
-                      "LastName",
-                      style: Theme.of(context)
-                          .textTheme
-                          .headline6
-                          .copyWith(color: Colors.black),
-                    ),
-                    Container(
-                      width: 150,
-                      child: TextFormField(
-                        style: Theme.of(context).textTheme.bodyText1,
-                        onSaved: (String value) {
-                          widget.lastNameChanged(value);
-                        },
+                    ],
+                  )),
+                  Container(
+                      child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      SizedBox(
+                        width: 100.0,
+                        child: Text(
+                          "Hospital provided ID",
+                          style: Theme.of(context)
+                              .textTheme
+                              .headline6
+                              .copyWith(color: Colors.black),
+                        ),
                       ),
-                    ),
-                  ],
-                )),
-                Container(
-                    child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Text(
-                      "Age",
-                      style: Theme.of(context)
-                          .textTheme
-                          .headline6
-                          .copyWith(color: Colors.black),
-                    ),
-                    Container(
-                      width: 150,
-                      child: TextFormField(
-                        keyboardType: TextInputType.number,
-                        style: Theme.of(context).textTheme.bodyText1,
-                        onSaved: (value) {
-                          widget.ageChanged(int.parse(value));
-                        },
+                      Container(
+                        width: 150,
+                        child: TextFormField(
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Please enter some text';
+                            }
+                            return null;
+                          },
+                          style: Theme.of(context).textTheme.bodyText1,
+                          onSaved: (String value) {
+                            widget.addHospitalGivenID(value);
+                          },
+                        ),
                       ),
-                    ),
-                  ],
-                )),
-                Container(
-                    child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      "Sex",
-                      style: Theme.of(context)
-                          .textTheme
-                          .headline6
-                          .copyWith(color: Colors.black),
-                    ),
-                    SizedBox(
-                      width: 20,
-                    ),
-                    Container(
-                        width: 230,
-                        child: Row(
-                          children: <Widget>[
-                            Radio(
-                              value: 0,
-                              groupValue: radioButtonChosen,
-                              onChanged: (value) {
-                                setState(() {
-                                  radioButtonChosen = value;
-                                  widget.sexChanged(Sex.Male);
-                                });
-                              },
-                            ),
-                            Text("Male"),
-                            SizedBox(
-                              width: 20,
-                            ),
-                            Radio(
-                              value: 1,
-                              groupValue: radioButtonChosen,
-                              onChanged: (value) {
-                                setState(() {
-                                  radioButtonChosen = value;
-                                  widget.sexChanged(Sex.Female);
-                                });
-                              },
-                            ),
-                            Text("Female"),
-                          ],
-                        )),
-                  ],
-                )),
-              ],
+                    ],
+                  )),
+                  Container(
+                      child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                        "FirstName",
+                        style: Theme.of(context)
+                            .textTheme
+                            .headline6
+                            .copyWith(color: Colors.black),
+                      ),
+                      Container(
+                        width: 150,
+                        child: TextFormField(
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Please enter some text';
+                            }
+                            return null;
+                          },
+                          style: Theme.of(context).textTheme.bodyText1,
+                          onSaved: (String value) {
+                            widget.firstNameChanged(value);
+                          },
+                        ),
+                      ),
+                    ],
+                  )),
+                  Container(
+                      child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                        "LastName",
+                        style: Theme.of(context)
+                            .textTheme
+                            .headline6
+                            .copyWith(color: Colors.black),
+                      ),
+                      Container(
+                        width: 150,
+                        child: TextFormField(
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Please enter some text';
+                            }
+                            return null;
+                          },
+                          style: Theme.of(context).textTheme.bodyText1,
+                          onSaved: (String value) {
+                            widget.lastNameChanged(value);
+                          },
+                        ),
+                      ),
+                    ],
+                  )),
+                  Container(
+                      child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                        "Age",
+                        style: Theme.of(context)
+                            .textTheme
+                            .headline6
+                            .copyWith(color: Colors.black),
+                      ),
+                      Container(
+                        width: 150,
+                        child: TextFormField(
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Please enter some text';
+                            }
+                            return null;
+                          },
+                          keyboardType: TextInputType.number,
+                          style: Theme.of(context).textTheme.bodyText1,
+                          onSaved: (value) {
+                            widget.ageChanged(int.parse(value));
+                          },
+                        ),
+                      ),
+                    ],
+                  )),
+                  Container(
+                      child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      SizedBox(
+                        width: 100.0,
+                        child: Text(
+                          "Phone Number",
+                          style: Theme.of(context)
+                              .textTheme
+                              .headline6
+                              .copyWith(color: Colors.black),
+                        ),
+                      ),
+                      Container(
+                        width: 150,
+                        child: TextFormField(
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Please enter some text';
+                            }
+                            return null;
+                          },
+                          keyboardType: TextInputType.number,
+                          style: Theme.of(context).textTheme.bodyText1,
+                          onSaved: (value) {
+                            widget.phoneNumberChanged(value);
+                          },
+                        ),
+                      ),
+                    ],
+                  )),
+                  Container(
+                      child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        "Sex",
+                        style: Theme.of(context)
+                            .textTheme
+                            .headline6
+                            .copyWith(color: Colors.black),
+                      ),
+                      SizedBox(
+                        width: 20,
+                      ),
+                      Container(
+                          width: 230,
+                          child: Row(
+                            children: <Widget>[
+                              Radio(
+                                value: 0,
+                                groupValue: radioButtonChosen,
+                                onChanged: (value) {
+                                  setState(() {
+                                    radioButtonChosen = value;
+                                    widget.sexChanged(Sex.Male);
+                                  });
+                                },
+                              ),
+                              Text("Male"),
+                              SizedBox(
+                                width: 20,
+                              ),
+                              Radio(
+                                value: 1,
+                                groupValue: radioButtonChosen,
+                                onChanged: (value) {
+                                  setState(() {
+                                    radioButtonChosen = value;
+                                    widget.sexChanged(Sex.Female);
+                                  });
+                                },
+                              ),
+                              Text("Female"),
+                            ],
+                          )),
+                    ],
+                  )),
+                  Container(
+                      child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                        "Street Address",
+                        style: Theme.of(context)
+                            .textTheme
+                            .headline6
+                            .copyWith(color: Colors.black),
+                      ),
+                      Container(
+                        width: 150,
+                        child: TextFormField(
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Please enter some text';
+                            }
+                            return null;
+                          },
+                          //        keyboardType: TextInputType.number,
+                          style: Theme.of(context).textTheme.bodyText1,
+                          onSaved: (value) {
+                            widget.addressChanged(value);
+                          },
+                        ),
+                      ),
+                    ],
+                  )),
+                  Container(
+                      child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                        "Zipcode",
+                        style: Theme.of(context)
+                            .textTheme
+                            .headline6
+                            .copyWith(color: Colors.black),
+                      ),
+                      Container(
+                        width: 150,
+                        child: TextFormField(
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Please enter some text';
+                            }
+                            return null;
+                          },
+                          keyboardType: TextInputType.number,
+                          style: Theme.of(context).textTheme.bodyText1,
+                          onSaved: (value) {
+                            widget.zipCodeChanged(value);
+                          },
+                        ),
+                      ),
+                    ],
+                  )),
+                  Container(
+                      child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                        "City",
+                        style: Theme.of(context)
+                            .textTheme
+                            .headline6
+                            .copyWith(color: Colors.black),
+                      ),
+                      Container(
+                        width: 150,
+                        child: TextFormField(
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Please enter some text';
+                            }
+                            return null;
+                          },
+                          //       keyboardType: TextInputType.number,
+                          style: Theme.of(context).textTheme.bodyText1,
+                          onSaved: (value) {
+                            widget.cityChanged(value);
+                          },
+                        ),
+                      ),
+                    ],
+                  )),
+                  Container(
+                      child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                        "State",
+                        style: Theme.of(context)
+                            .textTheme
+                            .headline6
+                            .copyWith(color: Colors.black),
+                      ),
+                      Container(
+                        width: 150,
+                        child: TextFormField(
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Please enter some text';
+                            }
+                            return null;
+                          },
+                          //    keyboardType: TextInputType.number,
+                          style: Theme.of(context).textTheme.bodyText1,
+                          onSaved: (value) {
+                            widget.stateChanged(value);
+                          },
+                        ),
+                      ),
+                    ],
+                  )),
+                  Container(
+                      child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                        "Country",
+                        style: Theme.of(context)
+                            .textTheme
+                            .headline6
+                            .copyWith(color: Colors.black),
+                      ),
+                      Container(
+                        width: 150,
+                        child: TextFormField(
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Please enter some text';
+                            }
+                            return null;
+                          },
+                          //      keyboardType: TextInputType.number,
+                          style: Theme.of(context).textTheme.bodyText1,
+                          onSaved: (value) {
+                            widget.countryChanged(value);
+                          },
+                        ),
+                      ),
+                    ],
+                  )),
+                ],
+              ),
             ),
           ),
         ),
@@ -505,7 +812,7 @@ class MyDialogState extends State<MyDialog> {
             style: Theme.of(context).textTheme.caption,
           ),
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.of(context).pop(true);
           },
         ),
         Provider.of<Patients>(context, listen: true).isAddingPatient == false
@@ -516,8 +823,10 @@ class MyDialogState extends State<MyDialog> {
                   style: Theme.of(context).textTheme.caption,
                 ),
                 onPressed: () {
-                  _formKey.currentState.save();
-                  widget.addPatient();
+                  if (_formKey.currentState.validate()) {
+                    _formKey.currentState.save();
+                    widget.addPatient();
+                  }
                 },
               )
             : CircularProgressIndicator(

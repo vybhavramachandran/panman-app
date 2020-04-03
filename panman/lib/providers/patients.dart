@@ -16,6 +16,7 @@ class Patients with ChangeNotifier {
   bool isUpdating = false;
   bool isFetching = false;
   bool isAddingPatient = false;
+  bool shouldRefreshList = false;
 
   var patientsCollection = Firestore.instance.collection('patients');
 
@@ -43,7 +44,9 @@ class Patients with ChangeNotifier {
         sex: patient['sex'] == "Male" ? Sex.Male : Sex.Female,
         ventilatorUsed: patient['ventilatorUsed'],
         id: patient['id'],
+        phoneNumber: patient['phoneNumber'],
         hospitalID: patient['hospitalID'],
+        idGivenByHospital: patient['idGivenByHospital'],
         events: patient['events'] == null
             ? []
             : patient['events'].map<event>((eventToBeAdded) {
@@ -52,6 +55,7 @@ class Patients with ChangeNotifier {
       ));
     });
     isFetching = false;
+    shouldRefreshList=false;
     notifyListeners();
   }
 
@@ -75,8 +79,7 @@ class Patients with ChangeNotifier {
     notifyListeners();
   }
 
-  getCovidvsNonCovidforDashboard(){
-
+  getCovidvsNonCovidforDashboard() {
     var covidCount = fetchedPatientsList
         .where((element) => !element.state.abbrv.contains("NP"))
         .length;
@@ -85,9 +88,8 @@ class Patients with ChangeNotifier {
         .where((element) => element.state.abbrv.contains("NP"))
         .length;
 
-    return([covidCount,nonCovidCount]);
+    return ([covidCount, nonCovidCount]);
   }
-
 
   getCovid19SummaryForTheDashboard() {
     List covid19Summary;
@@ -180,6 +182,7 @@ class Patients with ChangeNotifier {
           patientToAdd.toMap(),
         );
     isAddingPatient = false;
+    shouldRefreshList = true;
     notifyListeners();
     return true;
   }

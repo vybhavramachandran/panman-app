@@ -171,21 +171,21 @@ class _HomePageInvetoryWidgetState extends State<HomePageInvetoryWidget> {
       height: MediaQuery.of(context).size.height,
       child: Column(
         children: <Widget>[
-          Flexible(
-            flex: 1,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                // controller: editingController,
-                decoration: InputDecoration(
-                    labelText: "Search",
-                    hintText: "Search",
-                    prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(25.0)))),
-              ),
-            ),
-          ),
+          // Flexible(
+          //   flex: 1,
+          //   child: Padding(
+          //     padding: const EdgeInsets.all(8.0),
+          //     child: TextField(
+          //       // controller: editingController,
+          //       decoration: InputDecoration(
+          //           labelText: "Search",
+          //           hintText: "Search",
+          //           prefixIcon: Icon(Icons.search),
+          //           border: OutlineInputBorder(
+          //               borderRadius: BorderRadius.all(Radius.circular(25.0)))),
+          //     ),
+          //   ),
+          // ),
           Flexible(
             flex: 8,
             child: RefreshIndicator(

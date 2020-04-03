@@ -8,12 +8,14 @@ enum Sex { Male, Female }
 
 class Patient {
   final String id;
+  String idGivenByHospital;
   final String Firstname;
   final String LastName;
   final int age;
   final Sex sex;
   final FullAddress fullAddress;
   final String hospitalID;
+  String phoneNumber;
   c19 state;
   int currentLocation;
   bool ventilatorUsed;
@@ -26,7 +28,9 @@ class Patient {
     this.LastName,
     this.age,
     this.sex,
+    this.idGivenByHospital,
     this.fullAddress,
+    this.phoneNumber,
     this.state,
     this.currentLocation,
     this.ventilatorUsed,
@@ -47,6 +51,7 @@ class Patient {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'idGivenByHospital' : idGivenByHospital,
       'age': age,
       'sex': sex == Sex.Male ? "Male" : "Female",
       'ventilatorUsed': ventilatorUsed,

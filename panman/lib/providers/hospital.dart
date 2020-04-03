@@ -105,8 +105,11 @@ class Hospitals with ChangeNotifier {
     var newLocation = fetchedHospital.locations
         .indexWhere((element) => element.id == locationToBeIncremented);
 
-    fetchedHospital.locations[oldLocation].count =
+    if(fetchedHospital.locations[oldLocation].count>0){
+fetchedHospital.locations[oldLocation].count =
         fetchedHospital.locations[oldLocation].count - 1;
+    }
+    
     fetchedHospital.locations[newLocation].count =
         fetchedHospital.locations[newLocation].count + 1;
 
