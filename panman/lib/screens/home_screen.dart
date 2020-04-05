@@ -30,7 +30,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   String firstName;
   String lastName;
   int age;
@@ -57,6 +56,8 @@ class _HomeScreenState extends State<HomeScreen> {
         .getReferenceMedicalSupplyList();
     Provider.of<Hospitals>(context, listen: false)
         .getReferenceHospitalLocationList();
+    Provider.of<Covid19>(context, listen: false)
+        .getReferenceCovid19SevererityLevels();
     fetchFuture = fetchDoctorAndHospitalDetails();
     super.initState();
   }
@@ -180,12 +181,11 @@ class _HomeScreenState extends State<HomeScreen> {
         events: [],
       ));
 
-      await Provider.of<Hospitals>(context,listen:false).addPatientToTheHospital();
+      await Provider.of<Hospitals>(context, listen: false)
+          .addPatientToTheHospital();
 
       // await Provider.of<Patients>(context, listen: false).addPatientEvent();
       Navigator.pop(context);
-     
-
     } catch (error) {}
   }
 
@@ -441,11 +441,11 @@ class MyDialogState extends State<MyDialog> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       Text(
-                        "PatientID",
+                        "PanmanID",
                         style: Theme.of(context)
                             .textTheme
                             .headline6
-                            .copyWith(color: Colors.black),
+                            .copyWith(fontSize: 18, color: Colors.black),
                       ),
                       Container(
                         width: 150,
@@ -459,6 +459,9 @@ class MyDialogState extends State<MyDialog> {
                       ),
                     ],
                   )),
+                  SizedBox(
+                    height: 10,
+                  ),
                   Container(
                       child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -470,7 +473,7 @@ class MyDialogState extends State<MyDialog> {
                           style: Theme.of(context)
                               .textTheme
                               .headline6
-                              .copyWith(color: Colors.black),
+                              .copyWith(fontSize: 18, color: Colors.black),
                         ),
                       ),
                       Container(
@@ -483,6 +486,14 @@ class MyDialogState extends State<MyDialog> {
                             return null;
                           },
                           style: Theme.of(context).textTheme.bodyText1,
+                          decoration: InputDecoration(
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black),
+                            ),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black),
+                            ),
+                          ),
                           onSaved: (String value) {
                             widget.addHospitalGivenID(value);
                           },
@@ -499,7 +510,7 @@ class MyDialogState extends State<MyDialog> {
                         style: Theme.of(context)
                             .textTheme
                             .headline6
-                            .copyWith(color: Colors.black),
+                            .copyWith(fontSize: 18, color: Colors.black),
                       ),
                       Container(
                         width: 150,
@@ -511,6 +522,14 @@ class MyDialogState extends State<MyDialog> {
                             return null;
                           },
                           style: Theme.of(context).textTheme.bodyText1,
+                          decoration: InputDecoration(
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black),
+                            ),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black),
+                            ),
+                          ),
                           onSaved: (String value) {
                             widget.firstNameChanged(value);
                           },
@@ -527,7 +546,7 @@ class MyDialogState extends State<MyDialog> {
                         style: Theme.of(context)
                             .textTheme
                             .headline6
-                            .copyWith(color: Colors.black),
+                            .copyWith(fontSize: 18, color: Colors.black),
                       ),
                       Container(
                         width: 150,
@@ -539,6 +558,14 @@ class MyDialogState extends State<MyDialog> {
                             return null;
                           },
                           style: Theme.of(context).textTheme.bodyText1,
+                          decoration: InputDecoration(
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black),
+                            ),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black),
+                            ),
+                          ),
                           onSaved: (String value) {
                             widget.lastNameChanged(value);
                           },
@@ -555,7 +582,7 @@ class MyDialogState extends State<MyDialog> {
                         style: Theme.of(context)
                             .textTheme
                             .headline6
-                            .copyWith(color: Colors.black),
+                            .copyWith(fontSize: 18, color: Colors.black),
                       ),
                       Container(
                         width: 150,
@@ -567,6 +594,14 @@ class MyDialogState extends State<MyDialog> {
                             return null;
                           },
                           keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black),
+                            ),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black),
+                            ),
+                          ),
                           style: Theme.of(context).textTheme.bodyText1,
                           onSaved: (value) {
                             widget.ageChanged(int.parse(value));
@@ -586,7 +621,7 @@ class MyDialogState extends State<MyDialog> {
                           style: Theme.of(context)
                               .textTheme
                               .headline6
-                              .copyWith(color: Colors.black),
+                              .copyWith(fontSize: 18, color: Colors.black),
                         ),
                       ),
                       Container(
@@ -599,6 +634,14 @@ class MyDialogState extends State<MyDialog> {
                             return null;
                           },
                           keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black),
+                            ),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black),
+                            ),
+                          ),
                           style: Theme.of(context).textTheme.bodyText1,
                           onSaved: (value) {
                             widget.phoneNumberChanged(value);
@@ -616,7 +659,7 @@ class MyDialogState extends State<MyDialog> {
                         style: Theme.of(context)
                             .textTheme
                             .headline6
-                            .copyWith(color: Colors.black),
+                            .copyWith(fontSize: 18, color: Colors.black),
                       ),
                       SizedBox(
                         width: 20,
@@ -663,7 +706,7 @@ class MyDialogState extends State<MyDialog> {
                         style: Theme.of(context)
                             .textTheme
                             .headline6
-                            .copyWith(color: Colors.black),
+                            .copyWith(fontSize: 18, color: Colors.black),
                       ),
                       Container(
                         width: 150,
@@ -676,6 +719,14 @@ class MyDialogState extends State<MyDialog> {
                           },
                           //        keyboardType: TextInputType.number,
                           style: Theme.of(context).textTheme.bodyText1,
+                          decoration: InputDecoration(
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black),
+                            ),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black),
+                            ),
+                          ),
                           onSaved: (value) {
                             widget.addressChanged(value);
                           },
@@ -692,7 +743,7 @@ class MyDialogState extends State<MyDialog> {
                         style: Theme.of(context)
                             .textTheme
                             .headline6
-                            .copyWith(color: Colors.black),
+                            .copyWith(fontSize: 18, color: Colors.black),
                       ),
                       Container(
                         width: 150,
@@ -704,6 +755,14 @@ class MyDialogState extends State<MyDialog> {
                             return null;
                           },
                           keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black),
+                            ),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black),
+                            ),
+                          ),
                           style: Theme.of(context).textTheme.bodyText1,
                           onSaved: (value) {
                             widget.zipCodeChanged(value);
@@ -721,7 +780,7 @@ class MyDialogState extends State<MyDialog> {
                         style: Theme.of(context)
                             .textTheme
                             .headline6
-                            .copyWith(color: Colors.black),
+                            .copyWith(fontSize: 18, color: Colors.black),
                       ),
                       Container(
                         width: 150,
@@ -734,6 +793,14 @@ class MyDialogState extends State<MyDialog> {
                           },
                           //       keyboardType: TextInputType.number,
                           style: Theme.of(context).textTheme.bodyText1,
+                          decoration: InputDecoration(
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black),
+                            ),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black),
+                            ),
+                          ),
                           onSaved: (value) {
                             widget.cityChanged(value);
                           },
@@ -750,7 +817,7 @@ class MyDialogState extends State<MyDialog> {
                         style: Theme.of(context)
                             .textTheme
                             .headline6
-                            .copyWith(color: Colors.black),
+                            .copyWith(fontSize: 18, color: Colors.black),
                       ),
                       Container(
                         width: 150,
@@ -763,6 +830,14 @@ class MyDialogState extends State<MyDialog> {
                           },
                           //    keyboardType: TextInputType.number,
                           style: Theme.of(context).textTheme.bodyText1,
+                          decoration: InputDecoration(
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black),
+                            ),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black),
+                            ),
+                          ),
                           onSaved: (value) {
                             widget.stateChanged(value);
                           },
@@ -779,7 +854,7 @@ class MyDialogState extends State<MyDialog> {
                         style: Theme.of(context)
                             .textTheme
                             .headline6
-                            .copyWith(color: Colors.black),
+                            .copyWith(fontSize: 18, color: Colors.black),
                       ),
                       Container(
                         width: 150,
@@ -792,6 +867,14 @@ class MyDialogState extends State<MyDialog> {
                           },
                           //      keyboardType: TextInputType.number,
                           style: Theme.of(context).textTheme.bodyText1,
+                          decoration: InputDecoration(
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black),
+                            ),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black),
+                            ),
+                          ),
                           onSaved: (value) {
                             widget.countryChanged(value);
                           },

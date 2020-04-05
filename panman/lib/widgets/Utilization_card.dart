@@ -44,8 +44,7 @@ class UtilizationCard extends StatelessWidget {
             // ),
             Flexible(
               flex: 6,
-              child: Stack(
-                children: <Widget>[
+              child: 
                   PageView(
                     controller: pageController,
                     children: <Widget>[
@@ -59,17 +58,15 @@ class UtilizationCard extends StatelessWidget {
                                   .fetchedHospital
                                   .medicalSupplies
                                   .map((item) {
-                            return Flexible(
-                                flex: 2,
-                                child: medicalSuplyGraphWidget(
+                            return  medicalSuplyGraphWidget(
                                   medicalSupplyName: fetchCardName(item.id),
                                   quantityLeft: item.qty,
                                   willLastForInDays: 10,
-                                ));
+                                );
                           }).toList(),
                         ),
                       ),
-                      Expanded(
+                      Container(
                         child: Container(
                           color: Colors.cyan,
                           child: medicalSuplyGraphWidget(
@@ -85,21 +82,9 @@ class UtilizationCard extends StatelessWidget {
                       )
                     ],
                   ),
-                  // Align(
-                  //   alignment: Alignment.bottomCenter,
-                  //   child: new DotsIndicator(
-                  //     dotsCount: 2,
-                  //     position: pageController.page,
-                  //     decorator: DotsDecorator(
-                  //       size: const Size.square(9.0),
-                  //       activeSize: const Size(18.0, 9.0),
-                  //       activeShape: RoundedRectangleBorder(
-                  //           borderRadius: BorderRadius.circular(5.0)),
-                  //     ),
-                  //   ),
-                  // )
-                ],
-              ),
+
+                
+              
             ),
           ],
         ),

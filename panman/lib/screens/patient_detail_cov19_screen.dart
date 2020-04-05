@@ -201,11 +201,7 @@ class _PatientDetailCov19ScreenState extends State<PatientDetailCov19Screen> {
                           "Symptomatic. Severe Pneumonia. With respiratory failure / MODS",
                       cardColor: Colors.red,
                       optionNo: 7),
-                  c19card(
-                      abbrv: "S-6",
-                      fullText: "Deceased",
-                      cardColor: Colors.black,
-                      optionNo: 8),
+
                 ],
               ),
               showConfirmButton == true

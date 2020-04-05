@@ -37,142 +37,147 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return OfflineBuilder(connectivityBuilder: (
-      BuildContext context,
-      ConnectivityResult connectivity,
-      Widget child,
-    ) {
-      if (connectivity == ConnectivityResult.none) {
-        return MaterialApp(
-          title: 'HipoMVPdemo',
-          theme: ThemeData(
-            primarySwatch: Colors.purple,
-            buttonColor: Colors.black54,
-            accentColor: Colors.deepOrange,
-            backgroundColor: Colors.blueGrey,
-            textTheme: TextTheme(
-              title: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.w700,
-                fontSize: 25,
-              ),
-              body1: TextStyle(
-                  fontFamily: 'OpenSansCondensed',
-                  fontSize: 14.0,
-                  fontWeight: FontWeight.w300),
-              body2: TextStyle(
+    return OfflineBuilder(
+      connectivityBuilder: (
+        BuildContext context,
+        ConnectivityResult connectivity,
+        Widget child,
+      ) {
+        if (connectivity == ConnectivityResult.none) {
+          return MaterialApp(
+            title: 'HipoMVPdemo',
+            theme: ThemeData(
+              primarySwatch: Colors.purple,
+              buttonColor: Colors.black54,
+              accentColor: Colors.deepOrange,
+              backgroundColor: Colors.blueGrey,
+              textTheme: TextTheme(
+                title: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 25,
+                ),
+                body1: TextStyle(
+                    fontFamily: 'OpenSansCondensed',
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.w300),
+                body2: TextStyle(
+                    fontFamily: 'OpenSans',
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.w700),
+                display1: TextStyle(
+                  color: Colors.black,
                   fontFamily: 'OpenSans',
-                  fontSize: 20.0,
-                  fontWeight: FontWeight.w700),
-              display1: TextStyle(
-                color: Colors.black,
-                fontFamily: 'OpenSans',
-                fontWeight: FontWeight.w700,
-                fontSize: 15,
-              ),
-              display2: TextStyle(
-                color: Colors.black,
-                fontFamily: 'OpenSans',
-                fontWeight: FontWeight.w700,
-                fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 15,
+                ),
+                display2: TextStyle(
+                  color: Colors.black,
+                  fontFamily: 'OpenSans',
+                  fontWeight: FontWeight.w700,
+                  fontSize: 20,
+                ),
               ),
             ),
-          ),
-          home: Container(
-              color: Colors.white,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    "😢",
-                    style: TextStyle(fontSize: 45),
-                  ),
-                  Text(
-                    "We couldn't reach our servers!",
-                    style: Theme.of(context)
-                        .textTheme
-                        .title
-                        .copyWith(fontSize: 25),
-                  ),
-                  Text(
-                    "Check your internet connectivity",
-                    style: Theme.of(context)
-                        .textTheme
-                        .title
-                        .copyWith(fontSize: 20, color: Colors.black54),
-                  ),
-                ],
-              )),
-        );
-      } else {
-        return MultiProvider(
-          providers: [
-            ChangeNotifierProvider.value(
-              value: Patients(),
-            ),
-            // ChangeNotifierProvider.value(
-            //   value: Equipment(),
-            // ),
+            home: Container(
+                color: Colors.white,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                      "😢",
+                      style: TextStyle(fontSize: 45),
+                    ),
+                    Text(
+                      "We couldn't reach our servers!",
+                      style: Theme.of(context)
+                          .textTheme
+                          .title
+                          .copyWith(fontSize: 25),
+                    ),
+                    Text(
+                      "Check your internet connectivity",
+                      style: Theme.of(context)
+                          .textTheme
+                          .title
+                          .copyWith(fontSize: 20, color: Colors.black54),
+                    ),
+                  ],
+                )),
+          );
+        } else {
+          return MultiProvider(
+            providers: [
+              ChangeNotifierProvider.value(
+                value: Patients(),
+              ),
+              // ChangeNotifierProvider.value(
+              //   value: Equipment(),
+              // ),
 
-            ChangeNotifierProvider.value(
-              value: Hospitals(),
-            ),
+              ChangeNotifierProvider.value(
+                value: Hospitals(),
+              ),
 
-            ChangeNotifierProvider.value(
-              value: Auth(),
-            ),
-
-            ChangeNotifierProvider.value(
-              value: HealthCareWorkers(),
-            ),
-          ],
-          child: Consumer<Auth>(
-              builder: (ctx, auth, _) => MaterialApp(
-                    title: 'PanMan',
-                    debugShowCheckedModeBanner: false,
-                    theme: ThemeData(
-                        accentColor: Color.fromRGBO(35, 71, 162, 1),
-                        primaryColor: Colors.white,
-                        textTheme: TextTheme(
-                          headline6: TextStyle(
-                            color: Colors.white,
-                          ),
-                          headline5: TextStyle(color: Colors.white),
-                          caption: TextStyle(fontSize: 15, color: Colors.white),
-                          bodyText1: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                        )),
-                    home: FutureBuilder<FirebaseUser>(
-                        future: auth.tryAutoLogin(),
-                        builder: (ctx,
-                            AsyncSnapshot<FirebaseUser> authResultSnapshot) {
-                          if (authResultSnapshot.connectionState ==
-                                  ConnectionState.done ||
-                              authResultSnapshot.hasData) {
-                            return auth.isAuth
-                                ? SafeArea(child: HomeScreen())
-                                : AuthScreen();
-                          } else {
-                            return SplashScreen();
-                          }
-                        }),
-                    routes: {
-                      HomeScreen.routeName: (ctx) => HomeScreen(),
-                      PatientDetailScreen.routeName: (ctx) =>
-                          PatientDetailScreen(),
-                      PatientDetailCov19Screen.routeName: (ctx) =>
-                          PatientDetailCov19Screen(),
-                      PatientDetailMoveScreen.routeName: (ctx) =>
-                          PatientDetailMoveScreen(),
-                      PatientDetailAssignEquipment.routeName: (ctx) =>
-                          PatientDetailAssignEquipment(),
-                      DashboardScreen.routeName: (ctx) => DashboardScreen(),
-                      AuthScreen.routeName: (ctx) => AuthScreen(),
-                    },
-                  )),
-        );
-      }
-    },child: Container(),
+              ChangeNotifierProvider.value(
+                value: Auth(),
+              ),
+              ChangeNotifierProvider.value(
+                value: Covid19(),
+              ),
+              ChangeNotifierProvider.value(
+                value: HealthCareWorkers(),
+              ),
+            ],
+            child: Consumer<Auth>(
+                builder: (ctx, auth, _) => MaterialApp(
+                      title: 'PanMan',
+                      debugShowCheckedModeBanner: false,
+                      theme: ThemeData(
+                          accentColor: Color.fromRGBO(35, 71, 162, 1),
+                          primaryColor: Colors.white,
+                          textTheme: TextTheme(
+                            headline6: TextStyle(
+                              color: Colors.white,
+                            ),
+                            headline5: TextStyle(color: Colors.white),
+                            caption:
+                                TextStyle(fontSize: 15, color: Colors.white),
+                            bodyText1: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          )),
+                      home: FutureBuilder<FirebaseUser>(
+                          future: auth.tryAutoLogin(),
+                          builder: (ctx,
+                              AsyncSnapshot<FirebaseUser> authResultSnapshot) {
+                            if (authResultSnapshot.connectionState ==
+                                    ConnectionState.done ||
+                                authResultSnapshot.hasData) {
+                              return auth.isAuth
+                                  ? SafeArea(child: HomeScreen())
+                                  : AuthScreen();
+                            } else {
+                              return SplashScreen();
+                            }
+                          }),
+                      routes: {
+                        HomeScreen.routeName: (ctx) => HomeScreen(),
+                        PatientDetailScreen.routeName: (ctx) =>
+                            PatientDetailScreen(),
+                        PatientDetailCov19Screen.routeName: (ctx) =>
+                            PatientDetailCov19Screen(),
+                        PatientDetailMoveScreen.routeName: (ctx) =>
+                            PatientDetailMoveScreen(),
+                        PatientDetailAssignEquipment.routeName: (ctx) =>
+                            PatientDetailAssignEquipment(),
+                        DashboardScreen.routeName: (ctx) => DashboardScreen(),
+                        AuthScreen.routeName: (ctx) => AuthScreen(),
+                      },
+                    )),
+          );
+        }
+      },
+      child: Container(),
     );
   }
 }

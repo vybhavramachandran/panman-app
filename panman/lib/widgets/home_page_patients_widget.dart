@@ -77,9 +77,10 @@ class _HomePagePatientsWidgetState extends State<HomePagePatientsWidget> {
                 decoration: InputDecoration(
                     labelText: "Search",
                     hintText: "Search",
-                    prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(25.0)))),
+                    prefixIcon: Icon(Icons.search,color: Colors.black54,),
+                    enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
+                    focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
+                   ),
               ),
             ),
           ),

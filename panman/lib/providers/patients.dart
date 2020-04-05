@@ -55,7 +55,7 @@ class Patients with ChangeNotifier {
       ));
     });
     isFetching = false;
-    shouldRefreshList=false;
+    shouldRefreshList = false;
     notifyListeners();
   }
 
@@ -133,12 +133,43 @@ class Patients with ChangeNotifier {
   Future<bool> movePatient(int newLocation) async {
     var oldLocation = selectedPatient.currentLocation;
     selectedPatient.currentLocation = newLocation;
-    await addEvent(
-        eventType: "hospital_movement",
-        eventTime: DateTime.now(),
-        eventData: "${oldLocation}->${newLocation}");
+
+    isUpdating = true;
     notifyListeners();
-    await updatePatientProfileInFirebase();
+
+    if (newLocation == 7) {
+      selectedPatient.hospitalID = "";
+
+      await addEvent(
+          eventType: "patient_death",
+          eventTime: DateTime.now(),
+          eventData: "${oldLocation}->${newLocation}");
+      await updatePatientProfileInFirebase();
+    } else if (newLocation == 6) {
+      selectedPatient.hospitalID = "";
+      await addEvent(
+          eventType: "patient_transfer",
+          eventTime: DateTime.now(),
+          eventData: "${oldLocation}->${newLocation}");
+      await updatePatientProfileInFirebase();
+    } 
+    else if (newLocation == 0) {
+      selectedPatient.hospitalID = "";
+      await addEvent(
+          eventType: "patient_discharged",
+          eventTime: DateTime.now(),
+          eventData: "${oldLocation}->${newLocation}");
+      await updatePatientProfileInFirebase();
+    } else {
+      await addEvent(
+          eventType: "hospital_movement",
+          eventTime: DateTime.now(),
+          eventData: "${oldLocation}->${newLocation}");
+      await updatePatientProfileInFirebase();
+    }
+
+    isUpdating=false;
+    notifyListeners();
 
     return true;
   }

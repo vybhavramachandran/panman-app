@@ -7,14 +7,14 @@ enum Sex { Male, Female }
 
 
 class Patient {
-  final String id;
+   String id;
   String idGivenByHospital;
-  final String Firstname;
-  final String LastName;
-  final int age;
-  final Sex sex;
-  final FullAddress fullAddress;
-  final String hospitalID;
+   String Firstname;
+   String LastName;
+   int age;
+   Sex sex;
+   FullAddress fullAddress;
+   String hospitalID;
   String phoneNumber;
   c19 state;
   int currentLocation;

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
+import './home_screen.dart';
 import '../widgets/patient_detailed_header.dart';
 
 import '../models/locationInHospital.dart';
@@ -23,6 +24,7 @@ class _PatientDetailMoveScreenState extends State<PatientDetailMoveScreen> {
   bool setOnce = false;
   int selectedRadio;
   bool showConfirmButton = false;
+  bool isRemovingPatient = false;
   radioOnTapped(int value) {
     setState(() {
       showConfirmButton = true;
@@ -88,6 +90,80 @@ class _PatientDetailMoveScreenState extends State<PatientDetailMoveScreen> {
             ],
           ),
         ));
+  }
+
+  Future _showDialog(var oldState, var newState) async {
+    // flutter defined function
+    return showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Warning!",
+              style: Theme.of(context)
+                  .textTheme
+                  .headline4
+                  .copyWith(color: Colors.black)),
+          content: new Text(
+              "This action will remove the patient from the list of managed patients"),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new RaisedButton(
+              child: new Text("Go Back"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            Provider.of<Patients>(context, listen: true).isUpdating == false ||
+                    Provider.of<Hospitals>(context, listen: true).isUpdating ==
+                        false
+                ? new RaisedButton(
+                    child: new Text("I understand. Continue"),
+                    onPressed: () {
+                      return moveAndRemovePatient(oldState, newState);
+                    },
+                  )
+                : CircularProgressIndicator(
+                    backgroundColor: Colors.black,
+                  ),
+          ],
+        );
+      },
+    );
+  }
+
+  moveAndRemovePatient(var oldState, var newState) async {
+    if (await Provider.of<Patients>(context, listen: false)
+            .movePatient(selectedRadio - 1) ==
+        true) {
+      await Provider.of<Hospitals>(context, listen: false)
+          .movePatientOutOfHospital(
+              Provider.of<Hospitals>(context, listen: false)
+                  .referenceHospitalLocationList[oldState]
+                  .id);
+    }
+
+    Navigator.of(context).pop();
+  }
+
+  Future movePatient(var oldState, var newState) async {
+    if (await Provider.of<Patients>(context, listen: false)
+            .movePatient(selectedRadio - 1) ==
+        true) {
+      await Provider.of<Hospitals>(context, listen: false)
+          .changeLocationInHospitalCount(
+              Provider.of<Hospitals>(context, listen: false)
+                  .referenceHospitalLocationList[newState]
+                  .id,
+              Provider.of<Hospitals>(context, listen: false)
+                  .referenceHospitalLocationList[oldState]
+                  .id);
+      setState(() {
+        showConfirmButton = false;
+      });
+      return;
+    }
   }
 
   @override
@@ -172,6 +248,26 @@ class _PatientDetailMoveScreenState extends State<PatientDetailMoveScreen> {
                     cardColor: Colors.lightGreen,
                     optionNo: 6,
                   ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "Others",
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyText1
+                          .copyWith(color: Colors.black54),
+                    ),
+                  ),
+                  localtionInHospitalCard(
+                    fullText: "Transferred to another hospital",
+                    cardColor: Colors.lightGreen,
+                    optionNo: 7,
+                  ),
+                  localtionInHospitalCard(
+                    fullText: "Patient Deceased",
+                    cardColor: Colors.lightGreen,
+                    optionNo: 8,
+                  ),
                 ],
               ),
               showConfirmButton == true
@@ -198,19 +294,16 @@ class _PatientDetailMoveScreenState extends State<PatientDetailMoveScreen> {
                                     .selectedPatient
                                     .currentLocation;
                             var newState = selectedRadio - 1;
-                            if (await Provider.of<Patients>(context,
-                                        listen: false)
-                                    .movePatient(selectedRadio - 1) ==
-                                true) {
-                              await Provider.of<Hospitals>(context,
-                                      listen: false)
-                                  .changeLocationInHospitalCount(
-                                      Provider.of<Hospitals>(context,listen:false).referenceHospitalLocationList[newState].id,
-                                      Provider.of<Hospitals>(context,listen:false).referenceHospitalLocationList[oldState].id);
+
+                            if (newState == 0 || newState > 5) {
                               setState(() {
                                 showConfirmButton = false;
                               });
-                              return;
+                              await _showDialog(oldState, newState);
+                              Navigator.of(context)
+                                  .pushReplacementNamed(HomeScreen.routeName);
+                            } else {
+                              await movePatient(oldState, newState);
                             }
                           },
                         ),

@@ -70,14 +70,7 @@ enum C19PatientState { AS1, AS2, S1, S2, S3, S4, S5 }
             "Symptomatic. Severe Pneumonia. With respiratory failure / MODS",
         info: "TBD",
         stateColor: Colors.red,),
-    c19(
-        isSymptomatic: true,
-        index: 9,
-        abbrv: "S-6",
-        fullText:
-            "Deceased",
-        info: "TBD",
-        stateColor: Colors.black,),
+
   ];
 
 

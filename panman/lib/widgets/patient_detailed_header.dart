@@ -22,6 +22,8 @@ class PatientDetailedHeader extends StatelessWidget {
     "C19 Suspected Isolation",
     "C19 Confirmed Isolation",
     "ICU",
+    "Transferred",
+    "Deceased",
   ];
   @override
   Widget build(BuildContext context) {
@@ -92,7 +94,7 @@ class PatientDetailedHeader extends StatelessWidget {
                         SizedBox(
                           width: 5,
                         ),
-                        Text("32 YEARS", style: TextStyle(color: textColor)),
+                        Text("${newPatient.age.toString()} YEARS", style: TextStyle(color: textColor)),
                       ],
                     ),
                   ],
