@@ -74,10 +74,12 @@ class Hospitals with ChangeNotifier {
   }
 
   Future getHospitalDetailsFromServer(String hospitalID) async {
-    print("Calling getHospitalDetails");
+    print("Calling getHospitalDetails $hospitalID");
     hospitalSnapshot = await hospitalsCollection.document(hospitalID).get();
+    print("Fetched ${hospitalSnapshot.data}");
     fetchedHospital = Hospital.fromMap(hospitalSnapshot.data);
-    print("Fetched Hospital Name is" + fetchedHospital.hospitalName);
+    print("Fetched Hospital Name is" + fetchedHospital.toString());
+
     notifyListeners();
     return true;
   }
@@ -109,8 +111,8 @@ class Hospitals with ChangeNotifier {
   }
 
   Future movePatientOutOfHospital(String locationToBeDecremented) async {
-  isUpdating = true;
-  notifyListeners();
+    isUpdating = true;
+    notifyListeners();
     var oldLocation = fetchedHospital.locations
         .indexWhere((element) => element.id == locationToBeDecremented);
     fetchedHospital.locations[oldLocation].count =

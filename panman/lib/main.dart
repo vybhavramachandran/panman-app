@@ -24,6 +24,8 @@ import './screens/patient_detail_assign_equipment_screen.dart';
 import './screens/home_page_dashboard.dart';
 import './screens/auth_screen.dart';
 import './screens/splash_screen.dart';
+import './screens/patient_vitals_screen.dart';
+import './screens/patient_vitals_add_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -172,6 +174,9 @@ class MyApp extends StatelessWidget {
                             PatientDetailAssignEquipment(),
                         DashboardScreen.routeName: (ctx) => DashboardScreen(),
                         AuthScreen.routeName: (ctx) => AuthScreen(),
+                        PatientVitalsAddScreen.routeName:(ctx)=> PatientVitalsAddScreen(),
+                        PatientVitalsScreen.routeName: (ctx) =>
+                            PatientVitalsScreen(),
                       },
                     )),
           );

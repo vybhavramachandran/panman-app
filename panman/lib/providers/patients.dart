@@ -5,6 +5,16 @@ import '../models/c19data.dart';
 import '../models/address.dart';
 import '../models/event.dart';
 
+import '../models/patient_vitals/consciousness.dart';
+import '../models/patient_vitals/fi02.dart';
+import '../models/patient_vitals/flowrate.dart';
+import '../models/patient_vitals/mode.dart';
+import '../models/patient_vitals/periphery.dart';
+import '../models/patient_vitals/position.dart';
+import '../models/patient_vitals/rhythm.dart';
+
+import '../models/patientVital.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:flutter/foundation.dart';
@@ -52,10 +62,21 @@ class Patients with ChangeNotifier {
             : patient['events'].map<event>((eventToBeAdded) {
                 return event.fromMap(eventToBeAdded);
               }).toList(),
+        vitals: patient['vitals'] == null
+            ? []
+            : patient['vitals'].map<PatientVital>((vitalToBeAdded) {
+                return PatientVital.fromMap(vitalToBeAdded);
+              }).toList(),
       ));
     });
     isFetching = false;
     shouldRefreshList = false;
+    notifyListeners();
+  }
+
+  Future addVitalMeasurement(PatientVital vital) async {
+    selectedPatient.vitals.add(vital);
+    await updatePatientProfileInFirebase();
     notifyListeners();
   }
 

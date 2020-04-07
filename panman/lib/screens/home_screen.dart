@@ -179,6 +179,7 @@ class _HomeScreenState extends State<HomeScreen> {
         state: referenceCovid19SeverityLevelsList[0],
         ventilatorUsed: false,
         events: [],
+        vitals:[],
       ));
 
       await Provider.of<Hospitals>(context, listen: false)
@@ -271,9 +272,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
-                floatingActionButton: FloatingActionButton(
+                floatingActionButton: FloatingActionButton.extended(
                   backgroundColor: Theme.of(context).accentColor,
-                  child: Icon(Icons.add),
+                  icon: Icon(Icons.add),
+                  label: Text("Add Patient"),
                   onPressed: () async {
                     setState(() {
                       newPatientID = randomAlphaNumeric(10);

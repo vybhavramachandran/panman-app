@@ -40,9 +40,9 @@ class returnPatientFlowGraph extends StatelessWidget {
           location.locationInHospitalName,
       measureFn: (locationInHospitalCount location, _) => location.count,
       data: dummy_count_data,
-     // colorFn: (_, __) => charts.MaterialPalette.red.shadeDefault,
-      fillColorFn: (_, __) =>
-            charts.MaterialPalette.blue.shadeDefault.lighter,
+      colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
+      // fillColorFn: (_, __) =>
+      //       charts.MaterialPalette.red.shadeDefault.lighter,
       labelAccessorFn: (locationInHospitalCount loc, _) =>
           '${loc.count.toString()}',
     ));
@@ -81,8 +81,8 @@ class returnPatientFlowGraph extends StatelessWidget {
                     color: charts.MaterialPalette.black),
                 lineStyle: new charts.LineStyleSpec(
                     thickness: 0, color: charts.MaterialPalette.black))),
-        primaryMeasureAxis:
-            new charts.NumericAxisSpec(renderSpec: new charts.NoneRenderSpec()),
+        // primaryMeasureAxis:
+        //     new charts.NumericAxisSpec(renderSpec: new charts.NoneRenderSpec()),
         // new charts.NumericAxisSpec(
         //     renderSpec: new charts.GridlineRendererSpec(
         //         labelStyle: new charts.TextStyleSpec(

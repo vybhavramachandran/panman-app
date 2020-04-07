@@ -7,6 +7,7 @@ import '../models/patient.dart';
 import '../models/arguments/patient_detail_arguments.dart';
 
 import '../widgets/patient_detailed_header.dart';
+import '../widgets/timeline.dart';
 import '../screens/patient_detail_cov19_screen.dart';
 import '../providers/patients.dart';
 
@@ -31,8 +32,8 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
       child: InkWell(
         onTap: () {
           Navigator.pushNamed(context, moveToPage,
-                  arguments: PatientDetailArguments(localPatient));
-              // .then((isChanged) => isChanged ? _refreshPatient():"");
+              arguments: PatientDetailArguments(localPatient));
+          // .then((isChanged) => isChanged ? _refreshPatient():"");
         },
         child: Container(
           width: 200,
@@ -72,34 +73,78 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
   patientDetailScreenHome(Patient selectedPatient) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: GridView.count(
-        mainAxisSpacing: 10,
-        crossAxisSpacing: 10,
-        crossAxisCount: 2,
+      child: Row(
         children: <Widget>[
-          // patientPageCard(
-          //   iconToDisplay: "assets/images/monitor.png",
-          //   titleOfCard: "PATIENT VITALS",
-          //   //  patient: selectedPatient,
-          // ),
-          patientPageCard(
-            iconToDisplay: "assets/images/virus.png",
-            titleOfCard: "PATIENT COVID CATEGORY",
-            moveToPage: "/patient_detail_cov19_screen",
-            // patient: selectedPatient,
-          ),
-          patientPageCard(
-            iconToDisplay: "assets/images/move.png",
-            titleOfCard: "MOVE PATIENT",
-            moveToPage: "/patient_detail_move_screen",
+          // Flexible(
+          //   flex: 2,
+          //   child: SingleChildScrollView(
+          //     child: Container(
+          //       child: Timeline(
+          //         children: <Widget>[
+          //           Container(height: 100, color: Colors.red),
+          //           Container(height: 50, color: Colors.blue),
+          //           Container(height: 200, color: Colors.green),
+          //           Container(height: 100, color: Colors.yellow),
+          //           Container(height: 200, color: Colors.green),
+          //           Container(height: 100, color: Colors.yellow),
+          //           Container(height: 200, color: Colors.green),
+          //           Container(height: 100, color: Colors.yellow),
+          //           Container(height: 200, color: Colors.green),
+          //           Container(height: 100, color: Colors.yellow),
 
-            // patient: selectedPatient,
-          ),
-          patientPageCard(
-            iconToDisplay: "assets/images/ventilator.png",
-            titleOfCard: "ASSIGN EQUIPMENT",
-            moveToPage: '/patient_detail_assign_equipment_screen',
-            // patient: selectedPatient,
+          //         ],
+          //         indicators: <Widget>[
+          //           Icon(Icons.access_alarm),
+          //           Icon(Icons.backup),
+          //           Icon(Icons.accessibility_new),
+          //           Icon(Icons.access_alarm),
+          //           Icon(Icons.accessibility_new),
+          //           Icon(Icons.access_alarm),
+          //           Icon(Icons.accessibility_new),
+          //           Icon(Icons.access_alarm),
+          //           Icon(Icons.accessibility_new),
+          //           Icon(Icons.access_alarm),
+
+          //         ],
+          //       ),
+          //     ),
+          //   ),
+          // ),
+          Flexible(
+            flex: 2,
+            child: GridView.count(
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
+              crossAxisCount: 2,
+              children: <Widget>[
+                patientPageCard(
+                  iconToDisplay: "assets/images/monitor.png",
+                  titleOfCard: "PATIENT VITALS",
+                  moveToPage: "/patient_vitals_screen",
+
+                  //  patient: selectedPatient,
+                ),
+                patientPageCard(
+                  iconToDisplay: "assets/images/virus.png",
+                  titleOfCard: "PATIENT COVID CATEGORY",
+                  moveToPage: "/patient_detail_cov19_screen",
+                  // patient: selectedPatient,
+                ),
+                patientPageCard(
+                  iconToDisplay: "assets/images/move.png",
+                  titleOfCard: "MOVE PATIENT",
+                  moveToPage: "/patient_detail_move_screen",
+
+                  // patient: selectedPatient,
+                ),
+                patientPageCard(
+                  iconToDisplay: "assets/images/ventilator.png",
+                  titleOfCard: "ASSIGN EQUIPMENT",
+                  moveToPage: '/patient_detail_assign_equipment_screen',
+                  // patient: selectedPatient,
+                ),
+              ],
+            ),
           ),
         ],
       ),
