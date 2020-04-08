@@ -1,35 +1,32 @@
 import 'dart:ui';
 
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_offline/flutter_offline.dart';
-// import 'package:splashscreen/splashscreen.dart';
+import 'package:panman/utils/analytics_client.dart';
+import 'package:provider/provider.dart';
 
-import './models/c19data.dart';
-
-import './providers/patients.dart';
-// import './providers/medicalSupplies.dart';
-import './providers/hospital.dart';
-import './providers/covid19.dart';
 import './providers/auth.dart';
+import './providers/covid19.dart';
 import './providers/healthcareworkers.dart';
-
+import './providers/hospital.dart';
+import './providers/patients.dart';
+import './screens/auth_screen.dart';
+import './screens/home_page_dashboard.dart';
 import './screens/home_screen.dart';
-import './screens/patient_detail_screen.dart';
+import './screens/patient_detail_assign_equipment_screen.dart';
 import './screens/patient_detail_cov19_screen.dart';
 import './screens/patient_detail_move_screen.dart';
-import './screens/patient_detail_assign_equipment_screen.dart';
-import './screens/home_page_dashboard.dart';
-import './screens/auth_screen.dart';
-import './screens/splash_screen.dart';
-import './screens/patient_vitals_screen.dart';
+import './screens/patient_detail_screen.dart';
 import './screens/patient_vitals_add_screen.dart';
+import './screens/patient_vitals_screen.dart';
+import './screens/splash_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   Provider.debugCheckInvalidValueType = null;
+  Analytics.instance.logAppOpen();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) {
     runApp(MyApp());
@@ -174,7 +171,8 @@ class MyApp extends StatelessWidget {
                             PatientDetailAssignEquipment(),
                         DashboardScreen.routeName: (ctx) => DashboardScreen(),
                         AuthScreen.routeName: (ctx) => AuthScreen(),
-                        PatientVitalsAddScreen.routeName:(ctx)=> PatientVitalsAddScreen(),
+                        PatientVitalsAddScreen.routeName: (ctx) =>
+                            PatientVitalsAddScreen(),
                         PatientVitalsScreen.routeName: (ctx) =>
                             PatientVitalsScreen(),
                       },

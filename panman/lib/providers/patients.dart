@@ -1,23 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
+import 'package:panman/utils/analytics_client.dart';
 import 'package:random_string/random_string.dart';
 
-import '../models/patient.dart';
-import '../models/c19data.dart';
 import '../models/address.dart';
+import '../models/c19data.dart';
 import '../models/event.dart';
-
-import '../models/patient_vitals/consciousness.dart';
-import '../models/patient_vitals/fi02.dart';
-import '../models/patient_vitals/flowrate.dart';
-import '../models/patient_vitals/mode.dart';
-import '../models/patient_vitals/periphery.dart';
-import '../models/patient_vitals/position.dart';
-import '../models/patient_vitals/rhythm.dart';
-
+import '../models/patient.dart';
 import '../models/patientVital.dart';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'package:flutter/foundation.dart';
 
 class Patients with ChangeNotifier {
   List<Patient> fetchedPatientsList = [];
@@ -35,49 +25,58 @@ class Patients with ChangeNotifier {
   Future fetchPatientsListFromServer(String hospitalID) async {
     print("fetchPatientsList Called");
 
-    isFetching = true;
-    //notifyListeners();
-    fetchedPatientsList.clear();
-    patientSnapshot = await patientsCollection
-        .where('hospitalID', isEqualTo: hospitalID)
-        .getDocuments();
-    patientSnapshot.documents.forEach((patient) async {
-      print(patient['firstName'] + patient['covidStatus']);
-      fetchedPatientsList.add(Patient(
-        Firstname: patient['firstName'],
-        LastName: patient['lastName'],
-        age: patient['age'],
-        currentLocation: patient['locationInHospital'],
-        state: referenceCovid19SeverityLevelsList
-            .firstWhere((element) => element.abbrv == patient['covidStatus']),
-        fullAddress: FullAddress.fromMap(patient['fullAddress']),
-        sex: patient['sex'] == "Male" ? Sex.Male : Sex.Female,
-        ventilatorUsed: patient['ventilatorUsed'],
-        id: patient['id'],
-        phoneNumber: patient['phoneNumber'],
-        hospitalID: patient['hospitalID'],
-        idGivenByHospital: patient['idGivenByHospital'],
-        events: patient['events'] == null
-            ? []
-            : patient['events'].map<event>((eventToBeAdded) {
-                return event.fromMap(eventToBeAdded);
-              }).toList(),
-        vitals: patient['vitals'] == null
-            ? []
-            : patient['vitals'].map<PatientVital>((vitalToBeAdded) {
-                return PatientVital.fromMap(vitalToBeAdded);
-              }).toList(),
-      ));
-    });
-    isFetching = false;
-    shouldRefreshList = false;
-    notifyListeners();
+    try {
+      isFetching = true;
+      //notifyListeners();
+      fetchedPatientsList.clear();
+      patientSnapshot = await patientsCollection
+          .where('hospitalID', isEqualTo: hospitalID)
+          .getDocuments();
+      patientSnapshot.documents.forEach((patient) async {
+        print(patient['firstName'] + patient['covidStatus']);
+        fetchedPatientsList.add(Patient(
+          Firstname: patient['firstName'],
+          LastName: patient['lastName'],
+          age: patient['age'],
+          currentLocation: patient['locationInHospital'],
+          state: referenceCovid19SeverityLevelsList
+              .firstWhere((element) => element.abbrv == patient['covidStatus']),
+          fullAddress: FullAddress.fromMap(patient['fullAddress']),
+          sex: patient['sex'] == "Male" ? Sex.Male : Sex.Female,
+          ventilatorUsed: patient['ventilatorUsed'],
+          id: patient['id'],
+          phoneNumber: patient['phoneNumber'],
+          hospitalID: patient['hospitalID'],
+          idGivenByHospital: patient['idGivenByHospital'],
+          events: patient['events'] == null
+              ? []
+              : patient['events'].map<event>((eventToBeAdded) {
+                  return event.fromMap(eventToBeAdded);
+                }).toList(),
+          vitals: patient['vitals'] == null
+              ? []
+              : patient['vitals'].map<PatientVital>((vitalToBeAdded) {
+                  return PatientVital.fromMap(vitalToBeAdded);
+                }).toList(),
+        ));
+      });
+      Analytics.instance.logEvent(name: 'fetchPatientsListFromServer');
+      isFetching = false;
+      shouldRefreshList = false;
+      notifyListeners();
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future addVitalMeasurement(PatientVital vital) async {
-    selectedPatient.vitals.add(vital);
-    await updatePatientProfileInFirebase();
-    notifyListeners();
+    try {
+      selectedPatient.vitals.add(vital);
+      await updatePatientProfileInFirebase();
+      notifyListeners();
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<Patient> fetchPatientDetailsFromAPI(String patientID) async {
@@ -152,91 +151,156 @@ class Patients with ChangeNotifier {
   }
 
   Future<bool> movePatient(int newLocation) async {
-    var oldLocation = selectedPatient.currentLocation;
-    selectedPatient.currentLocation = newLocation;
+    try {
+      var oldLocation = selectedPatient.currentLocation;
+      selectedPatient.currentLocation = newLocation;
 
-    isUpdating = true;
-    notifyListeners();
+      isUpdating = true;
+      notifyListeners();
 
-    if (newLocation == 7) {
-      selectedPatient.hospitalID = "";
+      Analytics.instance.logEvent(name: 'movePatient');
 
-      await addEvent(
-          eventType: "patient_death",
-          eventTime: DateTime.now(),
-          eventData: "${oldLocation}->${newLocation}");
-      await updatePatientProfileInFirebase();
-    } else if (newLocation == 6) {
-      selectedPatient.hospitalID = "";
-      await addEvent(
-          eventType: "patient_transfer",
-          eventTime: DateTime.now(),
-          eventData: "${oldLocation}->${newLocation}");
-      await updatePatientProfileInFirebase();
-    } 
-    else if (newLocation == 0) {
-      selectedPatient.hospitalID = "";
-      await addEvent(
-          eventType: "patient_discharged",
-          eventTime: DateTime.now(),
-          eventData: "${oldLocation}->${newLocation}");
-      await updatePatientProfileInFirebase();
-    } else {
-      await addEvent(
-          eventType: "hospital_movement",
-          eventTime: DateTime.now(),
-          eventData: "${oldLocation}->${newLocation}");
-      await updatePatientProfileInFirebase();
+      if (newLocation == 7) {
+        selectedPatient.hospitalID = "";
+
+        await addEvent(
+            eventType: "patient_death",
+            eventTime: DateTime.now(),
+            eventData: "${oldLocation}->${newLocation}");
+        await updatePatientProfileInFirebase();
+
+        Analytics.instance.logEvent(name: 'movePatient', parameters: {
+          'eventType': 'patient_death',
+          'eventTime': DateTime.now(),
+          'eventData': "$oldLocation->$newLocation",
+        });
+      } else if (newLocation == 6) {
+        selectedPatient.hospitalID = "";
+        await addEvent(
+            eventType: "patient_transfer",
+            eventTime: DateTime.now(),
+            eventData: "${oldLocation}->${newLocation}");
+        await updatePatientProfileInFirebase();
+        Analytics.instance.logEvent(name: 'movePatient', parameters: {
+          'eventType': 'patient_transfer',
+          'eventTime': DateTime.now(),
+          'eventData': "$oldLocation->$newLocation",
+        });
+      } else if (newLocation == 0) {
+        selectedPatient.hospitalID = "";
+        await addEvent(
+            eventType: "patient_discharged",
+            eventTime: DateTime.now(),
+            eventData: "${oldLocation}->${newLocation}");
+        await updatePatientProfileInFirebase();
+        Analytics.instance.logEvent(name: 'movePatient', parameters: {
+          'eventType': 'patient_discharged',
+          'eventTime': DateTime.now(),
+          'eventData': "$oldLocation->$newLocation",
+        });
+      } else {
+        await addEvent(
+            eventType: "hospital_movement",
+            eventTime: DateTime.now(),
+            eventData: "${oldLocation}->${newLocation}");
+        await updatePatientProfileInFirebase();
+        Analytics.instance.logEvent(name: 'movePatient', parameters: {
+          'eventType': 'hospital_movement',
+          'eventTime': DateTime.now(),
+          'eventData': "$oldLocation->$newLocation",
+        });
+      }
+
+      isUpdating = false;
+      notifyListeners();
+
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
     }
-
-    isUpdating=false;
-    notifyListeners();
-
-    return true;
   }
 
   Future<bool> changePatientState(int newStateIndex) async {
-    c19 oldState = selectedPatient.state;
-    selectedPatient.state =
-        referenceCovid19SeverityLevelsList[newStateIndex + 2];
-    await addEvent(
-        eventType: "covid19_severity_change",
-        eventTime: DateTime.now(),
-        eventData: "${oldState.abbrv}->${selectedPatient.state.abbrv}");
-    await updatePatientProfileInFirebase();
+    try {
+      c19 oldState = selectedPatient.state;
+      selectedPatient.state =
+          referenceCovid19SeverityLevelsList[newStateIndex + 2];
+      await addEvent(
+          eventType: "covid19_severity_change",
+          eventTime: DateTime.now(),
+          eventData: "${oldState.abbrv}->${selectedPatient.state.abbrv}");
+      await updatePatientProfileInFirebase();
 
-    notifyListeners();
-    return true;
+      notifyListeners();
+
+      Analytics.instance.logEvent(name: 'changePatientState', parameters: {
+        'eventType': 'covid19_severity_change',
+        'eventTime': DateTime.now(),
+        'eventData': "${oldState.abbrv}->${selectedPatient.state.abbrv}",
+      });
+
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
   }
 
   Future<bool> toggleVentilatorAssignment(bool newValue) async {
-    selectedPatient.ventilatorUsed = newValue;
-    await addEvent(
-        eventType: "ventilator",
-        eventTime: DateTime.now(),
-        eventData: newValue.toString());
-    await updatePatientProfileInFirebase();
-    notifyListeners();
-    return true;
+    try {
+      selectedPatient.ventilatorUsed = newValue;
+      await addEvent(
+          eventType: "ventilator",
+          eventTime: DateTime.now(),
+          eventData: newValue.toString());
+      await updatePatientProfileInFirebase();
+      notifyListeners();
+
+      Analytics.instance
+          .logEvent(name: 'toggleVentilatorAssignment', parameters: {
+        'eventType': 'ventilator',
+        'eventTime': DateTime.now(),
+        'eventData': newValue.toString(),
+      });
+
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
   }
 
   Future<bool> addPatient(Patient patientToAdd) async {
-    isAddingPatient = true;
-    notifyListeners();
-    var patientsCollection = Firestore.instance.collection('patients');
-    event newEvent = event(
-        eventType: "hospital_admission",
-        eventData: patientToAdd.hospitalID,
-        eventDateTime: DateTime.now(),
-        eventID: randomAlphaNumeric(20));
-    patientToAdd.events.add(newEvent);
-    await patientsCollection.document(patientToAdd.id).setData(
-          patientToAdd.toMap(),
-        );
-    isAddingPatient = false;
-    shouldRefreshList = true;
-    notifyListeners();
-    return true;
+    try {
+      isAddingPatient = true;
+      notifyListeners();
+      var patientsCollection = Firestore.instance.collection('patients');
+      event newEvent = event(
+          eventType: "hospital_admission",
+          eventData: patientToAdd.hospitalID,
+          eventDateTime: DateTime.now(),
+          eventID: randomAlphaNumeric(20));
+      patientToAdd.events.add(newEvent);
+      await patientsCollection.document(patientToAdd.id).setData(
+            patientToAdd.toMap(),
+          );
+      isAddingPatient = false;
+      shouldRefreshList = true;
+      notifyListeners();
+
+      Analytics.instance.logEvent(name: 'addPatient', parameters: {
+        'eventType': 'hospital_admission',
+        'eventTime': DateTime.now(),
+        'eventData': patientToAdd.hospitalID,
+        'eventID': randomAlphaNumeric(20),
+      });
+
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
   }
 
   Future<bool> addEvent(
@@ -244,13 +308,14 @@ class Patients with ChangeNotifier {
       String eventType,
       DateTime eventTime,
       String eventData}) async {
-    event newEvent = event(
-        eventType: eventType,
-        eventData: eventData,
-        eventDateTime: eventTime,
-        eventID: randomAlphaNumeric(20));
-    selectedPatient.events.add(newEvent);
-    notifyListeners();
+    try {
+      event newEvent = event(
+          eventType: eventType,
+          eventData: eventData,
+          eventDateTime: eventTime,
+          eventID: randomAlphaNumeric(20));
+      selectedPatient.events.add(newEvent);
+      notifyListeners();
 /*
     if (eventType == "hospital_registration") {
       await patientsCollection.document(patientID).updateData({
@@ -262,24 +327,36 @@ class Patients with ChangeNotifier {
       });
     }*/
 
-    return true;
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
   }
 
   Future updatePatientProfileInFirebase() async {
-    var patientsCollection = Firestore.instance.collection('patients');
-    isUpdating = true;
-    // updatingInFirebase = true;
-    // finishedUpdatingFirebase = false;
-    notifyListeners();
+    try {
+      var patientsCollection = Firestore.instance.collection('patients');
+      isUpdating = true;
+      // updatingInFirebase = true;
+      // finishedUpdatingFirebase = false;
+      notifyListeners();
 
-    await patientsCollection
-        .document(selectedPatient.id)
-        .updateData(selectedPatient.toMap());
-    isUpdating = false;
-    notifyListeners();
-    // updatingInFirebase = false;
-    // finishedUpdatingFirebase = true;
-    // notifyListeners();
+      await patientsCollection
+          .document(selectedPatient.id)
+          .updateData(selectedPatient.toMap());
+      isUpdating = false;
+      notifyListeners();
+
+      Analytics.instance
+          .logEvent(name: 'addPatient', parameters: selectedPatient.toMap());
+
+      // updatingInFirebase = false;
+      // finishedUpdatingFirebase = true;
+      // notifyListeners();
+    } catch (e) {
+      print(e);
+    }
   }
 
   onSearchTextChanged(String searchTerm) {
@@ -294,6 +371,8 @@ class Patients with ChangeNotifier {
       }
     });
     notifyListeners();
+
+    Analytics.instance.logSearch(text: searchTerm);
   }
 
   List<Patient> filteredPatientsList = [
