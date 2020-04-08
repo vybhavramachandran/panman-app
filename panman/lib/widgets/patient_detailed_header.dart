@@ -118,7 +118,7 @@ class PatientDetailedHeader extends StatelessWidget {
             Provider.of<Patients>(context, listen: true)
                         .selectedPatient
                         .currentLocation >
-                    2
+                    3
                 ? C19StateBox(
                     patientState: Provider.of<Patients>(context, listen: true)
                         .selectedPatient
