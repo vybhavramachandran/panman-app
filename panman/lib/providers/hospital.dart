@@ -1,13 +1,9 @@
-import 'dart:convert';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:panman/models/hospital.dart';
 import 'package:panman/models/medicalSupply.dart';
-
-import '../models/patient.dart';
-
-import 'package:flutter/foundation.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:panman/utils/analytics_client.dart';
 
 class FetchedMedicalSupply {
   String id;
@@ -35,36 +31,47 @@ class Hospitals with ChangeNotifier {
   bool isUpdating = false;
 
   Future getReferenceMedicalSupplyList() async {
-    referenceMedicalSupplyList.clear();
-    referenceHospitalLocationList.clear();
-    var medicalSupplyCollection =
-        Firestore.instance.collection('medicalSupplyDetails');
+    try {
+      referenceMedicalSupplyList.clear();
+      referenceHospitalLocationList.clear();
+      var medicalSupplyCollection =
+          Firestore.instance.collection('medicalSupplyDetails');
 
-    var newList = await medicalSupplyCollection.getDocuments();
-    //  print(newList.documents);
-    newList.documents.forEach((element) {
-      print(element['Name'] + element['id']);
-      referenceMedicalSupplyList
-          .add(FetchedMedicalSupply(name: element['Name'], id: element['id']));
-    });
+      var newList = await medicalSupplyCollection.getDocuments();
+      //  print(newList.documents);
+      newList.documents.forEach((element) {
+        print(element['Name'] + element['id']);
+        referenceMedicalSupplyList.add(
+            FetchedMedicalSupply(name: element['Name'], id: element['id']));
+      });
 
-    notifyListeners();
+      notifyListeners();
+
+      Analytics.instance.logEvent(name: 'getReferenceMedicalSupplyList');
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future getReferenceHospitalLocationList() async {
-    var hospitalReferenceCollection =
-        Firestore.instance.collection('hospitalLocationReference');
+    try {
+      var hospitalReferenceCollection =
+          Firestore.instance.collection('hospitalLocationReference');
 
-    var newList =
-        await hospitalReferenceCollection.orderBy('id').getDocuments();
-    //  print(newList.documents);
-    newList.documents.forEach((element) {
-      print(element['name'] + element['id']);
-      referenceHospitalLocationList.add(FetchedHospitalLocationReference(
-          name: element['name'], id: element['id']));
-    });
+      var newList =
+          await hospitalReferenceCollection.orderBy('id').getDocuments();
+      //  print(newList.documents);
+      newList.documents.forEach((element) {
+        print(element['name'] + element['id']);
+        referenceHospitalLocationList.add(FetchedHospitalLocationReference(
+            name: element['name'], id: element['id']));
+      });
 
-    notifyListeners();
+      notifyListeners();
+      Analytics.instance.logEvent(name: 'getReferenceHospitalLocationList');
+    } catch (e) {
+      print(e);
+    }
   }
 
   String getMedicalSupplyNameFromId(String id) {
@@ -74,70 +81,99 @@ class Hospitals with ChangeNotifier {
   }
 
   Future getHospitalDetailsFromServer(String hospitalID) async {
-    print("Calling getHospitalDetails $hospitalID");
-    hospitalSnapshot = await hospitalsCollection.document(hospitalID).get();
-    print("Fetched ${hospitalSnapshot.data}");
-    fetchedHospital = Hospital.fromMap(hospitalSnapshot.data);
-    print("Fetched Hospital Name is" + fetchedHospital.toString());
+    try {
+      print("Calling getHospitalDetails $hospitalID");
+      hospitalSnapshot = await hospitalsCollection.document(hospitalID).get();
+      print("Fetched ${hospitalSnapshot.data}");
+      fetchedHospital = Hospital.fromMap(hospitalSnapshot.data);
+      print("Fetched Hospital Name is" + fetchedHospital.toString());
 
-    notifyListeners();
-    return true;
+      notifyListeners();
+      Analytics.instance.logEvent(name: 'getHospitalDetailsFromServer');
+      return true;
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<bool> decrementVentilatorCount() async {
-    fetchedHospital.equipments[0].qty = fetchedHospital.equipments[0].qty - 1;
-    await updateHospital();
+    try {
+      fetchedHospital.equipments[0].qty = fetchedHospital.equipments[0].qty - 1;
+      await updateHospital();
 
-    // ventilatorCountAvailable = ventilatorCountAvailable-1;
-    notifyListeners();
+      // ventilatorCountAvailable = ventilatorCountAvailable-1;
+      notifyListeners();
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<bool> incrementVentilatorCount() async {
-    fetchedHospital.equipments[0].qty = fetchedHospital.equipments[0].qty + 1;
+    try {
+      fetchedHospital.equipments[0].qty = fetchedHospital.equipments[0].qty + 1;
 
-    await updateHospital();
+      await updateHospital();
 
-    //   ventilatorCountAvailable = ventilatorCountAvailable+1;
-    notifyListeners();
+      //   ventilatorCountAvailable = ventilatorCountAvailable+1;
+      notifyListeners();
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future addPatientToTheHospital() async {
-    var location =
-        fetchedHospital.locations.indexWhere((element) => element.id == "1");
+    try {
+      var location =
+          fetchedHospital.locations.indexWhere((element) => element.id == "1");
 
-    fetchedHospital.locations[location].count =
-        fetchedHospital.locations[location].count + 1;
-    await updateHospital();
+      fetchedHospital.locations[location].count =
+          fetchedHospital.locations[location].count + 1;
+      await updateHospital();
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future movePatientOutOfHospital(String locationToBeDecremented) async {
-    isUpdating = true;
-    notifyListeners();
-    var oldLocation = fetchedHospital.locations
-        .indexWhere((element) => element.id == locationToBeDecremented);
-    fetchedHospital.locations[oldLocation].count =
-        fetchedHospital.locations[oldLocation].count - 1;
-    await updateHospital();
+    try {
+      isUpdating = true;
+      notifyListeners();
+      var oldLocation = fetchedHospital.locations
+          .indexWhere((element) => element.id == locationToBeDecremented);
+      fetchedHospital.locations[oldLocation].count =
+          fetchedHospital.locations[oldLocation].count - 1;
+      await updateHospital();
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future changeLocationInHospitalCount(
       String locationToBeIncremented, String locationToBeDecremented) async {
-    var newLocation = fetchedHospital.locations
-        .indexWhere((element) => element.id == locationToBeIncremented);
+    try {
+      var newLocation = fetchedHospital.locations
+          .indexWhere((element) => element.id == locationToBeIncremented);
 
-    fetchedHospital.locations[newLocation].count =
-        fetchedHospital.locations[newLocation].count + 1;
+      fetchedHospital.locations[newLocation].count =
+          fetchedHospital.locations[newLocation].count + 1;
 
-    await updateHospital();
+      await updateHospital();
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future updateQuantity(medicalSupply item, int newQuantity) async {
     print(newQuantity.toString());
-    var itemToUpdate = fetchedHospital.medicalSupplies
-        .indexWhere((element) => element.id == item.id);
-    fetchedHospital.medicalSupplies[itemToUpdate].qty = newQuantity;
-    print(fetchedHospital.medicalSupplies[itemToUpdate].qty);
-    await updateHospital();
+    try {
+      var itemToUpdate = fetchedHospital.medicalSupplies
+          .indexWhere((element) => element.id == item.id);
+      fetchedHospital.medicalSupplies[itemToUpdate].qty = newQuantity;
+      print(fetchedHospital.medicalSupplies[itemToUpdate].qty);
+      await updateHospital();
+    } catch (e) {
+      print(e);
+    }
   }
 
   getVentilatorCount() {
@@ -149,14 +185,22 @@ class Hospitals with ChangeNotifier {
     // updatingInFirebase = true;
     // finishedUpdatingFirebase = false;
     notifyListeners();
+    try {
+      await hospitalsCollection
+          .document(fetchedHospital.id)
+          .updateData(fetchedHospital.toMap());
+      isUpdating = false;
+      notifyListeners();
 
-    await hospitalsCollection
-        .document(fetchedHospital.id)
-        .updateData(fetchedHospital.toMap());
-    isUpdating = false;
-    notifyListeners();
-    // updatingInFirebase = false;
-    // finishedUpdatingFirebase = true;
-    // notifyListeners();
+      Analytics.instance.logEvent(
+          name: 'getHospitalDetailsFromServer',
+          parameters: fetchedHospital.toMap());
+
+      // updatingInFirebase = false;
+      // finishedUpdatingFirebase = true;
+      // notifyListeners();
+    } catch (e) {
+      print(e);
+    }
   }
 }
