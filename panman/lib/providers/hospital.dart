@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:panman/models/hospital.dart';
 import 'package:panman/models/medicalSupply.dart';
 import 'package:panman/utils/analytics_client.dart';
+import 'package:http/http.dart' as http;
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
 class FetchedMedicalSupply {
   String id;
@@ -40,6 +44,37 @@ class Hospitals with ChangeNotifier {
       var newList = await medicalSupplyCollection.getDocuments();
       //  print(newList.documents);
       newList.documents.forEach((element) {
+        print(element['Name'] + element['id']);
+        referenceMedicalSupplyList.add(
+            FetchedMedicalSupply(name: element['Name'], id: element['id']));
+      });
+
+      notifyListeners();
+
+      Analytics.instance.logEvent(name: 'getReferenceMedicalSupplyList');
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future getReferenceMedicalSupplyListFromAPI() async {
+    var medicalSupplySnapshot;
+
+    try {
+      referenceMedicalSupplyList.clear();
+      referenceHospitalLocationList.clear();
+
+      //  print(newList.documents);
+      final response =
+          await http.get('https://jsonplaceholder.typicode.com/albums/1');
+      if (response.statusCode == 200) {
+        medicalSupplySnapshot = json.decode(response.body);
+        notifyListeners();
+      } else {
+        throw Exception('Failed to load album');
+      }
+
+      medicalSupplySnapshot.documents.forEach((element) {
         print(element['Name'] + element['id']);
         referenceMedicalSupplyList.add(
             FetchedMedicalSupply(name: element['Name'], id: element['id']));
