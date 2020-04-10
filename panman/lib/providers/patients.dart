@@ -12,6 +12,7 @@ import '../models/patientVital.dart';
 class Patients with ChangeNotifier {
   List<Patient> fetchedPatientsList = [];
   Patient selectedPatient;
+  Patient newPatient = Patient();
   bool stateChanged = true;
   bool isUpdating = false;
   bool isFetching = false;

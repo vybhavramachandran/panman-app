@@ -1,27 +1,28 @@
+import 'dart:io';
+
 import './address.dart';
 import './c19data.dart';
 import './event.dart';
 import './patientVital.dart';
-import './locationInHospital.dart';
 
 enum Sex { Male, Female }
 
-
 class Patient {
-   String id;
+  String id;
   String idGivenByHospital;
-   String Firstname;
-   String LastName;
-   int age;
-   Sex sex;
-   FullAddress fullAddress;
-   String hospitalID;
+  String Firstname;
+  String LastName;
+  int age;
+  Sex sex;
+  FullAddress fullAddress;
+  String hospitalID;
   String phoneNumber;
   c19 state;
   int currentLocation;
   bool ventilatorUsed;
   List<event> events;
   List<PatientVital> vitals;
+  File pic;
 
   Patient({
     this.id,
@@ -40,7 +41,7 @@ class Patient {
     this.vitals,
   });
 
-   mapifyList(List input) {
+  mapifyList(List input) {
     List<Map> newList = [];
 
     input.forEach((item) {
@@ -50,22 +51,21 @@ class Patient {
     return newList.toList();
   }
 
-
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'idGivenByHospital' : idGivenByHospital,
+      'idGivenByHospital': idGivenByHospital,
       'age': age,
       'sex': sex == Sex.Male ? "Male" : "Female",
       'ventilatorUsed': ventilatorUsed,
       'locationInHospital': this.currentLocation,
       'hospitalID': this.hospitalID,
       'covidStatus': this.state.abbrv,
-      'fullAddress': fullAddress!=null?fullAddress.toMap():"",
+      'fullAddress': fullAddress != null ? fullAddress.toMap() : "",
       'firstName': Firstname,
       'lastName': LastName,
       'events': mapifyList(events),
-      'vitals':mapifyList(vitals),
+      'vitals': mapifyList(vitals),
     };
   }
 }

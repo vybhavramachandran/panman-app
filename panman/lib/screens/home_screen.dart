@@ -1,26 +1,19 @@
 import 'package:flutter/material.dart';
-// import 'package:font_awesome_flutter/fa_icon.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:panman/models/address.dart';
-
-import 'package:random_string/random_string.dart';
-import 'dart:math' show Random;
-
 import 'package:panman/models/c19data.dart';
-import 'package:panman/models/healthcareworker.dart';
-import 'package:panman/models/hospital.dart';
 import 'package:panman/models/patient.dart';
 import 'package:provider/provider.dart';
+import 'package:random_string/random_string.dart';
 
-import '../widgets/home_page_inventory_widget.dart';
-import '../widgets/home_page_patients_widget.dart';
 import './home_page_dashboard.dart';
-
+import '../providers/auth.dart';
+import '../providers/covid19.dart';
+import '../providers/healthcareworkers.dart';
 import '../providers/hospital.dart';
 import '../providers/patients.dart';
-import '../providers/covid19.dart';
-import '../providers/auth.dart';
-import '../providers/healthcareworkers.dart';
+import '../widgets/home_page_inventory_widget.dart';
+import '../widgets/home_page_patients_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   static const routeName = '/home_screen';
@@ -179,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
         state: referenceCovid19SeverityLevelsList[0],
         ventilatorUsed: false,
         events: [],
-        vitals:[],
+        vitals: [],
       ));
 
       await Provider.of<Hospitals>(context, listen: false)
