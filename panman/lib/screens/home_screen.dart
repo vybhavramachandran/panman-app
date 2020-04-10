@@ -70,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future fetchDoctorAndHospitalDetails() async {
     print("fetchingDoctorAndHospitalDetials");
     await Provider.of<HealthCareWorkers>(context, listen: false)
-        .getHCWDetailsFromServer(
+        .getHCWDetailsFromServerUsingAPI(
             Provider.of<Auth>(context, listen: false).loggedinUser.uid);
 
     await Provider.of<Hospitals>(context, listen: false)

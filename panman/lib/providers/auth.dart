@@ -35,12 +35,15 @@ class Auth with ChangeNotifier {
       Analytics.instance.setUserId(userId: loggedinUser.uid);
 
       if (user != null) {
-        _token = user.getIdToken().toString();
+        var temp = await user.getIdToken();
+        _token = temp.token;
+        print("_token is"+_token);
         _userEmail = user.email;
         _userID = user.uid;
         tryingToAuthenticate = false;
         notifyListeners();
         final prefs = await SharedPreferences.getInstance();
+        print(_token);
         final userData = json.encode(
           {
             'token': _token,
@@ -82,8 +85,22 @@ class Auth with ChangeNotifier {
       //  print("Auto Login called ${user.toString()}");
       if (user != null) {
         loggedinUser = user;
-        _token = user.getIdToken().toString();
+        var temp = await user.getIdToken();
+        _token = temp.token;
         _userID = user.uid;
+        _userEmail = user.email;
+          final prefs = await SharedPreferences.getInstance();
+          
+          print("tryautologin called ${_token}");
+        final userData = json.encode(
+          {
+            'token': _token,
+            'userId': _userID,
+            'userEmail': _userEmail,
+            // 'expiryDate': _expiryDate.toIso8601String(),
+          },
+        );
+        prefs.setString('userData', userData);
         notifyListeners();
         //  print("TryAutoLogin returning user ${user.toString()}");
         return user;
