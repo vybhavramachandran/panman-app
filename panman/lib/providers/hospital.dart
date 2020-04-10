@@ -143,7 +143,7 @@ class Hospitals with ChangeNotifier {
   Future<bool> decrementVentilatorCount() async {
     try {
       fetchedHospital.equipments[0].qty = fetchedHospital.equipments[0].qty - 1;
-      await updateHospital();
+      await updateHospitalUsingAPI();
 
       // ventilatorCountAvailable = ventilatorCountAvailable-1;
       notifyListeners();
@@ -156,7 +156,7 @@ class Hospitals with ChangeNotifier {
     try {
       fetchedHospital.equipments[0].qty = fetchedHospital.equipments[0].qty + 1;
 
-      await updateHospital();
+      await updateHospitalUsingAPI();
 
       //   ventilatorCountAvailable = ventilatorCountAvailable+1;
       notifyListeners();
@@ -172,7 +172,7 @@ class Hospitals with ChangeNotifier {
 
       fetchedHospital.locations[location].count =
           fetchedHospital.locations[location].count + 1;
-      await updateHospital();
+      await updateHospitalUsingAPI();
     } catch (e) {
       print(e);
     }
@@ -186,7 +186,7 @@ class Hospitals with ChangeNotifier {
           .indexWhere((element) => element.id == locationToBeDecremented);
       fetchedHospital.locations[oldLocation].count =
           fetchedHospital.locations[oldLocation].count - 1;
-      await updateHospital();
+      await updateHospitalUsingAPI();
     } catch (e) {
       print(e);
     }
@@ -201,7 +201,7 @@ class Hospitals with ChangeNotifier {
       fetchedHospital.locations[newLocation].count =
           fetchedHospital.locations[newLocation].count + 1;
 
-      await updateHospital();
+      await updateHospitalUsingAPI();
     } catch (e) {
       print(e);
     }
@@ -214,7 +214,7 @@ class Hospitals with ChangeNotifier {
           .indexWhere((element) => element.id == item.id);
       fetchedHospital.medicalSupplies[itemToUpdate].qty = newQuantity;
       print(fetchedHospital.medicalSupplies[itemToUpdate].qty);
-      await updateHospital();
+      await updateHospitalUsingAPI();
     } catch (e) {
       print(e);
     }
@@ -259,17 +259,19 @@ class Hospitals with ChangeNotifier {
     var decodedJson = json.decode(userData);
     var token = decodedJson['token'];
     try {
-      final response = await http.get(
+      final response = await http.put(
           'https://us-central1-thewarroom-98e6d.cloudfunctions.net/app/hospital/' +
               fetchedHospital.id,
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
             'Authorization': 'Bearer ${token}',
-          });
+          },
+          body: json.encode(fetchedHospital.toMap()),
+);
       if (response.statusCode == 200) {
         hospitalSnapshot = json.decode(response.body);
-        print(hospitalSnapshot.toString());
+        print("This is the request body of the hospital UPDATE"+hospitalSnapshot.toString());
         notifyListeners();
       } else {
         throw Exception('Failed to load album');
