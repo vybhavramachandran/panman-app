@@ -165,7 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
       country: country,
     );
     try {
-      await Provider.of<Patients>(context, listen: false).addPatient(Patient(
+      await Provider.of<Patients>(context, listen: false).addPatientUsingApi(Patient(
         Firstname: firstName,
         LastName: lastName,
         age: age,

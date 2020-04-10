@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:panman/utils/analytics_client.dart';
 import 'package:random_string/random_string.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 import '../models/address.dart';
 import '../models/c19data.dart';
@@ -69,10 +73,77 @@ class Patients with ChangeNotifier {
     }
   }
 
+  Future fetchPatientsListFromServerAPI(String hospitalID) async {
+    print("fetchPatientsList Called");
+
+    final prefs = await SharedPreferences.getInstance();
+    var userData = prefs.getString('userData');
+    // print("userData+${userData}");
+    var decodedJson = json.decode(userData);
+    var token = decodedJson['token'];
+    try {
+      isFetching = true;
+
+      //notifyListeners();
+      fetchedPatientsList.clear();
+
+      final response = await http.get(
+          'https://us-central1-thewarroom-98e6d.cloudfunctions.net/app/patient/hospitalid/' +
+              hospitalID,
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': 'Bearer ${token}',
+          });
+      if (response.statusCode == 200) {
+        patientSnapshot = json.decode(response.body);
+        print(patientSnapshot.toString());
+        notifyListeners();
+      } else {
+        throw Exception('Failed to load album');
+      }
+
+      patientSnapshot.forEach((patient) async {
+        print(patient['firstName'] + patient['covidStatus']);
+        fetchedPatientsList.add(Patient(
+          Firstname: patient['firstName'],
+          LastName: patient['lastName'],
+          age: patient['age'],
+          currentLocation: patient['locationInHospital'],
+          state: referenceCovid19SeverityLevelsList
+              .firstWhere((element) => element.abbrv == patient['covidStatus']),
+          fullAddress: FullAddress.fromMap(patient['fullAddress']),
+          sex: patient['sex'] == "Male" ? Sex.Male : Sex.Female,
+          ventilatorUsed: patient['ventilatorUsed'],
+          id: patient['id'],
+          phoneNumber: patient['phoneNumber'],
+          hospitalID: patient['hospitalID'],
+          idGivenByHospital: patient['idGivenByHospital'],
+          events: patient['events'] == null
+              ? []
+              : patient['events'].map<event>((eventToBeAdded) {
+                  return event.fromMap(eventToBeAdded);
+                }).toList(),
+          vitals: patient['vitals'] == null
+              ? []
+              : patient['vitals'].map<PatientVital>((vitalToBeAdded) {
+                  return PatientVital.fromMap(vitalToBeAdded);
+                }).toList(),
+        ));
+      });
+      Analytics.instance.logEvent(name: 'fetchPatientsListFromServer');
+      isFetching = false;
+      shouldRefreshList = false;
+      notifyListeners();
+    } catch (e) {
+      print(e);
+    }
+  }
+
   Future addVitalMeasurement(PatientVital vital) async {
     try {
       selectedPatient.vitals.add(vital);
-      await updatePatientProfileInFirebase();
+      await updatePatientProfileInFirebaseWithAPI();
       notifyListeners();
     } catch (e) {
       print(e);
@@ -167,7 +238,7 @@ class Patients with ChangeNotifier {
             eventType: "patient_death",
             eventTime: DateTime.now(),
             eventData: "${oldLocation}->${newLocation}");
-        await updatePatientProfileInFirebase();
+        await updatePatientProfileInFirebaseWithAPI();
 
         Analytics.instance.logEvent(name: 'movePatient', parameters: {
           'eventType': 'patient_death',
@@ -180,7 +251,7 @@ class Patients with ChangeNotifier {
             eventType: "patient_transfer",
             eventTime: DateTime.now(),
             eventData: "${oldLocation}->${newLocation}");
-        await updatePatientProfileInFirebase();
+        await updatePatientProfileInFirebaseWithAPI();
         Analytics.instance.logEvent(name: 'movePatient', parameters: {
           'eventType': 'patient_transfer',
           'eventTime': DateTime.now(),
@@ -192,7 +263,7 @@ class Patients with ChangeNotifier {
             eventType: "patient_discharged",
             eventTime: DateTime.now(),
             eventData: "${oldLocation}->${newLocation}");
-        await updatePatientProfileInFirebase();
+        await updatePatientProfileInFirebaseWithAPI();
         Analytics.instance.logEvent(name: 'movePatient', parameters: {
           'eventType': 'patient_discharged',
           'eventTime': DateTime.now(),
@@ -203,7 +274,7 @@ class Patients with ChangeNotifier {
             eventType: "hospital_movement",
             eventTime: DateTime.now(),
             eventData: "${oldLocation}->${newLocation}");
-        await updatePatientProfileInFirebase();
+        await updatePatientProfileInFirebaseWithAPI();
         Analytics.instance.logEvent(name: 'movePatient', parameters: {
           'eventType': 'hospital_movement',
           'eventTime': DateTime.now(),
@@ -230,7 +301,7 @@ class Patients with ChangeNotifier {
           eventType: "covid19_severity_change",
           eventTime: DateTime.now(),
           eventData: "${oldState.abbrv}->${selectedPatient.state.abbrv}");
-      await updatePatientProfileInFirebase();
+      await updatePatientProfileInFirebaseWithAPI();
 
       notifyListeners();
 
@@ -254,7 +325,7 @@ class Patients with ChangeNotifier {
           eventType: "ventilator",
           eventTime: DateTime.now(),
           eventData: newValue.toString());
-      await updatePatientProfileInFirebase();
+      await updatePatientProfileInFirebaseWithAPI();
       notifyListeners();
 
       Analytics.instance
@@ -272,9 +343,15 @@ class Patients with ChangeNotifier {
   }
 
   Future<bool> addPatient(Patient patientToAdd) async {
+    final prefs = await SharedPreferences.getInstance();
+    var userData = prefs.getString('userData');
+    // print("userData+${userData}");
+    var decodedJson = json.decode(userData);
+    var token = decodedJson['token'];
     try {
       isAddingPatient = true;
       notifyListeners();
+
       var patientsCollection = Firestore.instance.collection('patients');
       event newEvent = event(
           eventType: "hospital_admission",
@@ -285,6 +362,57 @@ class Patients with ChangeNotifier {
       await patientsCollection.document(patientToAdd.id).setData(
             patientToAdd.toMap(),
           );
+      isAddingPatient = false;
+      shouldRefreshList = true;
+      notifyListeners();
+
+      Analytics.instance.logEvent(name: 'addPatient', parameters: {
+        'eventType': 'hospital_admission',
+        'eventTime': DateTime.now(),
+        'eventData': patientToAdd.hospitalID,
+        'eventID': randomAlphaNumeric(20),
+      });
+
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
+  Future<bool> addPatientUsingApi(Patient patientToAdd) async {
+    final prefs = await SharedPreferences.getInstance();
+    var userData = prefs.getString('userData');
+    // print("userData+${userData}");
+    var decodedJson = json.decode(userData);
+    var token = decodedJson['token'];
+    try {
+      isAddingPatient = true;
+      notifyListeners();
+
+      event newEvent = event(
+          eventType: "hospital_admission",
+          eventData: patientToAdd.hospitalID,
+          eventDateTime: DateTime.now(),
+          eventID: randomAlphaNumeric(20));
+      patientToAdd.events.add(newEvent);
+
+      final response = await http.post(
+        'https://us-central1-thewarroom-98e6d.cloudfunctions.net/app/patient/',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer ${token}',
+        },
+        body: json.encode(patientToAdd.toMap()),
+      );
+      if (response.statusCode == 200) {
+        print("Patient added successfully");
+        notifyListeners();
+      } else {
+        throw Exception('Failed to load album');
+      }
+
       isAddingPatient = false;
       shouldRefreshList = true;
       notifyListeners();
@@ -345,6 +473,48 @@ class Patients with ChangeNotifier {
       await patientsCollection
           .document(selectedPatient.id)
           .updateData(selectedPatient.toMap());
+      isUpdating = false;
+      notifyListeners();
+
+      Analytics.instance
+          .logEvent(name: 'addPatient', parameters: selectedPatient.toMap());
+
+      // updatingInFirebase = false;
+      // finishedUpdatingFirebase = true;
+      // notifyListeners();
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future updatePatientProfileInFirebaseWithAPI() async {
+    final prefs = await SharedPreferences.getInstance();
+    var userData = prefs.getString('userData');
+    // print("userData+${userData}");
+    var decodedJson = json.decode(userData);
+    var token = decodedJson['token'];
+    try {
+  //    var patientsCollection = Firestore.instance.collection('patients');
+      isUpdating = true;
+      // updatingInFirebase = true;
+      // finishedUpdatingFirebase = false;
+      notifyListeners();
+
+       final response = await http.put(
+        'https://us-central1-thewarroom-98e6d.cloudfunctions.net/app/patient/'+selectedPatient.id,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer ${token}',
+        },
+        body: json.encode(selectedPatient.toMap()),
+      );
+      if (response.statusCode == 200) {
+        print("Patient updated successfully");
+        notifyListeners();
+      } else {
+        throw Exception('Failed to load album');
+      }
       isUpdating = false;
       notifyListeners();
 

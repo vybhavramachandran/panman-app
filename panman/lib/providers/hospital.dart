@@ -247,4 +247,45 @@ class Hospitals with ChangeNotifier {
       print(e);
     }
   }
+
+  Future updateHospitalUsingAPI() async {
+    isUpdating = true;
+    // updatingInFirebase = true;
+    // finishedUpdatingFirebase = false;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    var userData = prefs.getString('userData');
+    // print("userData+${userData}");
+    var decodedJson = json.decode(userData);
+    var token = decodedJson['token'];
+    try {
+      final response = await http.get(
+          'https://us-central1-thewarroom-98e6d.cloudfunctions.net/app/hospital/' +
+              fetchedHospital.id,
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': 'Bearer ${token}',
+          });
+      if (response.statusCode == 200) {
+        hospitalSnapshot = json.decode(response.body);
+        print(hospitalSnapshot.toString());
+        notifyListeners();
+      } else {
+        throw Exception('Failed to load album');
+      }
+      isUpdating = false;
+      notifyListeners();
+
+      Analytics.instance.logEvent(
+          name: 'getHospitalDetailsFromServer',
+          parameters: fetchedHospital.toMap());
+
+      // updatingInFirebase = false;
+      // finishedUpdatingFirebase = true;
+      // notifyListeners();
+    } catch (e) {
+      print(e);
+    }
+  }
 }

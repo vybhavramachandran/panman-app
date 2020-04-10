@@ -36,7 +36,7 @@ class _HomePagePatientsWidgetState extends State<HomePagePatientsWidget> {
 
     print("refreshListOfPatients called");
     return await Provider.of<Patients>(context, listen: false)
-        .fetchPatientsListFromServer(hospitalID);
+        .fetchPatientsListFromServerAPI(hospitalID);
   }
 
   @override

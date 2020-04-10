@@ -19,7 +19,7 @@ class event {
       : this(
           eventID: data['eventID'],
           eventType: data['eventType'],
-          eventDateTime: data['eventDateTime'].toDate(),
+          eventDateTime: DateTime.parse(data['eventDateTime']),
           eventData: data['eventData'],
         );
 
@@ -27,7 +27,7 @@ class event {
     return {
       'eventID': eventID,
       'eventType': eventType,
-      'eventDateTime': Timestamp.fromDate(eventDateTime) ,
+      'eventDateTime': eventDateTime.toString(),
       'eventData': eventData,
     };
   }
