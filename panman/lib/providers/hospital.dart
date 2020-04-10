@@ -9,6 +9,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 class FetchedMedicalSupply {
   String id;
   String name;
@@ -57,37 +59,6 @@ class Hospitals with ChangeNotifier {
     }
   }
 
-  Future getReferenceMedicalSupplyListFromAPI() async {
-    var medicalSupplySnapshot;
-
-    try {
-      referenceMedicalSupplyList.clear();
-      referenceHospitalLocationList.clear();
-
-      //  print(newList.documents);
-      final response =
-          await http.get('https://jsonplaceholder.typicode.com/albums/1');
-      if (response.statusCode == 200) {
-        medicalSupplySnapshot = json.decode(response.body);
-        notifyListeners();
-      } else {
-        throw Exception('Failed to load album');
-      }
-
-      medicalSupplySnapshot.documents.forEach((element) {
-        print(element['Name'] + element['id']);
-        referenceMedicalSupplyList.add(
-            FetchedMedicalSupply(name: element['Name'], id: element['id']));
-      });
-
-      notifyListeners();
-
-      Analytics.instance.logEvent(name: 'getReferenceMedicalSupplyList');
-    } catch (e) {
-      print(e);
-    }
-  }
-
   Future getReferenceHospitalLocationList() async {
     try {
       var hospitalReferenceCollection =
@@ -120,6 +91,44 @@ class Hospitals with ChangeNotifier {
       print("Calling getHospitalDetails $hospitalID");
       hospitalSnapshot = await hospitalsCollection.document(hospitalID).get();
       print("Fetched ${hospitalSnapshot.data}");
+      fetchedHospital = Hospital.fromMap(hospitalSnapshot.data);
+      print("Fetched Hospital Name is" + fetchedHospital.toString());
+
+      notifyListeners();
+      Analytics.instance.logEvent(name: 'getHospitalDetailsFromServer');
+      return true;
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future getHospitalDetailsFromServerUsingAPI(String hospitalID) async {
+    print("Calling getHospitalDetails $hospitalID");
+
+    final prefs = await SharedPreferences.getInstance();
+    var userData = prefs.getString('userData');
+    // print("userData+${userData}");
+    var decodedJson = json.decode(userData);
+    var token = decodedJson['token'];
+    // print("Fetched token is $token");
+    try {
+      final response = await http.get(
+          'https://us-central1-thewarroom-98e6d.cloudfunctions.net/app/hospital/' +
+              hospitalID,
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': 'Bearer ${token}',
+          });
+      if (response.statusCode == 200) {
+        hospitalSnapshot = json.decode(response.body);
+        print(hospitalSnapshot.toString());
+        notifyListeners();
+      } else {
+        throw Exception('Failed to load album');
+      }
+      //hospitalSnapshot = await hospitalsCollection.document(hospitalID).get();
+      // print("Fetched ${hospitalSnapshot.data}");
       fetchedHospital = Hospital.fromMap(hospitalSnapshot.data);
       print("Fetched Hospital Name is" + fetchedHospital.toString());
 
