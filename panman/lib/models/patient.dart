@@ -3,6 +3,8 @@ import './c19data.dart';
 import './event.dart';
 import './patientVital.dart';
 import './locationInHospital.dart';
+import './travelHistory.dart';
+import './delhiSpecificDetails.dart';
 
 enum Sex { Male, Female }
 
@@ -22,6 +24,8 @@ class Patient {
   bool ventilatorUsed;
   List<event> events;
   List<PatientVital> vitals;
+  List<TravelHistory> travelHistory;
+  DelhiSpecificDetails delhiDetails; 
 
   Patient({
     this.id,
@@ -38,6 +42,8 @@ class Patient {
     this.ventilatorUsed,
     this.events,
     this.vitals,
+    this.travelHistory,
+    this.delhiDetails,
   });
 
    mapifyList(List input) {
@@ -66,6 +72,9 @@ class Patient {
       'lastName': LastName,
       'events': mapifyList(events),
       'vitals':mapifyList(vitals),
+      'delhiDetails':delhiDetails!=null?delhiDetails.toMap():"",
+      'travelHistory':travelHistory!=null?mapifyList(travelHistory):"",
+
     };
   }
 }

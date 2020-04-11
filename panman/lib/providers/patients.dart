@@ -12,6 +12,8 @@ import '../models/c19data.dart';
 import '../models/event.dart';
 import '../models/patient.dart';
 import '../models/patientVital.dart';
+import '../models/travelHistory.dart';
+import '../models/delhiSpecificDetails.dart';
 
 class Patients with ChangeNotifier {
   List<Patient> fetchedPatientsList = [];
@@ -129,6 +131,12 @@ class Patients with ChangeNotifier {
               : patient['vitals'].map<PatientVital>((vitalToBeAdded) {
                   return PatientVital.fromMap(vitalToBeAdded);
                 }).toList(),
+          travelHistory: patient['travelHistory'] == null
+              ? []
+              : patient['travelHistory'].map<TravelHistory>((travel) {
+                  return TravelHistory.fromMap(travel);
+                }).toList(),
+          delhiDetails: patient['delhiDetails']
         ));
       });
       Analytics.instance.logEvent(name: 'fetchPatientsListFromServer');
@@ -397,6 +405,8 @@ class Patients with ChangeNotifier {
           eventID: randomAlphaNumeric(20));
       patientToAdd.events.add(newEvent);
 
+      print(patientToAdd.toMap().toString());
+
       final response = await http.post(
         'https://us-central1-thewarroom-98e6d.cloudfunctions.net/app/patient/',
         headers: {
@@ -494,14 +504,15 @@ class Patients with ChangeNotifier {
     var decodedJson = json.decode(userData);
     var token = decodedJson['token'];
     try {
-  //    var patientsCollection = Firestore.instance.collection('patients');
+      //    var patientsCollection = Firestore.instance.collection('patients');
       isUpdating = true;
       // updatingInFirebase = true;
       // finishedUpdatingFirebase = false;
       notifyListeners();
 
-       final response = await http.put(
-        'https://us-central1-thewarroom-98e6d.cloudfunctions.net/app/patient/'+selectedPatient.id,
+      final response = await http.put(
+        'https://us-central1-thewarroom-98e6d.cloudfunctions.net/app/patient/' +
+            selectedPatient.id,
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
