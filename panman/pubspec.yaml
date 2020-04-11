@@ -27,6 +27,7 @@ dependencies:
   cloud_firestore: ^0.12.9+5
   flutter_svg: ^0.17.4
   image_picker: ^0.6.4
+  intl:
   dots_indicator:
   charts_flutter:
   firebase_auth:

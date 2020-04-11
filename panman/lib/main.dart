@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_offline/flutter_offline.dart';
-import 'package:panman/screens/patient_dashboard.dart';
 import 'package:panman/utils/analytics_client.dart';
 import 'package:provider/provider.dart';
 
@@ -154,7 +153,7 @@ class MyApp extends StatelessWidget {
                                     ConnectionState.done ||
                                 authResultSnapshot.hasData) {
                               return auth.isAuth
-                                  ? SafeArea(child: PatientDashboardScreen())
+                                  ? SafeArea(child: HomeScreen())
                                   : AuthScreen();
                             } else {
                               return SplashScreen();

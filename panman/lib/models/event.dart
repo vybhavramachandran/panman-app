@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class event {
@@ -14,7 +13,6 @@ class event {
     this.eventData,
   });
 
-  
   event.fromMap(Map data)
       : this(
           eventID: data['eventID'],
@@ -27,7 +25,7 @@ class event {
     return {
       'eventID': eventID,
       'eventType': eventType,
-      'eventDateTime': Timestamp.fromDate(eventDateTime) ,
+      'eventDateTime': Timestamp.fromDate(eventDateTime),
       'eventData': eventData,
     };
   }

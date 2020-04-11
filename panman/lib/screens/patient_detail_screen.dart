@@ -1,15 +1,14 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-//import 'package:font_awesome_flutter/fa_icon.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
+import 'package:panman/models/event.dart';
 import 'package:provider/provider.dart';
 
-import '../models/patient.dart';
 import '../models/arguments/patient_detail_arguments.dart';
-
-import '../widgets/patient_detailed_header.dart';
-import '../widgets/timeline.dart';
-import '../screens/patient_detail_cov19_screen.dart';
+import '../models/patient.dart';
 import '../providers/patients.dart';
+import '../widgets/patient_detailed_header.dart';
 
 class PatientDetailScreen extends StatefulWidget {
   static const routeName = '/patient_detail_screen';
@@ -70,78 +69,201 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
     );
   }
 
-  patientDetailScreenHome(Patient selectedPatient) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
+  Widget _eventWidget(
+      {@required event event, @required bool isStart, @required bool isLast}) {
+    return Container(
+      height: 62.0,
       child: Row(
         children: <Widget>[
-          // Flexible(
-          //   flex: 2,
-          //   child: SingleChildScrollView(
-          //     child: Container(
-          //       child: Timeline(
-          //         children: <Widget>[
-          //           Container(height: 100, color: Colors.red),
-          //           Container(height: 50, color: Colors.blue),
-          //           Container(height: 200, color: Colors.green),
-          //           Container(height: 100, color: Colors.yellow),
-          //           Container(height: 200, color: Colors.green),
-          //           Container(height: 100, color: Colors.yellow),
-          //           Container(height: 200, color: Colors.green),
-          //           Container(height: 100, color: Colors.yellow),
-          //           Container(height: 200, color: Colors.green),
-          //           Container(height: 100, color: Colors.yellow),
-
-          //         ],
-          //         indicators: <Widget>[
-          //           Icon(Icons.access_alarm),
-          //           Icon(Icons.backup),
-          //           Icon(Icons.accessibility_new),
-          //           Icon(Icons.access_alarm),
-          //           Icon(Icons.accessibility_new),
-          //           Icon(Icons.access_alarm),
-          //           Icon(Icons.accessibility_new),
-          //           Icon(Icons.access_alarm),
-          //           Icon(Icons.accessibility_new),
-          //           Icon(Icons.access_alarm),
-
-          //         ],
-          //       ),
-          //     ),
-          //   ),
-          // ),
-          Flexible(
-            flex: 2,
-            child: GridView.count(
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
-              crossAxisCount: 2,
+          Column(
+            children: <Widget>[
+              Container(height: isStart ? 16.0 : 0.0),
+              Container(
+                height: isStart ? 0.0 : 40.0,
+                width: 2.0,
+                color: Color(0xFF8B8B8B),
+              ),
+              Container(
+                width: 6.0,
+                height: 6.0,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Color(0xFF8B8B8B),
+                ),
+              ),
+              Container(
+                height: isLast ? 0.0 : 40.0,
+                width: 2.0,
+                color: Color(0xFF8B8B8B),
+              ),
+            ],
+          ),
+          Container(
+            height: 40.0,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                patientPageCard(
-                  iconToDisplay: "assets/images/monitor.png",
-                  titleOfCard: "PATIENT VITALS",
-                  moveToPage: "/patient_vitals_screen",
+                // TODO: i put fixed icon as i think icons should be included with event object
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: SvgPicture.asset(
+                    'assets/images/isolation.svg',
+                    height: 40.0,
+                  ),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      DateFormat.yMMMMd().format(event.eventDateTime),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12.0,
+                      ),
+                    ),
+                    SizedBox(height: 4.0),
+                    Text(
+                      event.eventType,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 14.0),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Spacer(),
+          Icon(
+            Icons.open_in_new,
+            color: Colors.black,
+          ),
+        ],
+      ),
+    );
+  }
 
-                  //  patient: selectedPatient,
-                ),
-                patientPageCard(
-                  iconToDisplay: "assets/images/virus.png",
-                  titleOfCard: "PATIENT COVID CATEGORY",
-                  moveToPage: "/patient_detail_cov19_screen",
-                  // patient: selectedPatient,
-                ),
-                patientPageCard(
-                  iconToDisplay: "assets/images/move.png",
-                  titleOfCard: "MOVE PATIENT",
-                  moveToPage: "/patient_detail_move_screen",
+  patientDetailScreenHome(Patient selectedPatient) {
+    selectedPatient.events
+        .sort((a, b) => b.eventDateTime.compareTo(a.eventDateTime));
 
-                  // patient: selectedPatient,
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: <Widget>[
+          Container(
+            height: 280.0,
+            margin: EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(2.0)),
+            child: Card(
+              color: Colors.white,
+              elevation: 2.0,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(2.0)),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      'PATIENT HISTORY',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(height: 24.0),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: selectedPatient.events
+                              .map((e) => _eventWidget(
+                                    event: e,
+                                    isStart:
+                                        selectedPatient.events.indexOf(e) == 0,
+                                    isLast: selectedPatient.events.indexOf(e) ==
+                                        (selectedPatient.events.length - 1),
+                                  ))
+                              .toList(),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                patientPageCard(
-                  iconToDisplay: "assets/images/ventilator.png",
-                  titleOfCard: "ASSIGN EQUIPMENT",
-                  moveToPage: '/patient_detail_assign_equipment_screen',
-                  // patient: selectedPatient,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Row(
+              children: <Widget>[
+                // Flexible(
+                //   flex: 2,
+                //   child: SingleChildScrollView(
+                //     child: Container(
+                //       child: Timeline(
+                //         children: <Widget>[
+                //           Container(height: 100, color: Colors.red),
+                //           Container(height: 50, color: Colors.blue),
+                //           Container(height: 200, color: Colors.green),
+                //           Container(height: 100, color: Colors.yellow),
+                //           Container(height: 200, color: Colors.green),
+                //           Container(height: 100, color: Colors.yellow),
+                //           Container(height: 200, color: Colors.green),
+                //           Container(height: 100, color: Colors.yellow),
+                //           Container(height: 200, color: Colors.green),
+                //           Container(height: 100, color: Colors.yellow),
+
+                //         ],
+                //         indicators: <Widget>[
+                //           Icon(Icons.access_alarm),
+                //           Icon(Icons.backup),
+                //           Icon(Icons.accessibility_new),
+                //           Icon(Icons.access_alarm),
+                //           Icon(Icons.accessibility_new),
+                //           Icon(Icons.access_alarm),
+                //           Icon(Icons.accessibility_new),
+                //           Icon(Icons.access_alarm),
+                //           Icon(Icons.accessibility_new),
+                //           Icon(Icons.access_alarm),
+
+                //         ],
+                //       ),
+                //     ),
+                //   ),
+                // ),
+                Flexible(
+                  flex: 2,
+                  child: GridView.count(
+                    mainAxisSpacing: 10,
+                    crossAxisSpacing: 10,
+                    crossAxisCount: 2,
+                    children: <Widget>[
+                      patientPageCard(
+                        iconToDisplay: "assets/images/monitor.png",
+                        titleOfCard: "PATIENT VITALS",
+                        moveToPage: "/patient_vitals_screen",
+
+                        //  patient: selectedPatient,
+                      ),
+                      patientPageCard(
+                        iconToDisplay: "assets/images/virus.png",
+                        titleOfCard: "PATIENT COVID CATEGORY",
+                        moveToPage: "/patient_detail_cov19_screen",
+                        // patient: selectedPatient,
+                      ),
+                      patientPageCard(
+                        iconToDisplay: "assets/images/move.png",
+                        titleOfCard: "MOVE PATIENT",
+                        moveToPage: "/patient_detail_move_screen",
+
+                        // patient: selectedPatient,
+                      ),
+                      patientPageCard(
+                        iconToDisplay: "assets/images/ventilator.png",
+                        titleOfCard: "ASSIGN EQUIPMENT",
+                        moveToPage: '/patient_detail_assign_equipment_screen',
+                        // patient: selectedPatient,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
