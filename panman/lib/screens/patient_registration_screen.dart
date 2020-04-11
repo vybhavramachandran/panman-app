@@ -298,7 +298,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
     {"Area": "Jawahar Nagar", "Pincode": 110007, "Disctrict": "North Delhi"},
     {"Area": "Jharoda Majraa", "Pincode": 110084, "Disctrict": "North Delhi"},
     {"Area": "Kamla Nagar", "Pincode": 110007, "Disctrict": "North Delhi"},
-    {"Area": "Majnu ka Tila", "Pincode": 110054, "Disctrict": "North Delhi"},
+    {"Area": "Majnu ka a", "Pincode": 110054, "Disctrict": "North Delhi"},
     {"Area": "Malka Ganj", "Pincode": 110007, "Disctrict": "North Delhi"},
     {"Area": "Padam Nagar", "Pincode": 110007, "Disctrict": "North Delhi"},
     {
