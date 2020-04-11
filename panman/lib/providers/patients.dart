@@ -18,6 +18,7 @@ import '../models/delhiSpecificDetails.dart';
 class Patients with ChangeNotifier {
   List<Patient> fetchedPatientsList = [];
   Patient selectedPatient;
+  Patient newPatient = Patient();
   bool stateChanged = true;
   bool isUpdating = false;
   bool isFetching = false;
@@ -108,36 +109,35 @@ class Patients with ChangeNotifier {
       patientSnapshot.forEach((patient) async {
         print(patient['firstName'] + patient['covidStatus']);
         fetchedPatientsList.add(Patient(
-          Firstname: patient['firstName'],
-          LastName: patient['lastName'],
-          age: patient['age'],
-          currentLocation: patient['locationInHospital'],
-          state: referenceCovid19SeverityLevelsList
-              .firstWhere((element) => element.abbrv == patient['covidStatus']),
-          fullAddress: FullAddress.fromMap(patient['fullAddress']),
-          sex: patient['sex'] == "Male" ? Sex.Male : Sex.Female,
-          ventilatorUsed: patient['ventilatorUsed'],
-          id: patient['id'],
-          phoneNumber: patient['phoneNumber'],
-          hospitalID: patient['hospitalID'],
-          idGivenByHospital: patient['idGivenByHospital'],
-          events: patient['events'] == null
-              ? []
-              : patient['events'].map<event>((eventToBeAdded) {
-                  return event.fromMap(eventToBeAdded);
-                }).toList(),
-          vitals: patient['vitals'] == null
-              ? []
-              : patient['vitals'].map<PatientVital>((vitalToBeAdded) {
-                  return PatientVital.fromMap(vitalToBeAdded);
-                }).toList(),
-          travelHistory: patient['travelHistory'] == null
-              ? []
-              : patient['travelHistory'].map<TravelHistory>((travel) {
-                  return TravelHistory.fromMap(travel);
-                }).toList(),
-          delhiDetails: patient['delhiDetails']
-        ));
+            Firstname: patient['firstName'],
+            LastName: patient['lastName'],
+            age: patient['age'],
+            currentLocation: patient['locationInHospital'],
+            state: referenceCovid19SeverityLevelsList.firstWhere(
+                (element) => element.abbrv == patient['covidStatus']),
+            fullAddress: FullAddress.fromMap(patient['fullAddress']),
+            sex: patient['sex'] == "Male" ? Sex.Male : Sex.Female,
+            ventilatorUsed: patient['ventilatorUsed'],
+            id: patient['id'],
+            phoneNumber: patient['phoneNumber'],
+            hospitalID: patient['hospitalID'],
+            idGivenByHospital: patient['idGivenByHospital'],
+            events: patient['events'] == null
+                ? []
+                : patient['events'].map<event>((eventToBeAdded) {
+                    return event.fromMap(eventToBeAdded);
+                  }).toList(),
+            vitals: patient['vitals'] == null
+                ? []
+                : patient['vitals'].map<PatientVital>((vitalToBeAdded) {
+                    return PatientVital.fromMap(vitalToBeAdded);
+                  }).toList(),
+            travelHistory: patient['travelHistory'] == null
+                ? []
+                : patient['travelHistory'].map<TravelHistory>((travel) {
+                    return TravelHistory.fromMap(travel);
+                  }).toList(),
+            delhiDetails: patient['delhiDetails']));
       });
       Analytics.instance.logEvent(name: 'fetchPatientsListFromServer');
       isFetching = false;
