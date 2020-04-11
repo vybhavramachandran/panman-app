@@ -119,7 +119,7 @@ class PatientScreeningScreen extends StatelessWidget {
                   Padding(
                     padding: EdgeInsets.all(16.0),
                     child: Text(
-                        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua?'),
+                        'Has the patient travelled to any country in the last 30 days?'),
                   ),
                   Row(
                     children: <Widget>[

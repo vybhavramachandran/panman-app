@@ -23,6 +23,7 @@ import './screens/patient_vitals_add_screen.dart';
 import './screens/patient_vitals_screen.dart';
 import './screens/splash_screen.dart';
 import './screens/patient_dashboard.dart';
+import './screens/patient_registration_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -154,13 +155,14 @@ class MyApp extends StatelessWidget {
                                     ConnectionState.done ||
                                 authResultSnapshot.hasData) {
                               return auth.isAuth
-                                  ? SafeArea(child: PatientDashboardScreen())
+                                  ? SafeArea(child: HomeScreen())
                                   : AuthScreen();
                             } else {
                               return SplashScreen();
                             }
                           }),
                       routes: {
+                        PatientRegistrationScreen.routeName :(ctx)=> PatientRegistrationScreen(),
                         PatientDashboardScreen.routeName :(ctx) => PatientDashboardScreen(),
                         HomeScreen.routeName: (ctx) => HomeScreen(),
                         PatientDetailScreen.routeName: (ctx) =>
