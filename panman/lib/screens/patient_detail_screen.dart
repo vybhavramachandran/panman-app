@@ -143,6 +143,13 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
                   moveToPage: '/patient_detail_assign_equipment_screen',
                   // patient: selectedPatient,
                 ),
+                patientPageCard(
+                  iconToDisplay: "assets/images/monitor.png",
+                  titleOfCard: "TESTS",
+                  moveToPage: "/add_test_screen",
+
+                  //  patient: selectedPatient,
+                ),
               ],
             ),
           ),

@@ -24,6 +24,7 @@ import './screens/patient_vitals_screen.dart';
 import './screens/splash_screen.dart';
 import './screens/patient_dashboard.dart';
 import './screens/patient_registration_screen.dart';
+import './screens/add_test_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -162,6 +163,7 @@ class MyApp extends StatelessWidget {
                             }
                           }),
                       routes: {
+                        AddTestScreen.routeName :(ctx)=>AddTestScreen(),
                         PatientRegistrationScreen.routeName :(ctx)=> PatientRegistrationScreen(),
                         PatientDashboardScreen.routeName :(ctx) => PatientDashboardScreen(),
                         HomeScreen.routeName: (ctx) => HomeScreen(),

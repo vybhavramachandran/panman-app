@@ -5,6 +5,7 @@ import './patientVital.dart';
 import './locationInHospital.dart';
 import './travelHistory.dart';
 import './delhiSpecificDetails.dart';
+import './test.dart';
 
 import 'dart:io';
 
@@ -28,6 +29,7 @@ class Patient {
   List<TravelHistory> travelHistory;
   DelhiSpecificDetails delhiDetails;
   File pic;
+  List<Test> tests;
 
   Patient({
     this.id,
@@ -47,6 +49,7 @@ class Patient {
     this.travelHistory,
     this.delhiDetails,
     this.pic,
+    this.tests,
   });
 
   mapifyList(List input) {
@@ -76,6 +79,7 @@ class Patient {
       'vitals': mapifyList(vitals),
       'delhiDetails': delhiDetails != null ? delhiDetails.toMap() : "",
       'travelHistory': travelHistory != null ? mapifyList(travelHistory) : "",
+      'tests': tests != null ? mapifyList(tests) : "",
     };
   }
 }
