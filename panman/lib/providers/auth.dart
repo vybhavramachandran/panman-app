@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:panman/utils/analytics_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -27,12 +26,10 @@ class Auth with ChangeNotifier {
         password: password,
       );
 
-      Analytics.instance.logLogin();
 
       FirebaseUser user = result.user;
       loggedinUser = result.user;
 
-      Analytics.instance.setUserId(userId: loggedinUser.uid);
 
       if (user != null) {
         var temp = await user.getIdToken();

@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:panman/models/hospital.dart';
 import 'package:panman/models/medicalSupply.dart';
-import 'package:panman/utils/analytics_client.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
@@ -53,7 +52,6 @@ class Hospitals with ChangeNotifier {
 
       notifyListeners();
 
-      Analytics.instance.logEvent(name: 'getReferenceMedicalSupplyList');
     } catch (e) {
       print(e);
     }
@@ -74,7 +72,7 @@ class Hospitals with ChangeNotifier {
       });
 
       notifyListeners();
-      Analytics.instance.logEvent(name: 'getReferenceHospitalLocationList');
+
     } catch (e) {
       print(e);
     }
@@ -95,7 +93,7 @@ class Hospitals with ChangeNotifier {
       print("Fetched Hospital Name is" + fetchedHospital.toString());
 
       notifyListeners();
-      Analytics.instance.logEvent(name: 'getHospitalDetailsFromServer');
+
       return true;
     } catch (e) {
       print(e);
@@ -133,7 +131,7 @@ class Hospitals with ChangeNotifier {
       print("Fetched Hospital Name is" + fetchedHospital.toString());
 
       notifyListeners();
-      Analytics.instance.logEvent(name: 'getHospitalDetailsFromServer');
+
       return true;
     } catch (e) {
       print(e);
@@ -168,7 +166,7 @@ class Hospitals with ChangeNotifier {
   Future addPatientToTheHospital() async {
     try {
       var location =
-          fetchedHospital.locations.indexWhere((element) => element.id == "1");
+          fetchedHospital.locations.indexWhere((element) => element.id == "2");
 
       fetchedHospital.locations[location].count =
           fetchedHospital.locations[location].count + 1;
@@ -236,10 +234,6 @@ class Hospitals with ChangeNotifier {
       isUpdating = false;
       notifyListeners();
 
-      Analytics.instance.logEvent(
-          name: 'getHospitalDetailsFromServer',
-          parameters: fetchedHospital.toMap());
-
       // updatingInFirebase = false;
       // finishedUpdatingFirebase = true;
       // notifyListeners();
@@ -279,9 +273,6 @@ class Hospitals with ChangeNotifier {
       isUpdating = false;
       notifyListeners();
 
-      Analytics.instance.logEvent(
-          name: 'getHospitalDetailsFromServer',
-          parameters: fetchedHospital.toMap());
 
       // updatingInFirebase = false;
       // finishedUpdatingFirebase = true;

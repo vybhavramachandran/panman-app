@@ -79,7 +79,7 @@ class Patient {
       'vitals': mapifyList(vitals),
       'delhiDetails': delhiDetails != null ? delhiDetails.toMap() : "",
       'travelHistory': travelHistory != null ? mapifyList(travelHistory) : "",
-      'tests': tests != null ? mapifyList(tests) : "",
+      'tests': mapifyList(tests),
     };
   }
 }

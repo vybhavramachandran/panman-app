@@ -7,6 +7,14 @@ import 'package:panman/models/patient.dart';
 import 'package:panman/providers/patients.dart';
 import 'package:panman/screens/patient_screening.dart';
 import 'package:provider/provider.dart';
+import 'package:random_string/random_string.dart';
+import 'dart:math' show Random;
+
+import '../providers/hospital.dart';
+
+import '../models/delhiSpecificDetails.dart';
+
+import '../providers/covid19.dart';
 
 import 'dart:convert';
 
@@ -1295,18 +1303,101 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
   static String firstName;
   static String lastName;
   static int age;
+  static String phoneNumber;
   static String patientSex;
   static String address;
+  static String markaz;
   static String pincode;
   static String selectedDistrict;
   static String selectedRevenueDistrict;
   static String city;
   static String state;
+  static String country;
+  static String hospitalGivenID;
+  static String hospitalID;
+  static String hospitalName;
+  static bool isResidentOfDelhi;
+  static bool isHealthCareWorker=false;
+  static String fatherOrHusbandFirstName;
+  static String fatherOrHusbandLastName;
+  FullAddress patientAddress;
+  DelhiSpecificDetails details = DelhiSpecificDetails();
+
+  changePatientSex(String newSex) {
+    setState(() {
+      patientSex = newSex;
+    });
+  }
+
+  changeIsResidentOfDelhi(bool newStatus) {
+    setState(() {
+      isResidentOfDelhi = newStatus;
+    });
+  }
+
+  changeHealthWorkerStatus(bool newStatus) {
+    setState(() {
+      isHealthCareWorker = newStatus;
+    });
+  }
+
+  static String newPatientID;
   @override
+  AddPatient() async {
+    print("AddPatient called");
+    patientAddress = FullAddress(
+      address: address,
+      city: city,
+      state: state,
+      zipcode: pincode,
+      country: country,
+    );
+    try {
+      await Provider.of<Patients>(context, listen: false)
+          .addPatientUsingApi(Patient(
+        Firstname: firstName,
+        LastName: lastName,
+        age: age,
+        fullAddress: patientAddress,
+        id: newPatientID,
+        idGivenByHospital: hospitalGivenID,
+        currentLocation: 2,
+        delhiDetails: DelhiSpecificDetails(
+          fromMarkaz: markaz != "" ? true : false,
+          district: selectedDistrict,
+          revenueDistrict: selectedRevenueDistrict,
+          markazName: markaz,
+          isResidentOfDelhi: isResidentOfDelhi,
+          isHealthCareWorker: isHealthCareWorker,
+          fatherOrHusbandFirstName: fatherOrHusbandLastName,
+          fatherOrHusbandLastName: fatherOrHusbandLastName,
+        ),
+        hospitalID:
+            Provider.of<Hospitals>(context, listen: false).fetchedHospital.id,
+        sex: patientSex == "Male" ? Sex.Male : Sex.Female,
+        state: Provider.of<Covid19>(context, listen: false)
+            .referenceCovid19SeverityLevelsList[0],
+        ventilatorUsed: false,
+        events: [],
+        vitals: [],
+        tests: [],
+        travelHistory: [],
+      ));
+
+      await Provider.of<Hospitals>(context, listen: false)
+          .addPatientToTheHospital();
+
+      // await Provider.of<Patients>(context, listen: false).addPatientEvent();
+      //   Navigator.pop(context);
+    } catch (error) {}
+  }
+
   void initState() {
     firstName = "";
     patientSex = null;
     // TODO: implement initState
+    newPatientID = randomAlphaNumeric(10);
+
     super.initState();
   }
 
@@ -1316,351 +1407,35 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
     return a;
   }
 
-  final _formKey2 = GlobalKey<FormState>();
+  final formKey2 = GlobalKey<FormState>();
 
   _pickImage(Patient patient) async {
     patient.pic = await ImagePicker.pickImage(source: ImageSource.gallery);
     if (mounted) setState(() {});
   }
 
-  _submitPatient() {
-  //  if (_formKey2.currentState.validate()) {
-    //  _formKey2.currentState.save();
+  savePatientAndGoBack() async {
+    print("SavePatientAndGoBack called");
+    if (formKey2.currentState.validate()) {
+      formKey2.currentState.save();
+      await AddPatient();
+      Navigator.of(context).pop(true);
+    }
+  }
+
+  savePatientAndGoToScreening() async {
+    print("SavePatientAndGotoScreening called");
+
+    if (formKey2.currentState.validate()) {
+      formKey2.currentState.save();
+      await AddPatient();
       Navigator.of(context).push(MaterialPageRoute(
           builder: (BuildContext context) => PatientScreeningScreen()));
- //   }
+    }
   }
 
   int currentStep = 0;
   bool complete = false;
-  List<Step> steps = [
-    Step(
-      title: const Text('Patient Details'),
-      isActive: true,
-      state: StepState.editing,
-      content: Column(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(2.0),
-            child: TextFormField(
-              keyboardType: TextInputType.text,
-              validator: (value) {
-                if (value.isEmpty) {
-                  return 'Please enter some text';
-                }
-                return null;
-              },
-              //  style: Theme.of(context).textTheme.bodyText1,
-              decoration: InputDecoration(
-                labelText: "First Name",
-                // hintText: "Event",
-                enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey[300])),
-                focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey[300])),
-              ),
-              onSaved: (String value) {},
-            ),
-          ),
-          SizedBox(
-            height: 5,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(2.0),
-            child: TextFormField(
-              keyboardType: TextInputType.text,
-              validator: (value) {
-                if (value.isEmpty) {
-                  return 'Please enter some text';
-                }
-                return null;
-              },
-              //  style: Theme.of(context).textTheme.bodyText1,
-              decoration: InputDecoration(
-                labelText: "Last Name",
-                // hintText: "Event",
-                enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey[300])),
-                focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey[300])),
-              ),
-              onSaved: (String value) {},
-            ),
-          ),
-          SizedBox(
-            height: 5,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(2.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Flexible(
-                    flex: 5,
-                    child: Container(
-                      child: DropdownButton<String>(
-                        value: patientSex,
-                        hint: Text("Select Sex"),
-                        items: ["Male", "Female"].map((String selectedSex) {
-                          return new DropdownMenuItem<String>(
-                            value: selectedSex,
-                            child: new Text(selectedSex),
-                          );
-                        }).toList(),
-                        onChanged: (String value) {},
-                      ),
-                    )),
-                SizedBox(
-                  width: 5,
-                ),
-                Flexible(
-                  flex: 5,
-                  child: TextFormField(
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return 'Please enter some text';
-                      }
-                      return null;
-                    },
-                    //  style: Theme.of(context).textTheme.bodyText1,
-                    decoration: InputDecoration(
-                      labelText: "Age",
-                      // hintText: "Event",
-                      enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey[300])),
-                      focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey[300])),
-                    ),
-                    onSaved: (String value) {},
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(
-            height: 5,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(2.0),
-            child: TextFormField(
-              keyboardType: TextInputType.text,
-              validator: (value) {
-                if (value.isEmpty) {
-                  return 'Please enter some text';
-                }
-                return null;
-              },
-              //  style: Theme.of(context).textTheme.bodyText1,
-              decoration: InputDecoration(
-                labelText: "Phone Number",
-                // hintText: "Event",
-                enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey[300])),
-                focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey[300])),
-              ),
-              onSaved: (String value) {},
-            ),
-          ),
-        ],
-      ),
-    ),
-    Step(
-      isActive: true,
-      state: StepState.editing,
-      title: const Text('Address'),
-      content: Column(
-        children: <Widget>[
-          SizedBox(
-            height: 5,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(2.0),
-            child: TextFormField(
-              keyboardType: TextInputType.text,
-              validator: (value) {
-                if (value.isEmpty) {
-                  return 'Please enter some text';
-                }
-                return null;
-              },
-              //  style: Theme.of(context).textTheme.bodyText1,
-              decoration: InputDecoration(
-                labelText: "Street, Area Address",
-                // hintText: "Event",
-                enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey[300])),
-                focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey[300])),
-              ),
-              onSaved: (String value) {},
-            ),
-          ),
-          SizedBox(
-            height: 5,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(2.0),
-            child: TextFormField(
-              keyboardType: TextInputType.text,
-              validator: (value) {
-                if (value.isEmpty) {
-                  return 'Please enter some text';
-                }
-                return null;
-              },
-              //  style: Theme.of(context).textTheme.bodyText1,
-              decoration: InputDecoration(
-                labelText: "Markaz",
-                // hintText: "Event",
-                enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey[300])),
-                focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey[300])),
-              ),
-              onSaved: (String value) {},
-            ),
-          ),
-          SizedBox(
-            height: 5,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(2.0),
-            child: Row(
-              children: <Widget>[
-                Flexible(
-                  flex: 6,
-                  child: TextFormField(
-                    onChanged: (String value) {
-                      pincode = value;
-                    },
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return 'Please enter some text';
-                      }
-                      return null;
-                    },
-                    //  style: Theme.of(context).textTheme.bodyText1,
-                    decoration: InputDecoration(
-                      labelText: "Pin Code",
-                      // hintText: "Event",
-                      enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey[300])),
-                      focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey[300])),
-                    ),
-                    onSaved: (String value) {},
-                  ),
-                ),
-                // SizedBox(
-                //   width: 5,
-                // ),
-                // Flexible(
-                //     flex: 2,
-                //     child: FlatButton(
-                //       onPressed: () {
-                //         return findZipCodeDetails();
-                //       },
-                //       child: Text("Search"),
-                //     )),
-              ],
-            ),
-          ),
-          SizedBox(
-            height: 5,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(2.0),
-            child: Container(
-                child: DropdownButton<String>(
-              value: selectedDistrict,
-              hint: Text("Select District"),
-              items: delhiDistricts.map((String district) {
-                return new DropdownMenuItem<String>(
-                  value: district,
-                  child: new Text(district),
-                );
-              }).toList(),
-              onChanged: (String value) {},
-            )),
-          ),
-          SizedBox(
-            height: 5,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(2.0),
-            child: Container(
-                child: DropdownButton<String>(
-              value: selectedDistrict,
-              hint: Text("Select Revenue District"),
-              items: delhiDistricts.map((String district) {
-                return new DropdownMenuItem<String>(
-                  value: district,
-                  child: new Text(district),
-                );
-              }).toList(),
-              onChanged: (String value) {},
-            )),
-          ),
-          SizedBox(
-            height: 5,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(2.0),
-            child: TextFormField(
-              initialValue: "Delhi",
-              keyboardType: TextInputType.text,
-              validator: (value) {
-                if (value.isEmpty) {
-                  return 'Please enter some text';
-                }
-                return null;
-              },
-              //  style: Theme.of(context).textTheme.bodyText1,
-              decoration: InputDecoration(
-                labelText: "State",
-                // hintText: "Event",
-                enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey[300])),
-                focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey[300])),
-              ),
-              onSaved: (String value) {},
-            ),
-          ),
-          SizedBox(
-            height: 5,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(2.0),
-            child: TextFormField(
-              initialValue: "India",
-              keyboardType: TextInputType.text,
-              validator: (value) {
-                if (value.isEmpty) {
-                  return 'Please enter some text';
-                }
-                return null;
-              },
-              //  style: Theme.of(context).textTheme.bodyText1,
-              decoration: InputDecoration(
-                labelText: "Country",
-                // hintText: "Event",
-                enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey[300])),
-                focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey[300])),
-              ),
-              onSaved: (String value) {},
-            ),
-          ),
-        ],
-      ),
-    ),
-  
-  ];
 
   goTo(int step) {
     print("gotto step $currentStep $step");
@@ -1672,7 +1447,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
 
   next() {
     print("next called");
-    currentStep + 1 != steps.length
+    currentStep + 1 != 3
         ? goTo(currentStep + 1)
         : setState(() => complete = true);
   }
@@ -1685,7 +1460,19 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    List<Step> steps = [];
+
     Patient newPatient = Provider.of<Patients>(context).newPatient;
+
+    print("HOSPITAL IS" +
+        Provider.of<Hospitals>(context, listen: true)
+            .fetchedHospital
+            .hospitalName);
+    setState() {
+      hospitalName = Provider.of<Hospitals>(context, listen: true)
+          .fetchedHospital
+          .hospitalName;
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -1694,53 +1481,821 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
           color: Colors.white,
         ),
         title: Text(
-          'PATIENT REGISTRATION',
-          style: Theme.of(context).textTheme.headline6,
+          'Patient Registration',
+          style: Theme.of(context).textTheme.caption,
         ),
         centerTitle: true,
       ),
       body: Container(
         height: MediaQuery.of(context).size.height,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Flexible(
-              flex: 15,
-              child: Container(
-                height: MediaQuery.of(context).size.height,
-                child: Card(
-                  elevation: 4.0,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(2.0)),
-                  margin: EdgeInsets.all(16.0),
+              flex: 20,
+              child: SingleChildScrollView(
+                //    height: MediaQuery.of(context).size.height,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
                   child: Form(
-                    key: _formKey2,
+                    key: formKey2,
                     child: Theme(
-                      data: ThemeData(
-                          primaryColor: Color.fromRGBO(35, 71, 162, 1)),
-                      child: Stepper(
-                        steps: steps,
-                        currentStep: currentStep,
-                        onStepContinue: next,
-                        onStepTapped: (step) => goTo(step),
-                        onStepCancel: cancel,
-                      ),
-                    ),
+                        data: ThemeData(
+                            primaryColor: Color.fromRGBO(35, 71, 162, 1)),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text("1. Patient Information",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline5
+                                    .copyWith(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold)),
+                            SizedBox(height: 20),
+                            Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Text(
+                                    "Autogenerated patient ID:    ",
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.normal),
+                                  ),
+                                  Text(
+                                    newPatientID,
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        color: Colors.blue,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Container(
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: <Widget>[
+                                      Text("Is the patient a doctor/nurse?",
+                                          style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.normal)),
+                                      SizedBox(width: 10),
+                                      DropdownButton<bool>(
+                                        value: isHealthCareWorker,
+                                        hint: Text("Select"),
+                                        items: [true, false]
+                                            .map((bool selectedValue) {
+                                          return new DropdownMenuItem<bool>(
+                                            value: selectedValue,
+                                            child:
+                                                Text(selectedValue.toString()),
+                                          );
+                                        }).toList(),
+                                        onChanged: (value) {
+                                          this.setState(() {
+                                            isHealthCareWorker = value;
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                )),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: TextFormField(
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal),
+                                keyboardType: TextInputType.text,
+                                onChanged: (value) {
+                                  this.setState(() {
+                                    hospitalGivenID = value;
+                                  });
+                                },
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Please enter some text';
+                                  }
+                                  return null;
+                                },
+                                //  style: Theme.of(context).textTheme.bodyText1,
+                                decoration: InputDecoration(
+                                  labelText: "ID Given by hospital",
+                                  // hintText: "Event",
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                ),
+                                onSaved: (String value) {
+                                  this.setState(() {
+                                    hospitalGivenID = value;
+                                  });
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: TextFormField(
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal),
+                                keyboardType: TextInputType.text,
+                                onChanged: (value) {
+                                  this.setState(() {
+                                    firstName = value;
+                                  });
+                                },
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Please enter some text';
+                                  }
+                                  return null;
+                                },
+                                //  style: Theme.of(context).textTheme.bodyText1,
+                                decoration: InputDecoration(
+                                  labelText: "First Name",
+                                  // hintText: "Event",
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                ),
+                                onSaved: (String value) {
+                                  this.setState(() {
+                                    firstName = value;
+                                  });
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: TextFormField(
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal),
+                                keyboardType: TextInputType.text,
+                                onChanged: (value) {
+                                  this.setState(() {
+                                    lastName = value;
+                                  });
+                                },
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Please enter some text';
+                                  }
+                                  return null;
+                                },
+                                //  style: Theme.of(context).textTheme.bodyText1,
+                                decoration: InputDecoration(
+                                  labelText: "Last Name",
+                                  // hintText: "Event",
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                ),
+                                onSaved: (String value) {
+                                  this.setState(() {
+                                    lastName = value;
+                                  });
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child:
+                                   Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: <Widget>[
+                                        Text("Sex",
+                                            style: TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.normal)),
+                                        SizedBox(width: 10),
+                                        DropdownButton<String>(
+                                          value: patientSex,
+                                          hint: Text("Select Sex"),
+                                          items: ["Male", "Female"]
+                                              .map((String selectedSex) {
+                                            return new DropdownMenuItem<String>(
+                                              value: selectedSex,
+                                              child: new Text(selectedSex,
+                                                  style: TextStyle(
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.normal)),
+                                            );
+                                          }).toList(),
+                                          onChanged: (value) {
+                                            this.setState(() {
+                                              patientSex = value;
+                                            });
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  
+                                
+                              
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Padding(
+                              padding: EdgeInsets.all(2),
+                              child: TextFormField(
+                                onChanged: (value) {
+                                  this.setState(() {
+                                    age = int.parse(value);
+                                  });
+                                },
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal),
+                                keyboardType: TextInputType.number,
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Please enter some text';
+                                  }
+                                  return null;
+                                },
+                                //  style: Theme.of(context).textTheme.bodyText1,
+                                decoration: InputDecoration(
+                                  labelText: "Age",
+                                  // hintText: "Event",
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                ),
+                                onSaved: (String value) {
+                                  this.setState(() {
+                                    age = int.parse(value);
+                                  });
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: TextFormField(
+                                onChanged: (value) {
+                                  this.setState(() {
+                                    phoneNumber = value;
+                                  });
+                                },
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal),
+                                keyboardType: TextInputType.text,
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Please enter some text';
+                                  }
+                                  return null;
+                                },
+                                //  style: Theme.of(context).textTheme.bodyText1,
+                                decoration: InputDecoration(
+                                  labelText: "Phone Number",
+                                  // hintText: "Event",
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                ),
+                                onSaved: (String value) {
+                                  this.setState(() {
+                                    phoneNumber = value;
+                                  });
+                                },
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                            Text("2. Patient Address",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline5
+                                    .copyWith(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold)),
+                            SizedBox(height: 20),
+                            Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: Container(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Container(
+                                    width:200,
+                                    child: Text("Is the patient a resident of Delhi?",
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.normal)),
+                                  ),
+                                  SizedBox(width: 10),
+                                  DropdownButton<bool>(
+                                    value: isResidentOfDelhi,
+                                    hint: Text("Resident of Delhi?"),
+                                    items: [true, false].map((bool value) {
+                                      return new DropdownMenuItem<bool>(
+                                        value: value,
+                                        child: Text(value.toString()),
+                                      );
+                                    }).toList(),
+                                    onChanged: (bool value) {
+                                      this.setState(() {
+                                        isResidentOfDelhi = value;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              )),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: TextFormField(
+                                onChanged: (value) {
+                                  this.setState(() {
+                                    address = value;
+                                  });
+                                },
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal),
+                                keyboardType: TextInputType.text,
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Please enter some text';
+                                  }
+                                  return null;
+                                },
+                                //  style: Theme.of(context).textTheme.bodyText1,
+                                decoration: InputDecoration(
+                                  labelText: "Street, Area Address",
+                                  // hintText: "Event",
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                ),
+                                onSaved: (String value) {
+                                  this.setState(() {
+                                    address = value;
+                                  });
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: TextFormField(
+                                onChanged: (value) {
+                                  this.setState(() {
+                                    markaz = value;
+                                  });
+                                },
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal),
+                                keyboardType: TextInputType.text,
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Please enter some text';
+                                  }
+                                  return null;
+                                },
+                                //  style: Theme.of(context).textTheme.bodyText1,
+                                decoration: InputDecoration(
+                                  labelText: "Markaz",
+                                  // hintText: "Event",
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                ),
+                                onSaved: (String value) {
+                                  this.setState(() {
+                                    markaz = value;
+                                  });
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: Row(
+                                children: <Widget>[
+                                  Flexible(
+                                    flex: 6,
+                                    child: TextFormField(
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.normal),
+                                      onChanged: (String value) {
+                                        this.setState(() {
+                                          pincode = value;
+                                        });
+                                      },
+                                      keyboardType: TextInputType.number,
+                                      validator: (value) {
+                                        if (value.isEmpty) {
+                                          return 'Please enter some text';
+                                        }
+                                        return null;
+                                      },
+                                      //  style: Theme.of(context).textTheme.bodyText1,
+                                      decoration: InputDecoration(
+                                        labelText: "Pin Code",
+                                        // hintText: "Event",
+                                        enabledBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: Colors.grey[300])),
+                                        focusedBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: Colors.grey[300])),
+                                      ),
+                                      onSaved: (String value) {
+                                        this.setState(() {
+                                          pincode = value;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  // SizedBox(
+                                  //   width: 5,
+                                  // ),
+                                  // Flexible(
+                                  //     flex: 2,
+                                  //     child: FlatButton(
+                                  //       onPressed: () {
+                                  //         return findZipCodeDetails();
+                                  //       },
+                                  //       child: Text("Search"),
+                                  //     )),
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: Row(
+                                children: <Widget>[
+                                  Container(
+                                    width:200,
+                                    child: Text("Choose District",
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.normal)),
+                                  ),
+                                  Container(
+                                      child: DropdownButton<String>(
+                                    value: selectedDistrict,
+                                    hint: Text("Select District"),
+                                    items: delhiDistricts.map((String district) {
+                                      return new DropdownMenuItem<String>(
+                                        value: district,
+                                        child: new Text(district),
+                                      );
+                                    }).toList(),
+                                    onChanged: (String value) {
+                                      this.setState(() {
+                                        selectedDistrict = value;
+                                      });
+                                    },
+                                  )),
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Container(
+                                    width:150,
+                                    child: Text("Choose Revenue District",
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.normal)),
+                                  ),
+                                  DropdownButton<String>(
+                                    value: selectedRevenueDistrict,
+                                    hint: Text("Select Revenue District"),
+                                    items: delhiDistricts.map((String district) {
+                                      return new DropdownMenuItem<String>(
+                                        value: district,
+                                        child: new Text(district),
+                                      );
+                                    }).toList(),
+                                    onChanged: (String value) {
+                                      this.setState(() {
+                                        selectedRevenueDistrict = value;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: TextFormField(
+                                onChanged: (value) {
+                                  this.setState(() {
+                                    city = value;
+                                  });
+                                },
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal),
+                                initialValue: "Delhi",
+                                keyboardType: TextInputType.text,
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Please enter some text';
+                                  }
+                                  return null;
+                                },
+                                //  style: Theme.of(context).textTheme.bodyText1,
+                                decoration: InputDecoration(
+                                  labelText: "City",
+                                  // hintText: "Event",
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                ),
+                                onSaved: (String value) {
+                                  this.setState(() {
+                                    city = value;
+                                  });
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: TextFormField(
+                                onChanged: (value) {
+                                  this.setState(() {
+                                    state = value;
+                                  });
+                                },
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal),
+                                initialValue: "Delhi",
+                                keyboardType: TextInputType.text,
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Please enter some text';
+                                  }
+                                  return null;
+                                },
+                                //  style: Theme.of(context).textTheme.bodyText1,
+                                decoration: InputDecoration(
+                                  labelText: "State",
+                                  // hintText: "Event",
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                ),
+                                onSaved: (String value) {
+                                  this.setState(() {
+                                    state = value;
+                                  });
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: TextFormField(
+                                onChanged: (value) {
+                                  this.setState(() {
+                                    country = value;
+                                  });
+                                },
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal),
+                                initialValue: "India",
+                                keyboardType: TextInputType.text,
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Please enter some text';
+                                  }
+                                  return null;
+                                },
+                                //  style: Theme.of(context).textTheme.bodyText1,
+                                decoration: InputDecoration(
+                                  labelText: "Country",
+                                  // hintText: "Event",
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                ),
+                                onSaved: (String value) {
+                                  this.setState(() {
+                                    country = value;
+                                  });
+                                },
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                            Text("3. Family Details",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline5
+                                    .copyWith(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold)),
+                            SizedBox(height: 20),
+                            Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: TextFormField(
+                                onChanged: (value) {
+                                  this.setState(() {
+                                    fatherOrHusbandFirstName = value;
+                                  });
+                                },
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal),
+                                keyboardType: TextInputType.text,
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Please enter some text';
+                                  }
+                                  return null;
+                                },
+                                //  style: Theme.of(context).textTheme.bodyText1,
+                                decoration: InputDecoration(
+                                  labelText: "Father/Husband First Name",
+                                  // hintText: "Event",
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                ),
+                                onSaved: (String value) {
+                                  this.setState(() {
+                                    fatherOrHusbandFirstName = value;
+                                  });
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: TextFormField(
+                                onChanged: (value) {
+                                  this.setState(() {
+                                    fatherOrHusbandLastName = value;
+                                  });
+                                },
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal),
+                                keyboardType: TextInputType.text,
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Please enter some text';
+                                  }
+                                  return null;
+                                },
+                                //  style: Theme.of(context).textTheme.bodyText1,
+                                decoration: InputDecoration(
+                                  labelText: "Father/Husband Last Name",
+                                  // hintText: "Event",
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                ),
+                                onSaved: (String value) {
+                                  this.setState(() {
+                                    fatherOrHusbandLastName = value;
+                                  });
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                          ],
+                        )),
                   ),
                 ),
               ),
             ),
             SizedBox(height: 8.0),
-            GestureDetector(
-              onTap: () => _submitPatient(),
-              child: Container(
-                height: 64.0,
-                width: MediaQuery.of(context).size.width,
-                color: Theme.of(context).accentColor,
-                child: Center(
-                  child: Text(
-                    'MOVE PATIENT TO SCREENING',
-                    style: Theme.of(context).textTheme.headline6,
-                  ),
+            Flexible(
+              flex: 2,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    FlatButton(
+                      onPressed: () async {
+                        await savePatientAndGoBack();
+                      },
+                      color: Theme.of(context).accentColor,
+                      child: Provider.of<Patients>(context, listen: true)
+                                  .isAddingPatient ==
+                              false
+                          ? Text("SAVE & GO BACK",
+                              style: Theme.of(context).textTheme.caption)
+                          : CircularProgressIndicator(
+                              backgroundColor: Colors.black,
+                            ),
+                    ),
+                    // FlatButton(
+                    //   onPressed: () async {
+                    //     await savePatientAndGoBack();
+                    //   },
+                    //   color: Theme.of(context).accentColor,
+                    //   child: Text("START SCREENING",
+                    //       style: Theme.of(context).textTheme.caption),
+                    // ),
+                  ],
                 ),
               ),
             ),

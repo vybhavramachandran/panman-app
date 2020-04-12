@@ -1,25 +1,22 @@
 class Test {
   String id;
-  DateTime submissionDate;
   DateTime resultDate;
   String testCenterName;
   String result;
-  String reportStatus;
 
   Test(
-      {this.submissionDate,
+      {
+        this.id,
       this.testCenterName,
       this.result,
-      this.reportStatus,
       this.resultDate});
 
   Test.fromMap(Map data)
       : this(
-          submissionDate: DateTime.parse(data['submissionDate']),
+          id: data['id'],
           testCenterName: data['testCenterName'],
           result: data['result'],
-          reportStatus: data['reportStatus'],
-          resultDate: data['resultDate'],
+          resultDate: DateTime.parse(data['resultDate']),
         );
 
   Map<String, dynamic> toMap() {
@@ -27,8 +24,7 @@ class Test {
       'resultDate': resultDate.toString(),
       'testCenterName': testCenterName,
       'result': result,
-      'reportStatus': reportStatus,
-      'submissionDate': submissionDate.toString(),
+      'id': id,
     };
   }
 }

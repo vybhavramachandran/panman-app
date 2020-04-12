@@ -144,9 +144,9 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
                   // patient: selectedPatient,
                 ),
                 patientPageCard(
-                  iconToDisplay: "assets/images/monitor.png",
+                  iconToDisplay: "assets/images/laboratory.png",
                   titleOfCard: "TESTS",
-                  moveToPage: "/add_test_screen",
+                  moveToPage: "/patient_tests_screen",
 
                   //  patient: selectedPatient,
                 ),

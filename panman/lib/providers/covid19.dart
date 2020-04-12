@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:panman/utils/analytics_client.dart';
 
 import '../models/c19data.dart';
 
@@ -41,7 +40,6 @@ class Covid19 with ChangeNotifier {
         ));
       });
 
-      Analytics.instance.logEvent(name: 'getReferenceCovid19SevererityLevels');
 
       notifyListeners();
     } catch (e) {
