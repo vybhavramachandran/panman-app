@@ -174,7 +174,7 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
             iconTheme: IconThemeData(color: Colors.white),
             backgroundColor: Theme.of(context).accentColor,
             title: Text(
-              "PATIENT",
+              "PATIENT / DETAIL",
               style: Theme.of(context).textTheme.caption,
             ),
             centerTitle: true,

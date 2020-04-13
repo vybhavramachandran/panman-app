@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_offline/flutter_offline.dart';
+import './screens/patient_screening.dart';
 import 'package:provider/provider.dart';
 
 import './providers/auth.dart';
@@ -25,6 +26,7 @@ import './screens/patient_dashboard.dart';
 import './screens/patient_registration_screen.dart';
 import './screens/add_test_screen.dart';
 import './screens/patient_tests_screen.dart';
+import './screens/patient_screening.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -162,6 +164,7 @@ class MyApp extends StatelessWidget {
                             }
                           }),
                       routes: {
+                        PatientScreeningScreen.routeName : (ctx) => PatientScreeningScreen(),
                         PatientTestsScreen.routeName: (ctx) => PatientTestsScreen(),
                         AddTestScreen.routeName :(ctx)=>AddTestScreen(),
                         PatientRegistrationScreen.routeName :(ctx)=> PatientRegistrationScreen(),

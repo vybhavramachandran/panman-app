@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import '../models/address.dart';
 import '../models/c19data.dart';
 import '../models/event.dart';
+import '../models/screening.dart';
 import '../models/patient.dart';
 import '../models/patientVital.dart';
 import '../models/travelHistory.dart';
@@ -81,8 +82,28 @@ class Patients with ChangeNotifier {
     DelhiSpecificDetails dummyDetails = DelhiSpecificDetails(
       district: "",
       fromMarkaz: false,
-      markazName: "",
       revenueDistrict: "",
+    );
+
+    Screening dummyScreening = Screening(
+      hasComorbdityOrganTransplant: false,
+      hasComorbidityCOPD: false,
+      hasComorbidityChronicNeuro: false,
+      hasComorbidityChronicRenalDisease: false,
+      hasComorbidityDiabetes: false,
+      hasComorbidityHIV: false,
+      hasComorbidityHeartDisease: false,
+      hasComorbidityHypertension: false,
+      hasComorbidityLiverDisease: false,
+      hasComorbidityMalignancy: false,
+      hasComorbidityPregnancy: false,
+      hasCough: false,
+      hasDifficultyBreathing: false,
+      hasFever: false,
+      hasTravelledAboard: false,
+      hasTiredness: false,
+      returnDate: DateTime.now(),
+      visitedCountry: "No Data",
     );
 
     final prefs = await SharedPreferences.getInstance();
@@ -114,45 +135,65 @@ class Patients with ChangeNotifier {
 
       patientSnapshot.forEach((patient) async {
         print(patient['firstName'] + patient['covidStatus']);
-        fetchedPatientsList.add(Patient(
-          Firstname: patient['firstName'],
-          LastName: patient['lastName'],
-          age: patient['age'],
-          currentLocation: patient['locationInHospital'],
-          state: referenceCovid19SeverityLevelsList
-              .firstWhere((element) => element.abbrv == patient['covidStatus']),
-          fullAddress: FullAddress.fromMap(patient['fullAddress']),
-          sex: patient['sex'] == "Male" ? Sex.Male : Sex.Female,
-          ventilatorUsed: patient['ventilatorUsed'],
-          id: patient['id'],
-          phoneNumber: patient['phoneNumber'],
-          hospitalID: patient['hospitalID'],
-          idGivenByHospital: patient['idGivenByHospital'],
-          events: patient['events'] == null
-              ? []
-              : patient['events'].map<event>((eventToBeAdded) {
-                  return event.fromMap(eventToBeAdded);
-                }).toList(),
-          vitals: patient['vitals'] == null
-              ? []
-              : patient['vitals'].map<PatientVital>((vitalToBeAdded) {
-                  return PatientVital.fromMap(vitalToBeAdded);
-                }).toList(),
-          travelHistory: patient['travelHistory'] == null
-              ? []
-              : patient['travelHistory'].map<TravelHistory>((travel) {
-                  return TravelHistory.fromMap(travel);
-                }).toList(),
-          delhiDetails: patient['delhiDetails']==null?dummyDetails:DelhiSpecificDetails.fromMap(patient['delhiDetails']),
-          tests: patient['tests'] == null
-              ? []
-              : patient['tests'].map<Test>((testToBeAdded) {
-                  return Test.fromMap(testToBeAdded);
-                }).toList(),
-        ));
+       
+          fetchedPatientsList.add(Patient(
+            Firstname: patient['firstName'],
+            LastName: patient['lastName'],
+            age: patient['age'],
+            currentLocation: patient['locationInHospital'],
+            state: referenceCovid19SeverityLevelsList.firstWhere(
+                (element) => element.abbrv == patient['covidStatus']),
+            fullAddress: FullAddress.fromMap(patient['fullAddress']),
+            sex: patient['sex'] == "Male"
+                ? Sex.Male
+                : patient['sex'] == "Female" ? Sex.Female : Sex.Other,
+            ventilatorUsed: patient['ventilatorUsed'],
+            id: patient['id'],
+            phoneNumber: patient['phoneNumber'],
+            hospitalID: patient['hospitalID'],
+            screeningResult: patient['screeningResult'] == null || patient['screeningResult'] == ""
+                ? dummyScreening
+                : Screening.fromMap(patient['screeningResult']),
+            idGivenByHospital: patient['idGivenByHospital'],
+            events: patient['events'] == null
+                ? []
+                : patient['events'].map<event>((eventToBeAdded) {
+                    return event.fromMap(eventToBeAdded);
+                  }).toList(),
+            vitals: patient['vitals'] == null
+                ? []
+                : patient['vitals'].map<PatientVital>((vitalToBeAdded) {
+                    return PatientVital.fromMap(vitalToBeAdded);
+                  }).toList(),
+            // travelHistory: patient['travelHistory'] == null
+            //     ? []
+            //     : patient['travelHistory'].map<TravelHistory>((travel) {
+            //         return TravelHistory.fromMap(travel);
+            //       }).toList(),
+            delhiDetails: patient['delhiDetails'] == null
+                ? dummyDetails
+                : DelhiSpecificDetails.fromMap(patient['delhiDetails']),
+            tests: patient['tests'] == null
+                ? []
+                : patient['tests'].map<Test>((testToBeAdded) {
+                    return Test.fromMap(testToBeAdded);
+                  }).toList(),
+          ));
+        
       });
       isFetching = false;
       shouldRefreshList = false;
+      notifyListeners();
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future addScreening(Screening screeningVal, int location) async {
+    try {
+      selectedPatient.screeningResult = screeningVal;
+      selectedPatient.currentLocation = location;
+      await updatePatientProfileInFirebaseWithAPI();
       notifyListeners();
     } catch (e) {
       print(e);
@@ -248,8 +289,6 @@ class Patients with ChangeNotifier {
       isUpdating = true;
       notifyListeners();
 
-   
-
       if (newLocation == 7) {
         selectedPatient.hospitalID = "";
 
@@ -258,8 +297,6 @@ class Patients with ChangeNotifier {
             eventTime: DateTime.now(),
             eventData: "${oldLocation}->${newLocation}");
         await updatePatientProfileInFirebaseWithAPI();
-
-       
       } else if (newLocation == 6) {
         selectedPatient.hospitalID = "";
         await addEvent(
@@ -267,7 +304,6 @@ class Patients with ChangeNotifier {
             eventTime: DateTime.now(),
             eventData: "${oldLocation}->${newLocation}");
         await updatePatientProfileInFirebaseWithAPI();
-      
       } else if (newLocation == 0) {
         selectedPatient.hospitalID = "";
         await addEvent(
@@ -275,14 +311,12 @@ class Patients with ChangeNotifier {
             eventTime: DateTime.now(),
             eventData: "${oldLocation}->${newLocation}");
         await updatePatientProfileInFirebaseWithAPI();
-       
       } else {
         await addEvent(
             eventType: "hospital_movement",
             eventTime: DateTime.now(),
             eventData: "${oldLocation}->${newLocation}");
         await updatePatientProfileInFirebaseWithAPI();
-    
       }
 
       isUpdating = false;
@@ -308,7 +342,6 @@ class Patients with ChangeNotifier {
 
       notifyListeners();
 
- 
       return true;
     } catch (e) {
       print(e);
@@ -325,8 +358,6 @@ class Patients with ChangeNotifier {
           eventData: newValue.toString());
       await updatePatientProfileInFirebaseWithAPI();
       notifyListeners();
-
-   
 
       return true;
     } catch (e) {
@@ -359,8 +390,6 @@ class Patients with ChangeNotifier {
       shouldRefreshList = true;
       notifyListeners();
 
-     
-
       return true;
     } catch (e) {
       print(e);
@@ -371,21 +400,22 @@ class Patients with ChangeNotifier {
   Future<bool> addPatientUsingApi(Patient patientToAdd) async {
     final prefs = await SharedPreferences.getInstance();
     var userData = prefs.getString('userData');
+    print("Add Patient called ${patientToAdd}");
     // print("userData+${userData}");
     var decodedJson = json.decode(userData);
     var token = decodedJson['token'];
     try {
       isAddingPatient = true;
       notifyListeners();
-
+      print("Hospital ID is"+patientToAdd.hospitalID);
       event newEvent = event(
           eventType: "hospital_admission",
           eventData: patientToAdd.hospitalID,
           eventDateTime: DateTime.now(),
           eventID: randomAlphaNumeric(20));
       patientToAdd.events.add(newEvent);
-
-      print(patientToAdd.toMap().toString());
+      var test = json.encode(patientToAdd.toMap());
+    //  print(patientToAdd.toMap().toString());
 
       final response = await http.post(
         'https://us-central1-thewarroom-98e6d.cloudfunctions.net/app/patient/',
@@ -480,8 +510,6 @@ class Patients with ChangeNotifier {
       isUpdating = false;
       notifyListeners();
 
-     
-
       // updatingInFirebase = false;
       // finishedUpdatingFirebase = true;
       // notifyListeners();
@@ -548,7 +576,6 @@ class Patients with ChangeNotifier {
       }
     });
     notifyListeners();
-
   }
 
   List<Patient> filteredPatientsList = [

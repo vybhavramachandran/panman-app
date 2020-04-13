@@ -100,6 +100,7 @@ class _AddTestScreenState extends State<AddTestScreen> {
                   onSaved: (String value) {
                     setState(() {
                       newTest.testCenterName = value;
+                      newTest.isSelfInitiated=false;
                     });
                   },
                 ),

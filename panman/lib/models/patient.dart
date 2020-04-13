@@ -6,10 +6,12 @@ import './locationInHospital.dart';
 import './travelHistory.dart';
 import './delhiSpecificDetails.dart';
 import './test.dart';
+import './screening.dart';
+import './emergency_contact.dart';
 
 import 'dart:io';
 
-enum Sex { Male, Female }
+enum Sex { Male, Female, Other}
 
 class Patient {
   String id;
@@ -26,10 +28,14 @@ class Patient {
   bool ventilatorUsed;
   List<event> events;
   List<PatientVital> vitals;
-  List<TravelHistory> travelHistory;
   DelhiSpecificDetails delhiDetails;
   File pic;
   List<Test> tests;
+  Screening screeningResult;
+  String emergencyContactRelation;
+  String emergencyContactFirstName;
+  String emergencyContactLastName;
+  String emergencyContactPhoneNumber;
 
   Patient({
     this.id,
@@ -46,10 +52,14 @@ class Patient {
     this.ventilatorUsed,
     this.events,
     this.vitals,
-    this.travelHistory,
     this.delhiDetails,
     this.pic,
     this.tests,
+    this.screeningResult,
+    this.emergencyContactFirstName,
+    this.emergencyContactLastName,
+    this.emergencyContactPhoneNumber,
+    this.emergencyContactRelation,
   });
 
   mapifyList(List input) {
@@ -67,10 +77,11 @@ class Patient {
       'id': id,
       'idGivenByHospital': idGivenByHospital,
       'age': age,
-      'sex': sex == Sex.Male ? "Male" : "Female",
+      'sex': sex == Sex.Male ? "Male" : sex== Sex.Female?"Female" :"Other",
       'ventilatorUsed': ventilatorUsed,
       'locationInHospital': this.currentLocation,
       'hospitalID': this.hospitalID,
+      'phoneNumber':this.phoneNumber,
       'covidStatus': this.state.abbrv,
       'fullAddress': fullAddress != null ? fullAddress.toMap() : "",
       'firstName': Firstname,
@@ -78,8 +89,14 @@ class Patient {
       'events': mapifyList(events),
       'vitals': mapifyList(vitals),
       'delhiDetails': delhiDetails != null ? delhiDetails.toMap() : "",
-      'travelHistory': travelHistory != null ? mapifyList(travelHistory) : "",
       'tests': mapifyList(tests),
+      'screeningResult':screeningResult!=null?screeningResult.toMap():"",
+      'emergencyContactFirstName':emergencyContactFirstName,
+      'emergencyContactLastName':emergencyContactLastName,
+      'emergencyContactPhoneNumber':emergencyContactPhoneNumber,
+      'emergencyContactRelation':emergencyContactRelation,
+
+
     };
   }
 }

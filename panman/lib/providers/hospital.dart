@@ -27,6 +27,7 @@ class FetchedHospitalLocationReference {
 class Hospitals with ChangeNotifier {
   var hospitalsCollection = Firestore.instance.collection('hospitals');
   var hospitalSnapshot;
+  var isUpdatingHospital=false;
 
   List<FetchedMedicalSupply> referenceMedicalSupplyList = [];
   List<FetchedHospitalLocationReference> referenceHospitalLocationList = [];
@@ -164,6 +165,9 @@ class Hospitals with ChangeNotifier {
   }
 
   Future addPatientToTheHospital() async {
+    isUpdatingHospital=true;
+    notifyListeners();
+    print("addPatientToTheHospital");
     try {
       var location =
           fetchedHospital.locations.indexWhere((element) => element.id == "2");
@@ -171,6 +175,8 @@ class Hospitals with ChangeNotifier {
       fetchedHospital.locations[location].count =
           fetchedHospital.locations[location].count + 1;
       await updateHospitalUsingAPI();
+      isUpdatingHospital = false;
+      notifyListeners();
     } catch (e) {
       print(e);
     }

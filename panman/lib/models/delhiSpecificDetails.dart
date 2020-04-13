@@ -1,6 +1,5 @@
 class DelhiSpecificDetails {
   bool fromMarkaz;
-  String markazName;
   String district;
   String revenueDistrict;
   bool isResidentOfDelhi;
@@ -10,7 +9,6 @@ class DelhiSpecificDetails {
 
   DelhiSpecificDetails({
     this.fromMarkaz,
-    this.markazName,
     this.district,
     this.revenueDistrict,
     this.fatherOrHusbandFirstName,
@@ -22,7 +20,6 @@ class DelhiSpecificDetails {
   DelhiSpecificDetails.fromMap(Map data)
       : this(
           fromMarkaz: data['fromMarkaz'],
-          markazName: data['markazName'],
           district: data['district'],
           revenueDistrict: data['revenueDistrict'],
           fatherOrHusbandFirstName: data['fatherOrHusbandFirstName'],
@@ -34,7 +31,6 @@ class DelhiSpecificDetails {
   Map<String, dynamic> toMap() {
     return {
       'fromMarkaz': fromMarkaz != null ? fromMarkaz : "",
-      'markazName': markazName != null ? markazName : "",
       'district': district != null ? district : "",
       'fatherOrHusbandFirstName':
           fatherOrHusbandFirstName != null ? fatherOrHusbandFirstName : "",

@@ -1305,6 +1305,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
   static int age;
   static String phoneNumber;
   static String patientSex;
+  Sex patientSexToBeSaved;
   static String address;
   static String markaz;
   static String pincode;
@@ -1317,9 +1318,46 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
   static String hospitalID;
   static String hospitalName;
   static bool isResidentOfDelhi;
-  static bool isHealthCareWorker=false;
+  static bool isHealthCareWorker;
   static String fatherOrHusbandFirstName;
   static String fatherOrHusbandLastName;
+  static String emergencyContactRelation;
+  static String emergencyContactFirstNametest;
+  static String emergencyContactLastName;
+  static String emergencyContactPhoneNumber;
+
+  bool markazRadioGroupValue;
+  markazRadioTapped(bool value) {
+    setState(() {
+      markazRadioGroupValue = value;
+    });
+  }
+
+  isResidentRadioTapped(bool value) {
+    setState(() {
+      isResidentOfDelhi = value;
+    });
+  }
+
+  healhcareWorkerRadioTapped(bool value) {
+    setState(() {
+      isHealthCareWorker = value;
+    });
+  }
+
+  patientSexChanged(String value) {
+    setState(() {
+      patientSex = value;
+      if (patientSex == "Male") {
+        patientSexToBeSaved = Sex.Male;
+      } else if (patientSex == "Female") {
+        patientSexToBeSaved = Sex.Female;
+      } else if (patientSex == "Other") {
+        patientSexToBeSaved = Sex.Other;
+      }
+    });
+  }
+
   FullAddress patientAddress;
   DelhiSpecificDetails details = DelhiSpecificDetails();
 
@@ -1352,9 +1390,8 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
       zipcode: pincode,
       country: country,
     );
-    try {
-      await Provider.of<Patients>(context, listen: false)
-          .addPatientUsingApi(Patient(
+
+    Patient patientToBeCrated = Patient(
         Firstname: firstName,
         LastName: lastName,
         age: age,
@@ -1363,10 +1400,9 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
         idGivenByHospital: hospitalGivenID,
         currentLocation: 2,
         delhiDetails: DelhiSpecificDetails(
-          fromMarkaz: markaz != "" ? true : false,
+          fromMarkaz: markazRadioGroupValue,
           district: selectedDistrict,
           revenueDistrict: selectedRevenueDistrict,
-          markazName: markaz,
           isResidentOfDelhi: isResidentOfDelhi,
           isHealthCareWorker: isHealthCareWorker,
           fatherOrHusbandFirstName: fatherOrHusbandLastName,
@@ -1374,15 +1410,24 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
         ),
         hospitalID:
             Provider.of<Hospitals>(context, listen: false).fetchedHospital.id,
-        sex: patientSex == "Male" ? Sex.Male : Sex.Female,
+        sex: patientSexToBeSaved,
         state: Provider.of<Covid19>(context, listen: false)
             .referenceCovid19SeverityLevelsList[0],
         ventilatorUsed: false,
         events: [],
         vitals: [],
         tests: [],
-        travelHistory: [],
-      ));
+        
+        phoneNumber: phoneNumber,
+        emergencyContactFirstName: emergencyContactFirstNametest,
+        emergencyContactLastName: emergencyContactLastName,
+        emergencyContactPhoneNumber: emergencyContactLastName,
+        emergencyContactRelation: emergencyContactRelation
+        // travelHistory: [],
+      );
+    try {
+      await Provider.of<Patients>(context, listen: false)
+          .addPatientUsingApi(patientToBeCrated);
 
       await Provider.of<Hospitals>(context, listen: false)
           .addPatientToTheHospital();
@@ -1426,12 +1471,12 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
   savePatientAndGoToScreening() async {
     print("SavePatientAndGotoScreening called");
 
-    if (formKey2.currentState.validate()) {
-      formKey2.currentState.save();
-      await AddPatient();
-      Navigator.of(context).push(MaterialPageRoute(
-          builder: (BuildContext context) => PatientScreeningScreen()));
-    }
+    // if (formKey2.currentState.validate()) {
+    //   formKey2.currentState.save();
+    //   await AddPatient();
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (BuildContext context) => PatientScreeningScreen()));
+    // }
   }
 
   int currentStep = 0;
@@ -1550,26 +1595,101 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                               fontSize: 15,
                                               fontWeight: FontWeight.normal)),
                                       SizedBox(width: 10),
-                                      DropdownButton<bool>(
-                                        value: isHealthCareWorker,
-                                        hint: Text("Select"),
-                                        items: [true, false]
-                                            .map((bool selectedValue) {
-                                          return new DropdownMenuItem<bool>(
-                                            value: selectedValue,
-                                            child:
-                                                Text(selectedValue.toString()),
-                                          );
-                                        }).toList(),
-                                        onChanged: (value) {
-                                          this.setState(() {
-                                            isHealthCareWorker = value;
-                                          });
-                                        },
+                                      Row(
+                                        children: <Widget>[
+                                          Text("Yes"),
+                                          Radio(
+                                            value: true,
+                                            groupValue: isHealthCareWorker,
+                                            onChanged: (value) =>
+                                                healhcareWorkerRadioTapped(
+                                                    value),
+                                          ),
+                                          SizedBox(width: 20),
+                                          Text("No"),
+                                          Radio(
+                                            value: false,
+                                            groupValue: isHealthCareWorker,
+                                            onChanged: (value) =>
+                                                healhcareWorkerRadioTapped(
+                                                    value),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
                                 )),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Container(
+                                    width: 200,
+                                    child: Text("Markaz",
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.normal)),
+                                  ),
+                                  Row(
+                                    children: <Widget>[
+                                      Text("Yes"),
+                                      Radio(
+                                        value: true,
+                                        groupValue: markazRadioGroupValue,
+                                        onChanged: (value) =>
+                                            markazRadioTapped(value),
+                                      ),
+                                      SizedBox(width: 20),
+                                      Text("No"),
+                                      Radio(
+                                        value: false,
+                                        groupValue: markazRadioGroupValue,
+                                        onChanged: (value) =>
+                                            markazRadioTapped(value),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              // child: TextFormField(
+                              //   onChanged: (value) {
+                              //     this.setState(() {
+                              //       markaz = value;
+                              //     });
+                              //   },
+                              //   style: TextStyle(
+                              //       fontSize: 15,
+                              //       fontWeight: FontWeight.normal),
+                              //   keyboardType: TextInputType.text,
+                              //   validator: (value) {
+                              //     if (value.isEmpty) {
+                              //       return 'Please enter some text';
+                              //     }
+                              //     return null;
+                              //   },
+                              //   //  style: Theme.of(context).textTheme.bodyText1,
+                              //   decoration: InputDecoration(
+                              //     labelText: "Markaz",
+                              //     // hintText: "Event",
+                              //     enabledBorder: OutlineInputBorder(
+                              //         borderSide:
+                              //             BorderSide(color: Colors.grey[300])),
+                              //     focusedBorder: OutlineInputBorder(
+                              //         borderSide:
+                              //             BorderSide(color: Colors.grey[300])),
+                              //   ),
+                              //   onSaved: (String value) {
+                              //     this.setState(() {
+                              //       markaz = value;
+                              //     });
+                              //   },
+                              // ),
+                            ),
                             SizedBox(
                               height: 5,
                             ),
@@ -1692,41 +1812,44 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             ),
                             Padding(
                               padding: const EdgeInsets.all(2.0),
-                              child:
-                                   Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: <Widget>[
-                                        Text("Sex",
-                                            style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.normal)),
-                                        SizedBox(width: 10),
-                                        DropdownButton<String>(
-                                          value: patientSex,
-                                          hint: Text("Select Sex"),
-                                          items: ["Male", "Female"]
-                                              .map((String selectedSex) {
-                                            return new DropdownMenuItem<String>(
-                                              value: selectedSex,
-                                              child: new Text(selectedSex,
-                                                  style: TextStyle(
-                                                      fontSize: 15,
-                                                      fontWeight:
-                                                          FontWeight.normal)),
-                                            );
-                                          }).toList(),
-                                          onChanged: (value) {
-                                            this.setState(() {
-                                              patientSex = value;
-                                            });
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  
-                                
-                              
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Text("Sex",
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.normal)),
+                                  SizedBox(width: 10),
+                                  Row(
+                                    children: <Widget>[
+                                      Text("Male"),
+                                      Radio(
+                                        value: "Male",
+                                        groupValue: patientSex,
+                                        onChanged: (value) =>
+                                            patientSexChanged(value),
+                                      ),
+                                      SizedBox(width: 20),
+                                      Text("Female"),
+                                      Radio(
+                                        value: "Female",
+                                        groupValue: patientSex,
+                                        onChanged: (value) =>
+                                            patientSexChanged(value),
+                                      ),
+                                      SizedBox(width: 20),
+                                      Text("Other"),
+                                      Radio(
+                                        value: "Other",
+                                        groupValue: patientSex,
+                                        onChanged: (value) =>
+                                            patientSexChanged(value),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                             SizedBox(
                               height: 5,
@@ -1819,30 +1942,37 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                               padding: const EdgeInsets.all(2.0),
                               child: Container(
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
                                   Container(
-                                    width:200,
-                                    child: Text("Is the patient a resident of Delhi?",
+                                    width: 200,
+                                    child: Text(
+                                        "Is the patient a resident of Delhi?",
                                         style: TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.normal)),
                                   ),
                                   SizedBox(width: 10),
-                                  DropdownButton<bool>(
-                                    value: isResidentOfDelhi,
-                                    hint: Text("Resident of Delhi?"),
-                                    items: [true, false].map((bool value) {
-                                      return new DropdownMenuItem<bool>(
-                                        value: value,
-                                        child: Text(value.toString()),
-                                      );
-                                    }).toList(),
-                                    onChanged: (bool value) {
-                                      this.setState(() {
-                                        isResidentOfDelhi = value;
-                                      });
-                                    },
+                                 Row(
+                                    children: <Widget>[
+                                      Text("Yes"),
+                                      Radio(
+                                        value: true,
+                                        groupValue: isResidentOfDelhi,
+                                        onChanged: (value) =>
+                                            isResidentRadioTapped(value),
+                                      ),
+                                      SizedBox(width: 20),
+                                      Text("No"),
+                                      Radio(
+                                        value: false,
+                                        groupValue: isResidentOfDelhi,
+                                        onChanged: (value) =>
+                                            isResidentRadioTapped(value),
+                                      ),
+                                    
+                                    ],
                                   ),
                                 ],
                               )),
@@ -1889,45 +2019,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                 },
                               ),
                             ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: TextFormField(
-                                onChanged: (value) {
-                                  this.setState(() {
-                                    markaz = value;
-                                  });
-                                },
-                                style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.normal),
-                                keyboardType: TextInputType.text,
-                                validator: (value) {
-                                  if (value.isEmpty) {
-                                    return 'Please enter some text';
-                                  }
-                                  return null;
-                                },
-                                //  style: Theme.of(context).textTheme.bodyText1,
-                                decoration: InputDecoration(
-                                  labelText: "Markaz",
-                                  // hintText: "Event",
-                                  enabledBorder: OutlineInputBorder(
-                                      borderSide:
-                                          BorderSide(color: Colors.grey[300])),
-                                  focusedBorder: OutlineInputBorder(
-                                      borderSide:
-                                          BorderSide(color: Colors.grey[300])),
-                                ),
-                                onSaved: (String value) {
-                                  this.setState(() {
-                                    markaz = value;
-                                  });
-                                },
-                              ),
-                            ),
+                           
                             SizedBox(
                               height: 5,
                             ),
@@ -1993,7 +2085,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                               child: Row(
                                 children: <Widget>[
                                   Container(
-                                    width:200,
+                                    width: 200,
                                     child: Text("Choose District",
                                         style: TextStyle(
                                             fontSize: 15,
@@ -2003,7 +2095,8 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                       child: DropdownButton<String>(
                                     value: selectedDistrict,
                                     hint: Text("Select District"),
-                                    items: delhiDistricts.map((String district) {
+                                    items:
+                                        delhiDistricts.map((String district) {
                                       return new DropdownMenuItem<String>(
                                         value: district,
                                         child: new Text(district),
@@ -2018,39 +2111,41 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                 ],
                               ),
                             ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  Container(
-                                    width:150,
-                                    child: Text("Choose Revenue District",
-                                        style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.normal)),
-                                  ),
-                                  DropdownButton<String>(
-                                    value: selectedRevenueDistrict,
-                                    hint: Text("Select Revenue District"),
-                                    items: delhiDistricts.map((String district) {
-                                      return new DropdownMenuItem<String>(
-                                        value: district,
-                                        child: new Text(district),
-                                      );
-                                    }).toList(),
-                                    onChanged: (String value) {
-                                      this.setState(() {
-                                        selectedRevenueDistrict = value;
-                                      });
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
+                            // SizedBox(
+                            //   height: 5,
+                            // ),
+                            // Padding(
+                            //   padding: const EdgeInsets.all(2.0),
+                            //   child: Row(
+                            //     mainAxisAlignment:
+                            //         MainAxisAlignment.spaceBetween,
+                            //     children: <Widget>[
+                            //       Container(
+                            //         width: 150,
+                            //         child: Text("Choose Revenue District",
+                            //             style: TextStyle(
+                            //                 fontSize: 15,
+                            //                 fontWeight: FontWeight.normal)),
+                            //       ),
+                            //       DropdownButton<String>(
+                            //         value: selectedRevenueDistrict,
+                            //         hint: Text("Select Revenue District"),
+                            //         items:
+                            //             delhiDistricts.map((String district) {
+                            //           return new DropdownMenuItem<String>(
+                            //             value: district,
+                            //             child: new Text(district),
+                            //           );
+                            //         }).toList(),
+                            //         onChanged: (String value) {
+                            //           this.setState(() {
+                            //             selectedRevenueDistrict = value;
+                            //           });
+                            //         },
+                            //       ),
+                            //     ],
+                            //   ),
+                            // ),
                             SizedBox(
                               height: 5,
                             ),
@@ -2172,20 +2267,59 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                               ),
                             ),
                             SizedBox(height: 20),
-                            Text("3. Family Details",
+                            Text("3. Emergency Contact",
                                 style: Theme.of(context)
                                     .textTheme
                                     .headline5
                                     .copyWith(
                                         color: Colors.black,
                                         fontWeight: FontWeight.bold)),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Container(
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: <Widget>[
+                                      Text("Relation",
+                                          style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.normal)),
+                                      SizedBox(width: 10),
+                                      DropdownButton<String>(
+                                        value: emergencyContactRelation,
+                                        hint: Text("Select"),
+                                        items: [
+                                          "Father",
+                                          "Mother",
+                                          "Spouse",
+                                          "Child"
+                                        ].map((String selectedValue) {
+                                          return new DropdownMenuItem<String>(
+                                            value: selectedValue,
+                                            child:
+                                                Text(selectedValue),
+                                          );
+                                        }).toList(),
+                                        onChanged: (value) {
+                                          this.setState(() {
+                                            emergencyContactRelation = value;
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                )),
                             SizedBox(height: 20),
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: TextFormField(
                                 onChanged: (value) {
                                   this.setState(() {
-                                    fatherOrHusbandFirstName = value;
+                                    emergencyContactFirstNametest = value;
                                   });
                                 },
                                 style: TextStyle(
@@ -2200,7 +2334,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                 },
                                 //  style: Theme.of(context).textTheme.bodyText1,
                                 decoration: InputDecoration(
-                                  labelText: "Father/Husband First Name",
+                                  labelText: "Emergency Contact's First Name",
                                   // hintText: "Event",
                                   enabledBorder: OutlineInputBorder(
                                       borderSide:
@@ -2211,7 +2345,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                 ),
                                 onSaved: (String value) {
                                   this.setState(() {
-                                    fatherOrHusbandFirstName = value;
+                                    emergencyContactFirstNametest = value;
                                   });
                                 },
                               ),
@@ -2224,7 +2358,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                               child: TextFormField(
                                 onChanged: (value) {
                                   this.setState(() {
-                                    fatherOrHusbandLastName = value;
+                                    emergencyContactLastName = value;
                                   });
                                 },
                                 style: TextStyle(
@@ -2239,7 +2373,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                 },
                                 //  style: Theme.of(context).textTheme.bodyText1,
                                 decoration: InputDecoration(
-                                  labelText: "Father/Husband Last Name",
+                                  labelText: "Emergency Contact's Last Name",
                                   // hintText: "Event",
                                   enabledBorder: OutlineInputBorder(
                                       borderSide:
@@ -2250,7 +2384,46 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                 ),
                                 onSaved: (String value) {
                                   this.setState(() {
-                                    fatherOrHusbandLastName = value;
+                                    emergencyContactLastName = value;
+                                  });
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: TextFormField(
+                                onChanged: (value) {
+                                  this.setState(() {
+                                    emergencyContactPhoneNumber = value;
+                                  });
+                                },
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal),
+                                keyboardType: TextInputType.text,
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Please enter some text';
+                                  }
+                                  return null;
+                                },
+                                //  style: Theme.of(context).textTheme.bodyText1,
+                                decoration: InputDecoration(
+                                  labelText: "Emergency Contact's Phone Number",
+                                  // hintText: "Event",
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                ),
+                                onSaved: (String value) {
+                                  this.setState(() {
+                                    emergencyContactPhoneNumber = value;
                                   });
                                 },
                               ),
@@ -2289,7 +2462,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                     ),
                     // FlatButton(
                     //   onPressed: () async {
-                    //     await savePatientAndGoBack();
+                    //     await savePatientAndGoToScreening();
                     //   },
                     //   color: Theme.of(context).accentColor,
                     //   child: Text("START SCREENING",

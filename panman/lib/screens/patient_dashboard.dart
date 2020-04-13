@@ -4,7 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:panman/providers/auth.dart';
 import 'package:panman/providers/healthcareworkers.dart';
 import 'package:panman/providers/hospital.dart';
-import 'package:panman/screens/patient_registration_screen.dart';
+import './patient_registration_screen.dart';
 import 'package:provider/provider.dart';
 
 class PatientDashboardScreen extends StatefulWidget {
