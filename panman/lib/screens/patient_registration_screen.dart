@@ -10,6 +10,8 @@ import 'package:panman/screens/patient_screening.dart';
 import 'package:provider/provider.dart';
 import 'package:random_string/random_string.dart';
 import 'dart:math' show Random;
+import 'package:string_validator/string_validator.dart';
+
 
 import '../providers/hospital.dart';
 
@@ -1333,6 +1335,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
       markazRadioGroupValue = value;
     });
   }
+  
 
   isResidentRadioTapped(bool value) {
     setState(() {
@@ -1436,6 +1439,8 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
       //   Navigator.pop(context);
     } catch (error) {}
   }
+
+  
 
   AddPatientAndScreen() async {
     print("AddPatientAndScreen called");
@@ -1805,6 +1810,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: TextFormField(
+                                autovalidate: true,
                                 style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.normal),
@@ -1817,6 +1823,10 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                 validator: (value) {
                                   if (value.isEmpty) {
                                     return 'Please enter some text';
+                                  }
+                                  else if (isAlpha(value)==false){
+                                    print("Here");
+                                    return 'Names can contain only alphabets';
                                   }
                                   return null;
                                 },
@@ -1844,6 +1854,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: TextFormField(
+                                autovalidate: true,
                                 style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.normal),
@@ -1856,6 +1867,10 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                 validator: (value) {
                                   if (value.isEmpty) {
                                     return 'Please enter some text';
+                                  }
+                                   else if (isAlpha(value)==false){
+                                    print("Here");
+                                    return 'Names can contain only alphabets';
                                   }
                                   return null;
                                 },
@@ -1927,6 +1942,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             Padding(
                               padding: EdgeInsets.all(2),
                               child: TextFormField(
+                                autovalidate: true,
                                 onChanged: (value) {
                                   this.setState(() {
                                     age = int.parse(value);
@@ -1939,6 +1955,12 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                 validator: (value) {
                                   if (value.isEmpty) {
                                     return 'Please enter some text';
+                                  }
+                                   else if (isNumeric(value)==false){
+                                    return 'Age can only be a number';
+                                  }
+                                  else if(int.parse(value)>120){
+                                    return ('Please enter a valid age');
                                   }
                                   return null;
                                 },
@@ -1966,6 +1988,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: TextFormField(
+                                autovalidate: true,
                                 onChanged: (value) {
                                   this.setState(() {
                                     phoneNumber = value;
@@ -1974,10 +1997,13 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                 style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.normal),
-                                keyboardType: TextInputType.text,
+                                keyboardType: TextInputType.number,
                                 validator: (value) {
                                   if (value.isEmpty) {
                                     return 'Please enter some text';
+                                  }
+                                  else if (isNumeric(value)==false){
+                                    return 'Phone Number only allows numbers';
                                   }
                                   return null;
                                 },
@@ -2112,6 +2138,9 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                         if (value.isEmpty) {
                                           return 'Please enter some text';
                                         }
+                                        else if(isNumeric(value)==false){
+                                          return 'Pincode can only have numbers';
+                                        }
                                         return null;
                                       },
                                       //  style: Theme.of(context).textTheme.bodyText1,
@@ -2221,6 +2250,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: TextFormField(
+                                
                                 onChanged: (value) {
                                   this.setState(() {
                                     city = value;
@@ -2385,6 +2415,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: TextFormField(
+                                autovalidate: true,
                                 onChanged: (value) {
                                   this.setState(() {
                                     emergencyContactFirstNametest = value;
@@ -2397,6 +2428,9 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                 validator: (value) {
                                   if (value.isEmpty) {
                                     return 'Please enter some text';
+                                  }
+                                  else if (isAlpha(value)==false){
+                                    return 'Names can only have alphabets in them';
                                   }
                                   return null;
                                 },
@@ -2424,6 +2458,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: TextFormField(
+                                autovalidate: true,
                                 onChanged: (value) {
                                   this.setState(() {
                                     emergencyContactLastName = value;
@@ -2436,6 +2471,9 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                 validator: (value) {
                                   if (value.isEmpty) {
                                     return 'Please enter some text';
+                                  }
+                                   else if (isAlpha(value)==false){
+                                    return 'Names can only have alphabets in them';
                                   }
                                   return null;
                                 },
@@ -2463,6 +2501,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: TextFormField(
+                                autovalidate: true,
                                 onChanged: (value) {
                                   this.setState(() {
                                     emergencyContactPhoneNumber = value;
@@ -2471,10 +2510,13 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                 style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.normal),
-                                keyboardType: TextInputType.text,
+                                keyboardType: TextInputType.number,
                                 validator: (value) {
                                   if (value.isEmpty) {
                                     return 'Please enter some text';
+                                  }
+                                   else if (isNumeric(value)==false){
+                                    return 'Phone Numbers can only have numbers in them';
                                   }
                                   return null;
                                 },

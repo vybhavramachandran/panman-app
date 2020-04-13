@@ -30,8 +30,6 @@ class _PatientContactTracingScreenState
   //       builder: (BuildContext context) => PatientRecommendationScreen()));
   // }
 
-
-
   contactTracing newContact = contactTracing(
     isMorePatientInfoAvailable: false,
     sourceOfInfection: "",
@@ -40,14 +38,14 @@ class _PatientContactTracingScreenState
     sourcePatientLastName: "",
   );
 
-   submitTrackingAndMoveToState(int location) async {
+  submitTrackingAndMoveToState(int location) async {
     print("submitTrackingAndMoveToHome called");
 
     //print(json.encode(screeningResult));
 
-     await Provider.of<Patients>(context, listen: false)
-         .addContactTracking(newContact, location);
-    //Navigator.of(context).pop(true);
+    await Provider.of<Patients>(context, listen: false)
+        .addContactTracking(newContact, location);
+    Navigator.of(context).pushReplacementNamed('/home_screen');
   }
 
   typeOfContactChosen(String value) {
@@ -175,7 +173,7 @@ class _PatientContactTracingScreenState
                 SizedBox(
                   height: 5,
                 ),
-               newContact.isMorePatientInfoAvailable  == true
+                newContact.isMorePatientInfoAvailable == true
                     ? Padding(
                         padding: const EdgeInsets.all(2.0),
                         child: TextFormField(
@@ -338,7 +336,13 @@ class _PatientContactTracingScreenState
                         ),
                       )
                     : Container(),
-                Text("Move the Patient to",style: Theme.of(context).textTheme.headline6.copyWith(color:Colors.grey),),
+                Text(
+                  "Move the Patient to",
+                  style: Theme.of(context)
+                      .textTheme
+                      .headline6
+                      .copyWith(color: Colors.grey),
+                ),
                 Container(
                   height: 80,
                   child: Padding(
@@ -348,7 +352,6 @@ class _PatientContactTracingScreenState
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
                         Container(
-                          
                           width: (MediaQuery.of(context).size.width - 50) / 3,
                           child: FlatButton(
                             onPressed: () async {
@@ -377,13 +380,13 @@ class _PatientContactTracingScreenState
                             },
                             color: Theme.of(context).accentColor,
                             child: Provider.of<Patients>(context, listen: true)
-                                        .isAddingPatient ==
+                                        .isUpdating ==
                                     false
-                                ?  Text("ISOLATION WARD",
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .caption,textAlign: TextAlign.center,)
-                                  
+                                ? Text(
+                                    "ISOLATION WARD",
+                                    style: Theme.of(context).textTheme.caption,
+                                    textAlign: TextAlign.center,
+                                  )
                                 : CircularProgressIndicator(
                                     backgroundColor: Colors.black,
                                   ),

@@ -34,6 +34,7 @@ dependencies:
   flutter_svg:
   image_picker:
   datetime_picker_formfield:
+  string_validator:
 
 
   # The following adds the Cupertino Icons font to your application.

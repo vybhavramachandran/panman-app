@@ -192,6 +192,8 @@ class Patients with ChangeNotifier {
   }
 
   Future addScreening(Screening screeningVal, int location) async {
+    isAddingPatient = true;
+    notifyListeners();
     try {
       selectedPatient.screeningResult = screeningVal;
       selectedPatient.currentLocation = location;
@@ -200,9 +202,13 @@ class Patients with ChangeNotifier {
     } catch (e) {
       print(e);
     }
+    isAddingPatient = false;
+    notifyListeners();
   }
 
   Future addContactTracking(contactTracing newTracing, int location) async {
+    isUpdating = true;
+    notifyListeners();
     try {
       selectedPatient.tracingDetail = newTracing;
       selectedPatient.currentLocation = location;
@@ -211,6 +217,8 @@ class Patients with ChangeNotifier {
     } catch (e) {
       print(e);
     }
+    isUpdating = false;
+    notifyListeners();
   }
 
   Future addVitalMeasurement(PatientVital vital) async {
