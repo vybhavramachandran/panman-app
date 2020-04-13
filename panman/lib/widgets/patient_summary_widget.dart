@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:panman/screens/patient_contact_tracing.dart';
 import 'package:panman/screens/patient_screening.dart';
 import 'package:provider/provider.dart';
 

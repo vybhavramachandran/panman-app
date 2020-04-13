@@ -27,6 +27,7 @@ import './screens/patient_registration_screen.dart';
 import './screens/add_test_screen.dart';
 import './screens/patient_tests_screen.dart';
 import './screens/patient_screening.dart';
+import './screens/patient_contact_tracing.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -164,6 +165,7 @@ class MyApp extends StatelessWidget {
                             }
                           }),
                       routes: {
+                        PatientContactTracingScreen.routeName:(ctx)=> PatientContactTracingScreen(),
                         PatientScreeningScreen.routeName : (ctx) => PatientScreeningScreen(),
                         PatientTestsScreen.routeName: (ctx) => PatientTestsScreen(),
                         AddTestScreen.routeName :(ctx)=>AddTestScreen(),

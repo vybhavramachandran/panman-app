@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:panman/models/address.dart';
 import 'package:panman/models/patient.dart';
 import 'package:panman/providers/patients.dart';
+import 'package:panman/screens/patient_contact_tracing.dart';
 import 'package:panman/screens/patient_screening.dart';
 import 'package:provider/provider.dart';
 import 'package:random_string/random_string.dart';
@@ -1417,18 +1418,81 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
         events: [],
         vitals: [],
         tests: [],
-        
         phoneNumber: phoneNumber,
         emergencyContactFirstName: emergencyContactFirstNametest,
         emergencyContactLastName: emergencyContactLastName,
         emergencyContactPhoneNumber: emergencyContactLastName,
         emergencyContactRelation: emergencyContactRelation
         // travelHistory: [],
-      );
+        );
     try {
       await Provider.of<Patients>(context, listen: false)
           .addPatientUsingApi(patientToBeCrated);
 
+      await Provider.of<Hospitals>(context, listen: false)
+          .addPatientToTheHospital();
+
+      // await Provider.of<Patients>(context, listen: false).addPatientEvent();
+      //   Navigator.pop(context);
+    } catch (error) {}
+  }
+
+  AddPatientAndScreen() async {
+    print("AddPatientAndScreen called");
+    patientAddress = FullAddress(
+      address: address,
+      city: city,
+      state: state,
+      zipcode: pincode,
+      country: country,
+    );
+
+    Patient patientToBeCrated = Patient(
+        Firstname: firstName,
+        LastName: lastName,
+        age: age,
+        fullAddress: patientAddress,
+        id: newPatientID,
+        idGivenByHospital: hospitalGivenID,
+        currentLocation: 2,
+        delhiDetails: DelhiSpecificDetails(
+          fromMarkaz: markazRadioGroupValue,
+          district: selectedDistrict,
+          revenueDistrict: selectedRevenueDistrict,
+          isResidentOfDelhi: isResidentOfDelhi,
+          isHealthCareWorker: isHealthCareWorker,
+          fatherOrHusbandFirstName: fatherOrHusbandLastName,
+          fatherOrHusbandLastName: fatherOrHusbandLastName,
+        ),
+        hospitalID:
+            Provider.of<Hospitals>(context, listen: false).fetchedHospital.id,
+        sex: patientSexToBeSaved,
+        state: Provider.of<Covid19>(context, listen: false)
+            .referenceCovid19SeverityLevelsList[0],
+        ventilatorUsed: false,
+        events: [],
+        vitals: [],
+        tests: [],
+        phoneNumber: phoneNumber,
+        emergencyContactFirstName: emergencyContactFirstNametest,
+        emergencyContactLastName: emergencyContactLastName,
+        emergencyContactPhoneNumber: emergencyContactLastName,
+        emergencyContactRelation: emergencyContactRelation
+        // travelHistory: [],
+        );
+    try {
+      
+      await Provider.of<Patients>(context, listen: false)
+          .addPatient(patientToBeCrated);
+
+      await Provider.of<Patients>(context,listen:false).fetchPatientsListFromServerAPI(
+        Provider.of<Hospitals>(context,listen:false).fetchedHospital.id
+      );
+
+      
+      await Provider.of<Patients>(context, listen: false)
+          .selectPatient(patientToBeCrated.id);
+          
       await Provider.of<Hospitals>(context, listen: false)
           .addPatientToTheHospital();
 
@@ -1474,9 +1538,15 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
     // if (formKey2.currentState.validate()) {
     //   formKey2.currentState.save();
     //   await AddPatient();
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (BuildContext context) => PatientScreeningScreen()));
-    // }
+
+    if (formKey2.currentState.validate()) {
+      formKey2.currentState.save();
+         await AddPatientAndScreen();
+
+
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (BuildContext context) => PatientScreeningScreen()));
+    }
   }
 
   int currentStep = 0;
@@ -1954,7 +2024,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                             fontWeight: FontWeight.normal)),
                                   ),
                                   SizedBox(width: 10),
-                                 Row(
+                                  Row(
                                     children: <Widget>[
                                       Text("Yes"),
                                       Radio(
@@ -1971,7 +2041,6 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                         onChanged: (value) =>
                                             isResidentRadioTapped(value),
                                       ),
-                                    
                                     ],
                                   ),
                                 ],
@@ -2019,7 +2088,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                 },
                               ),
                             ),
-                           
+
                             SizedBox(
                               height: 5,
                             ),
@@ -2300,8 +2369,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                         ].map((String selectedValue) {
                                           return new DropdownMenuItem<String>(
                                             value: selectedValue,
-                                            child:
-                                                Text(selectedValue),
+                                            child: Text(selectedValue),
                                           );
                                         }).toList(),
                                         onChanged: (value) {
@@ -2446,19 +2514,52 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
-                    FlatButton(
-                      onPressed: () async {
-                        await savePatientAndGoBack();
-                      },
-                      color: Theme.of(context).accentColor,
-                      child: Provider.of<Patients>(context, listen: true)
-                                  .isAddingPatient ==
-                              false
-                          ? Text("SAVE & GO BACK",
-                              style: Theme.of(context).textTheme.caption)
-                          : CircularProgressIndicator(
-                              backgroundColor: Colors.black,
-                            ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        FlatButton(
+                          onPressed: () async {
+                            await savePatientAndGoBack();
+                          },
+                          color: Theme.of(context).accentColor,
+                          child: Provider.of<Patients>(context, listen: true)
+                                          .isAddingPatient ==
+                                      false &&
+                                  Provider.of<Hospitals>(context, listen: true)
+                                          .isUpdating ==
+                                      false
+                              ? Text("SAVE & GO BACK",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .caption
+                                      .copyWith())
+                              : CircularProgressIndicator(
+                                  backgroundColor: Colors.black,
+                                ),
+                        ),
+                      ],
+                    ),
+
+                    Container(
+                      //  width: 200,
+                      child: FlatButton(
+                        onPressed: () async {
+                          await savePatientAndGoToScreening();
+                        },
+                        color: Theme.of(context).accentColor,
+                        child: Provider.of<Patients>(context, listen: true)
+                                        .isAddingPatient ==
+                                    false &&
+                                Provider.of<Hospitals>(context, listen: true)
+                                        .isUpdating ==
+                                    false
+                            ? Text("PROCEED TO SCREENING",
+                                style: Theme.of(context).textTheme.caption)
+                            : CircularProgressIndicator(
+                                backgroundColor: Colors.black,
+                              ),
+                      ),
                     ),
                     // FlatButton(
                     //   onPressed: () async {

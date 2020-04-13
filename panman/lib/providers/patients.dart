@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:panman/models/contactTracing.dart';
 import 'package:random_string/random_string.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -130,56 +131,57 @@ class Patients with ChangeNotifier {
         print(patientSnapshot.toString());
         notifyListeners();
       } else {
-        throw Exception('Failed to load album');
+        throw Exception('Fetch Patients Failed');
       }
 
       patientSnapshot.forEach((patient) async {
         print(patient['firstName'] + patient['covidStatus']);
-       
-          fetchedPatientsList.add(Patient(
-            Firstname: patient['firstName'],
-            LastName: patient['lastName'],
-            age: patient['age'],
-            currentLocation: patient['locationInHospital'],
-            state: referenceCovid19SeverityLevelsList.firstWhere(
-                (element) => element.abbrv == patient['covidStatus']),
-            fullAddress: FullAddress.fromMap(patient['fullAddress']),
-            sex: patient['sex'] == "Male"
-                ? Sex.Male
-                : patient['sex'] == "Female" ? Sex.Female : Sex.Other,
-            ventilatorUsed: patient['ventilatorUsed'],
-            id: patient['id'],
-            phoneNumber: patient['phoneNumber'],
-            hospitalID: patient['hospitalID'],
-            screeningResult: patient['screeningResult'] == null || patient['screeningResult'] == ""
-                ? dummyScreening
-                : Screening.fromMap(patient['screeningResult']),
-            idGivenByHospital: patient['idGivenByHospital'],
-            events: patient['events'] == null
-                ? []
-                : patient['events'].map<event>((eventToBeAdded) {
-                    return event.fromMap(eventToBeAdded);
-                  }).toList(),
-            vitals: patient['vitals'] == null
-                ? []
-                : patient['vitals'].map<PatientVital>((vitalToBeAdded) {
-                    return PatientVital.fromMap(vitalToBeAdded);
-                  }).toList(),
-            // travelHistory: patient['travelHistory'] == null
-            //     ? []
-            //     : patient['travelHistory'].map<TravelHistory>((travel) {
-            //         return TravelHistory.fromMap(travel);
-            //       }).toList(),
-            delhiDetails: patient['delhiDetails'] == null
-                ? dummyDetails
-                : DelhiSpecificDetails.fromMap(patient['delhiDetails']),
-            tests: patient['tests'] == null
-                ? []
-                : patient['tests'].map<Test>((testToBeAdded) {
-                    return Test.fromMap(testToBeAdded);
-                  }).toList(),
-          ));
-        
+
+        fetchedPatientsList.add(Patient(
+          Firstname: patient['firstName'],
+          LastName: patient['lastName'],
+          age: patient['age'],
+          currentLocation: patient['locationInHospital'],
+          state: referenceCovid19SeverityLevelsList
+              .firstWhere((element) => element.abbrv == patient['covidStatus']),
+          fullAddress: FullAddress.fromMap(patient['fullAddress']),
+          sex: patient['sex'] == "Male"
+              ? Sex.Male
+              : patient['sex'] == "Female" ? Sex.Female : Sex.Other,
+          ventilatorUsed: patient['ventilatorUsed'],
+          id: patient['id'],
+          phoneNumber: patient['phoneNumber'],
+          hospitalID: patient['hospitalID'],
+          screeningResult: patient['screeningResult'] == null ||
+                  patient['screeningResult'] == ""
+              ? dummyScreening
+              : Screening.fromMap(patient['screeningResult']),
+          idGivenByHospital: patient['idGivenByHospital'],
+          events: patient['events'] == null
+              ? []
+              : patient['events'].map<event>((eventToBeAdded) {
+                  return event.fromMap(eventToBeAdded);
+                }).toList(),
+          vitals: patient['vitals'] == null
+              ? []
+              : patient['vitals'].map<PatientVital>((vitalToBeAdded) {
+                  return PatientVital.fromMap(vitalToBeAdded);
+                }).toList(),
+          // travelHistory: patient['travelHistory'] == null
+          //     ? []
+          //     : patient['travelHistory'].map<TravelHistory>((travel) {
+          //         return TravelHistory.fromMap(travel);
+          //       }).toList(),
+          delhiDetails: patient['delhiDetails'] == null
+              ? dummyDetails
+              : DelhiSpecificDetails.fromMap(patient['delhiDetails']),
+          tests: patient['tests'] == null
+              ? []
+              : patient['tests'].map<Test>((testToBeAdded) {
+                  return Test.fromMap(testToBeAdded);
+                }).toList(),
+          tracingDetail: patient['tracingDetail'],
+        ));
       });
       isFetching = false;
       shouldRefreshList = false;
@@ -192,6 +194,17 @@ class Patients with ChangeNotifier {
   Future addScreening(Screening screeningVal, int location) async {
     try {
       selectedPatient.screeningResult = screeningVal;
+      selectedPatient.currentLocation = location;
+      await updatePatientProfileInFirebaseWithAPI();
+      notifyListeners();
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future addContactTracking(contactTracing newTracing, int location) async {
+    try {
+      selectedPatient.tracingDetail = newTracing;
       selectedPatient.currentLocation = location;
       await updatePatientProfileInFirebaseWithAPI();
       notifyListeners();
@@ -407,7 +420,7 @@ class Patients with ChangeNotifier {
     try {
       isAddingPatient = true;
       notifyListeners();
-      print("Hospital ID is"+patientToAdd.hospitalID);
+      print("Hospital ID is" + patientToAdd.hospitalID);
       event newEvent = event(
           eventType: "hospital_admission",
           eventData: patientToAdd.hospitalID,
@@ -415,10 +428,10 @@ class Patients with ChangeNotifier {
           eventID: randomAlphaNumeric(20));
       patientToAdd.events.add(newEvent);
       var test = json.encode(patientToAdd.toMap());
-    //  print(patientToAdd.toMap().toString());
+      //  print(patientToAdd.toMap().toString());
 
       final response = await http.post(
-        'https://us-central1-thewarroom-98e6d.cloudfunctions.net/app/patient/',
+        'https://us-central1-thewarroom-98e6d.cloudfunctions.net/app/patient/${patientToAdd.id}',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',

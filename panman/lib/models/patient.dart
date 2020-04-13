@@ -8,7 +8,7 @@ import './delhiSpecificDetails.dart';
 import './test.dart';
 import './screening.dart';
 import './emergency_contact.dart';
-
+import './contactTracing.dart';
 import 'dart:io';
 
 enum Sex { Male, Female, Other}
@@ -36,6 +36,7 @@ class Patient {
   String emergencyContactFirstName;
   String emergencyContactLastName;
   String emergencyContactPhoneNumber;
+  contactTracing tracingDetail;
 
   Patient({
     this.id,
@@ -60,6 +61,7 @@ class Patient {
     this.emergencyContactLastName,
     this.emergencyContactPhoneNumber,
     this.emergencyContactRelation,
+    this.tracingDetail,
   });
 
   mapifyList(List input) {
@@ -90,6 +92,7 @@ class Patient {
       'vitals': mapifyList(vitals),
       'delhiDetails': delhiDetails != null ? delhiDetails.toMap() : "",
       'tests': mapifyList(tests),
+      'contactTracing' : tracingDetail !=null?tracingDetail.toMap():"",
       'screeningResult':screeningResult!=null?screeningResult.toMap():"",
       'emergencyContactFirstName':emergencyContactFirstName,
       'emergencyContactLastName':emergencyContactLastName,
