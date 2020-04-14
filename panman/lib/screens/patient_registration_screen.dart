@@ -1430,7 +1430,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
         );
     try {
       await Provider.of<Patients>(context, listen: false)
-          .addPatientUsingApi(patientToBeCrated);
+          .addPatient(patientToBeCrated);
 
       await Provider.of<Hospitals>(context, listen: false)
           .addPatientToTheHospital();
@@ -1490,7 +1490,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
       await Provider.of<Patients>(context, listen: false)
           .addPatient(patientToBeCrated);
 
-      await Provider.of<Patients>(context,listen:false).fetchPatientsListFromServerAPI(
+      await Provider.of<Patients>(context,listen:false).fetchPatientsListFromServer(
         Provider.of<Hospitals>(context,listen:false).fetchedHospital.id
       );
 

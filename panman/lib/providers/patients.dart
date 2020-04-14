@@ -34,6 +34,33 @@ class Patients with ChangeNotifier {
   Future fetchPatientsListFromServer(String hospitalID) async {
     print("fetchPatientsList Called");
 
+    
+    DelhiSpecificDetails dummyDetails = DelhiSpecificDetails(	
+      district: "",	
+      fromMarkaz: false,	
+      revenueDistrict: "",	
+    );	
+    Screening dummyScreening = Screening(	
+      hasComorbdityOrganTransplant: false,	
+      hasComorbidityCOPD: false,	
+      hasComorbidityChronicNeuro: false,	
+      hasComorbidityChronicRenalDisease: false,	
+      hasComorbidityDiabetes: false,	
+      hasComorbidityHIV: false,	
+      hasComorbidityHeartDisease: false,	
+      hasComorbidityHypertension: false,	
+      hasComorbidityLiverDisease: false,	
+      hasComorbidityMalignancy: false,	
+      hasComorbidityPregnancy: false,	
+      hasCough: false,	
+      hasDifficultyBreathing: false,	
+      hasFever: false,	
+      hasTravelledAboard: false,	
+      hasTiredness: false,	
+      returnDate: DateTime.now(),	
+      visitedCountry: "No Data",	
+    );
+
     try {
       isFetching = true;
       //notifyListeners();
@@ -51,11 +78,17 @@ class Patients with ChangeNotifier {
           state: referenceCovid19SeverityLevelsList
               .firstWhere((element) => element.abbrv == patient['covidStatus']),
           fullAddress: FullAddress.fromMap(patient['fullAddress']),
-          sex: patient['sex'] == "Male" ? Sex.Male : Sex.Female,
+         sex: patient['sex'] == "Male"
+              ? Sex.Male
+              : patient['sex'] == "Female" ? Sex.Female : Sex.Other,
           ventilatorUsed: patient['ventilatorUsed'],
           id: patient['id'],
           phoneNumber: patient['phoneNumber'],
           hospitalID: patient['hospitalID'],
+          screeningResult: patient['screeningResult'] == null ||
+                  patient['screeningResult'] == ""
+              ? dummyScreening
+              : Screening.fromMap(patient['screeningResult']),
           idGivenByHospital: patient['idGivenByHospital'],
           events: patient['events'] == null
               ? []
@@ -67,6 +100,20 @@ class Patients with ChangeNotifier {
               : patient['vitals'].map<PatientVital>((vitalToBeAdded) {
                   return PatientVital.fromMap(vitalToBeAdded);
                 }).toList(),
+          // travelHistory: patient['travelHistory'] == null
+          //     ? []
+          //     : patient['travelHistory'].map<TravelHistory>((travel) {
+          //         return TravelHistory.fromMap(travel);
+          //       }).toList(),
+          delhiDetails: patient['delhiDetails'] == null
+              ? dummyDetails
+              : DelhiSpecificDetails.fromMap(patient['delhiDetails']),
+          tests: patient['tests'] == null
+              ? []
+              : patient['tests'].map<Test>((testToBeAdded) {
+                  return Test.fromMap(testToBeAdded);
+                }).toList(),
+          tracingDetail: patient['tracingDetail'],
         ));
       });
       isFetching = false;
@@ -77,7 +124,7 @@ class Patients with ChangeNotifier {
     }
   }
 
-  Future fetchPatientsListFromServerAPI(String hospitalID) async {
+  Future fetchPatientsListFromServerAPI2(String hospitalID) async {
     print("fetchPatientsList Called");
 
     DelhiSpecificDetails dummyDetails = DelhiSpecificDetails(
@@ -197,7 +244,7 @@ class Patients with ChangeNotifier {
     try {
       selectedPatient.screeningResult = screeningVal;
       selectedPatient.currentLocation = location;
-      await updatePatientProfileInFirebaseWithAPI();
+      await updatePatientProfileInFirebase();
       notifyListeners();
     } catch (e) {
       print(e);
@@ -212,7 +259,7 @@ class Patients with ChangeNotifier {
     try {
       selectedPatient.tracingDetail = newTracing;
       selectedPatient.currentLocation = location;
-      await updatePatientProfileInFirebaseWithAPI();
+      await updatePatientProfileInFirebase();
       notifyListeners();
     } catch (e) {
       print(e);
@@ -224,7 +271,7 @@ class Patients with ChangeNotifier {
   Future addVitalMeasurement(PatientVital vital) async {
     try {
       selectedPatient.vitals.add(vital);
-      await updatePatientProfileInFirebaseWithAPI();
+      await updatePatientProfileInFirebase();
       notifyListeners();
     } catch (e) {
       print(e);
@@ -317,27 +364,27 @@ class Patients with ChangeNotifier {
             eventType: "patient_death",
             eventTime: DateTime.now(),
             eventData: "${oldLocation}->${newLocation}");
-        await updatePatientProfileInFirebaseWithAPI();
+        await updatePatientProfileInFirebase();
       } else if (newLocation == 6) {
         selectedPatient.hospitalID = "";
         await addEvent(
             eventType: "patient_transfer",
             eventTime: DateTime.now(),
             eventData: "${oldLocation}->${newLocation}");
-        await updatePatientProfileInFirebaseWithAPI();
+        await updatePatientProfileInFirebase();
       } else if (newLocation == 0) {
         selectedPatient.hospitalID = "";
         await addEvent(
             eventType: "patient_discharged",
             eventTime: DateTime.now(),
             eventData: "${oldLocation}->${newLocation}");
-        await updatePatientProfileInFirebaseWithAPI();
+        await updatePatientProfileInFirebase();
       } else {
         await addEvent(
             eventType: "hospital_movement",
             eventTime: DateTime.now(),
             eventData: "${oldLocation}->${newLocation}");
-        await updatePatientProfileInFirebaseWithAPI();
+        await updatePatientProfileInFirebase();
       }
 
       isUpdating = false;
@@ -359,7 +406,7 @@ class Patients with ChangeNotifier {
           eventType: "covid19_severity_change",
           eventTime: DateTime.now(),
           eventData: "${oldState.abbrv}->${selectedPatient.state.abbrv}");
-      await updatePatientProfileInFirebaseWithAPI();
+      await updatePatientProfileInFirebase();
 
       notifyListeners();
 
@@ -377,7 +424,7 @@ class Patients with ChangeNotifier {
           eventType: "ventilator",
           eventTime: DateTime.now(),
           eventData: newValue.toString());
-      await updatePatientProfileInFirebaseWithAPI();
+      await updatePatientProfileInFirebase();
       notifyListeners();
 
       return true;
@@ -477,7 +524,7 @@ class Patients with ChangeNotifier {
 
     try {
       selectedPatient.tests.add(testToAdd);
-      await updatePatientProfileInFirebaseWithAPI();
+      await updatePatientProfileInFirebase();
       notifyListeners();
       return true;
     } catch (e) {
@@ -539,7 +586,7 @@ class Patients with ChangeNotifier {
     }
   }
 
-  Future updatePatientProfileInFirebaseWithAPI() async {
+  Future updatePatientProfileInFirebaseWithAPI2() async {
     print("update Patient also called ${selectedPatient.id}");
     final prefs = await SharedPreferences.getInstance();
     var userData = prefs.getString('userData');
@@ -590,8 +637,9 @@ class Patients with ChangeNotifier {
     notifyListeners();
     print("Calling this, $searchTerm");
     fetchedPatientsList.forEach((patient) {
-      if (patient.Firstname.contains(searchTerm) ||
-          patient.LastName.contains(searchTerm)) {
+      if (patient.Firstname.toLowerCase().contains(searchTerm) ||
+          patient.LastName.toLowerCase().contains(searchTerm) ||
+          patient.idGivenByHospital.toLowerCase().contains(searchTerm)){
         filteredPatientsList.add(patient);
         print(patient.Firstname);
       }

@@ -142,7 +142,7 @@ class Hospitals with ChangeNotifier {
   Future<bool> decrementVentilatorCount() async {
     try {
       fetchedHospital.equipments[0].qty = fetchedHospital.equipments[0].qty - 1;
-      await updateHospitalUsingAPI();
+      await updateHospital();
 
       // ventilatorCountAvailable = ventilatorCountAvailable-1;
       notifyListeners();
@@ -155,7 +155,7 @@ class Hospitals with ChangeNotifier {
     try {
       fetchedHospital.equipments[0].qty = fetchedHospital.equipments[0].qty + 1;
 
-      await updateHospitalUsingAPI();
+      await updateHospital();
 
       //   ventilatorCountAvailable = ventilatorCountAvailable+1;
       notifyListeners();
@@ -174,7 +174,7 @@ class Hospitals with ChangeNotifier {
 
       fetchedHospital.locations[location].count =
           fetchedHospital.locations[location].count + 1;
-      await updateHospitalUsingAPI();
+      await updateHospital();
       isUpdatingHospital = false;
       notifyListeners();
     } catch (e) {
@@ -190,7 +190,7 @@ class Hospitals with ChangeNotifier {
           .indexWhere((element) => element.id == locationToBeDecremented);
       fetchedHospital.locations[oldLocation].count =
           fetchedHospital.locations[oldLocation].count - 1;
-      await updateHospitalUsingAPI();
+      await updateHospital();
     } catch (e) {
       print(e);
     }
@@ -205,7 +205,7 @@ class Hospitals with ChangeNotifier {
       fetchedHospital.locations[newLocation].count =
           fetchedHospital.locations[newLocation].count + 1;
 
-      await updateHospitalUsingAPI();
+      await updateHospital();
     } catch (e) {
       print(e);
     }
@@ -218,7 +218,7 @@ class Hospitals with ChangeNotifier {
           .indexWhere((element) => element.id == item.id);
       fetchedHospital.medicalSupplies[itemToUpdate].qty = newQuantity;
       print(fetchedHospital.medicalSupplies[itemToUpdate].qty);
-      await updateHospitalUsingAPI();
+      await updateHospital();
     } catch (e) {
       print(e);
     }
@@ -248,7 +248,7 @@ class Hospitals with ChangeNotifier {
     }
   }
 
-  Future updateHospitalUsingAPI() async {
+  Future updateHospitalUsingAPI2() async {
     isUpdating = true;
     // updatingInFirebase = true;
     // finishedUpdatingFirebase = false;
