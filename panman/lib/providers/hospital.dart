@@ -9,6 +9,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 class FetchedMedicalSupply {
   String id;
   String name;
@@ -44,37 +46,6 @@ class Hospitals with ChangeNotifier {
       var newList = await medicalSupplyCollection.getDocuments();
       //  print(newList.documents);
       newList.documents.forEach((element) {
-        print(element['Name'] + element['id']);
-        referenceMedicalSupplyList.add(
-            FetchedMedicalSupply(name: element['Name'], id: element['id']));
-      });
-
-      notifyListeners();
-
-      Analytics.instance.logEvent(name: 'getReferenceMedicalSupplyList');
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  Future getReferenceMedicalSupplyListFromAPI() async {
-    var medicalSupplySnapshot;
-
-    try {
-      referenceMedicalSupplyList.clear();
-      referenceHospitalLocationList.clear();
-
-      //  print(newList.documents);
-      final response =
-          await http.get('https://jsonplaceholder.typicode.com/albums/1');
-      if (response.statusCode == 200) {
-        medicalSupplySnapshot = json.decode(response.body);
-        notifyListeners();
-      } else {
-        throw Exception('Failed to load album');
-      }
-
-      medicalSupplySnapshot.documents.forEach((element) {
         print(element['Name'] + element['id']);
         referenceMedicalSupplyList.add(
             FetchedMedicalSupply(name: element['Name'], id: element['id']));
@@ -131,10 +102,48 @@ class Hospitals with ChangeNotifier {
     }
   }
 
+  Future getHospitalDetailsFromServerUsingAPI(String hospitalID) async {
+    print("Calling getHospitalDetails $hospitalID");
+
+    final prefs = await SharedPreferences.getInstance();
+    var userData = prefs.getString('userData');
+    // print("userData+${userData}");
+    var decodedJson = json.decode(userData);
+    var token = decodedJson['token'];
+    // print("Fetched token is $token");
+    try {
+      final response = await http.get(
+          'https://us-central1-thewarroom-98e6d.cloudfunctions.net/app/hospital/' +
+              hospitalID,
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': 'Bearer ${token}',
+          });
+      if (response.statusCode == 200) {
+        hospitalSnapshot = json.decode(response.body);
+        print(hospitalSnapshot.toString());
+        notifyListeners();
+      } else {
+        throw Exception('Failed to load album');
+      }
+      //hospitalSnapshot = await hospitalsCollection.document(hospitalID).get();
+      // print("Fetched ${hospitalSnapshot.data}");
+      fetchedHospital = Hospital.fromMap(hospitalSnapshot.data);
+      print("Fetched Hospital Name is" + fetchedHospital.toString());
+
+      notifyListeners();
+      Analytics.instance.logEvent(name: 'getHospitalDetailsFromServer');
+      return true;
+    } catch (e) {
+      print(e);
+    }
+  }
+
   Future<bool> decrementVentilatorCount() async {
     try {
       fetchedHospital.equipments[0].qty = fetchedHospital.equipments[0].qty - 1;
-      await updateHospital();
+      await updateHospitalUsingAPI();
 
       // ventilatorCountAvailable = ventilatorCountAvailable-1;
       notifyListeners();
@@ -147,7 +156,7 @@ class Hospitals with ChangeNotifier {
     try {
       fetchedHospital.equipments[0].qty = fetchedHospital.equipments[0].qty + 1;
 
-      await updateHospital();
+      await updateHospitalUsingAPI();
 
       //   ventilatorCountAvailable = ventilatorCountAvailable+1;
       notifyListeners();
@@ -163,7 +172,7 @@ class Hospitals with ChangeNotifier {
 
       fetchedHospital.locations[location].count =
           fetchedHospital.locations[location].count + 1;
-      await updateHospital();
+      await updateHospitalUsingAPI();
     } catch (e) {
       print(e);
     }
@@ -177,7 +186,7 @@ class Hospitals with ChangeNotifier {
           .indexWhere((element) => element.id == locationToBeDecremented);
       fetchedHospital.locations[oldLocation].count =
           fetchedHospital.locations[oldLocation].count - 1;
-      await updateHospital();
+      await updateHospitalUsingAPI();
     } catch (e) {
       print(e);
     }
@@ -192,7 +201,7 @@ class Hospitals with ChangeNotifier {
       fetchedHospital.locations[newLocation].count =
           fetchedHospital.locations[newLocation].count + 1;
 
-      await updateHospital();
+      await updateHospitalUsingAPI();
     } catch (e) {
       print(e);
     }
@@ -205,7 +214,7 @@ class Hospitals with ChangeNotifier {
           .indexWhere((element) => element.id == item.id);
       fetchedHospital.medicalSupplies[itemToUpdate].qty = newQuantity;
       print(fetchedHospital.medicalSupplies[itemToUpdate].qty);
-      await updateHospital();
+      await updateHospitalUsingAPI();
     } catch (e) {
       print(e);
     }
@@ -224,6 +233,49 @@ class Hospitals with ChangeNotifier {
       await hospitalsCollection
           .document(fetchedHospital.id)
           .updateData(fetchedHospital.toMap());
+      isUpdating = false;
+      notifyListeners();
+
+      Analytics.instance.logEvent(
+          name: 'getHospitalDetailsFromServer',
+          parameters: fetchedHospital.toMap());
+
+      // updatingInFirebase = false;
+      // finishedUpdatingFirebase = true;
+      // notifyListeners();
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future updateHospitalUsingAPI() async {
+    isUpdating = true;
+    // updatingInFirebase = true;
+    // finishedUpdatingFirebase = false;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    var userData = prefs.getString('userData');
+    // print("userData+${userData}");
+    var decodedJson = json.decode(userData);
+    var token = decodedJson['token'];
+    try {
+      final response = await http.put(
+          'https://us-central1-thewarroom-98e6d.cloudfunctions.net/app/hospital/' +
+              fetchedHospital.id,
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': 'Bearer ${token}',
+          },
+          body: json.encode(fetchedHospital.toMap()),
+);
+      if (response.statusCode == 200) {
+        hospitalSnapshot = json.decode(response.body);
+        print("This is the request body of the hospital UPDATE"+hospitalSnapshot.toString());
+        notifyListeners();
+      } else {
+        throw Exception('Failed to load album');
+      }
       isUpdating = false;
       notifyListeners();
 

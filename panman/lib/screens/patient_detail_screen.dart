@@ -20,10 +20,10 @@ class PatientDetailScreen extends StatefulWidget {
 class _PatientDetailScreenState extends State<PatientDetailScreen> {
   Patient localPatient;
 
-  _refreshPatient() async {
-    localPatient = await Provider.of<Patients>(context, listen: false)
-        .fetchPatientDetailsFromAPI(localPatient.id);
-  }
+  // _refreshPatient() async {
+  //   localPatient = await Provider.of<Patients>(context, listen: false)
+  //       .fetchPatientDetailsFromAPI(localPatient.id);
+  // }
 
   patientPageCard(
       {String moveToPage, String iconToDisplay, String titleOfCard}) {
@@ -264,6 +264,13 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
                       ),
                     ],
                   ),
+                ),
+                patientPageCard(
+                  iconToDisplay: "assets/images/monitor.png",
+                  titleOfCard: "TESTS",
+                  moveToPage: "/add_test_screen",
+
+                  //  patient: selectedPatient,
                 ),
               ],
             ),

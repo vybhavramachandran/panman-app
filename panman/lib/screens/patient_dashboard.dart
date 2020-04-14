@@ -8,6 +8,8 @@ import 'package:panman/screens/patient_registration_screen.dart';
 import 'package:provider/provider.dart';
 
 class PatientDashboardScreen extends StatefulWidget {
+  static const routeName = '/patient_dashboard_screen';
+
   @override
   _PatientDashboardScreenState createState() => _PatientDashboardScreenState();
 }

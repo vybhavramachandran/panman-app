@@ -1,226 +1,407 @@
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:panman/models/patient.dart';
 import 'package:panman/providers/patients.dart';
-import 'package:panman/screens/patient_recommendation_screen.dart';
 import 'package:provider/provider.dart';
 
-class PatientScreeningScreen extends StatelessWidget {
-  _proceed(BuildContext context) {
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (BuildContext context) => PatientRecommendationScreen()));
-  }
+import '../models/travelHistory.dart';
+import '../widgets/patient_detailed_header.dart';
+
+class PatientScreeningScreen extends StatefulWidget {
+  @override
+  _PatientScreeningScreenState createState() => _PatientScreeningScreenState();
+}
+
+class _PatientScreeningScreenState extends State<PatientScreeningScreen> {
+  // _proceed(BuildContext context) {
+  //   Navigator.of(context).push(MaterialPageRoute(
+  //       builder: (BuildContext context) => PatientRecommendationScreen()));
+  // }
+
+  bool hasTravelledAbroad = false;
+  TravelHistory travelDetails = TravelHistory();
+  bool hasHyperTension = false;
+  bool hasHeartDisease = false;
+  bool hasAtrialFibrilation = false;
+  bool hasDiabetes = false;
+  bool hasActiveCancer = false;
+  bool hasChronicKidneyDisease = false;
+  bool hasCOPD = false;
+  bool hasStroke = false;
+  bool hasDementia = false;
+
+  bool symptomHasCough = false;
+  bool symptomHasFever = false;
+  bool symptomHasTiredness = false;
+  bool symptomHasDifficultyBreathing = false;
 
   @override
   Widget build(BuildContext context) {
+    final format = DateFormat("dd-MM-yyyy");
+
     Patient newPatient = Provider.of<Patients>(context).newPatient;
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).accentColor,
-        iconTheme: IconThemeData(
-          color: Colors.white,
-        ),
-        title: Text(
-          'SCREENING',
-          style: Theme.of(context).textTheme.headline6,
-        ),
-        centerTitle: true,
-        bottom: PreferredSize(
-          preferredSize: Size(MediaQuery.of(context).size.width, 100.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  newPatient.pic == null
-                      ? SvgPicture.asset('assets/images/personPin.svg')
-                      : Image.file(
-                          newPatient.pic,
-                          width: 48.0,
-                          height: 64.0,
-                        ),
-                  SizedBox(width: 24.0),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        '${newPatient.Firstname}',
-                        style: TextStyle(
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      SizedBox(height: 12.0),
-                      Row(
-                        children: <Widget>[
-                          FaIcon(
-                            FontAwesomeIcons.transgender,
-                            color: Colors.white,
-                          ),
-                          SizedBox(width: 8.0),
-                          Text(
-                            'MALE',
-                            style: TextStyle(
-                              color: Colors.white,
-                            ),
-                          ),
-                          SizedBox(width: 32.0),
-                          Icon(
-                            Icons.person,
-                            color: Colors.white,
-                          ),
-                          SizedBox(width: 8.0),
-                          Text(
-                            '${newPatient.age} YEARS',
-                            style: TextStyle(
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 12.0),
-                      Row(
-                        children: <Widget>[
-                          SvgPicture.asset('assets/images/depart.svg'),
-                          SizedBox(width: 8.0),
-                          Text(
-                            'C-19 Department',
-                            style: TextStyle(
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              SizedBox(height: 24.0),
-            ],
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(160),
+        child: AppBar(
+          iconTheme: IconThemeData(color: Colors.white),
+          backgroundColor: Theme.of(context).accentColor,
+          title: Text(
+            "PATIENT",
+            style: Theme.of(context).textTheme.caption,
+          ),
+          centerTitle: true,
+          flexibleSpace: PatientDetailedHeader(
+            textColor: Colors.white,
+            headerPatient:
+                Provider.of<Patients>(context, listen: true).selectedPatient,
           ),
         ),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(8.0),
         child: Column(
           children: <Widget>[
-            Card(
-              color: Colors.white,
-              elevation: 1.0,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(2.0)),
-              child: Column(
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Text(
-                        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua?'),
-                  ),
-                  Row(
+            Flexible(
+              flex: 4,
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
                     children: <Widget>[
+                      Container(
+                          width: MediaQuery.of(context).size.width,
+                          child: Text("Symptoms",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline6
+                                  .copyWith(color: Colors.black))),
                       Expanded(
                         child: Container(
-                          height: 48,
-                          color: Color(0xFF1FB89B),
-                          child: Center(
-                            child: Text(
-                              'Yes',
-                              style: TextStyle(
-                                color: Colors.white,
+                          //     height: 300,
+                          child: GridView.count(
+                            childAspectRatio: (5 / 2),
+                            mainAxisSpacing: 0,
+                            crossAxisCount: 2,
+                            children: <Widget>[
+                              CheckboxListTile(
+                                title: Text("Cough"),
+                                value: symptomHasCough,
+                                onChanged: (bool newValue) {
+                                  setState(() {
+                                    symptomHasCough = newValue;
+                                  });
+                                },
                               ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 1.0),
-                      Expanded(
-                        child: Container(
-                          height: 48,
-                          color: Color(0xFF2347A2),
-                          child: Center(
-                            child: Text(
-                              'NO',
-                              style: TextStyle(
-                                color: Colors.white,
+                              CheckboxListTile(
+                                title: Text("Fever"),
+                                value: symptomHasFever,
+                                onChanged: (bool newValue) {
+                                  setState(() {
+                                    symptomHasFever = newValue;
+                                  });
+                                },
                               ),
-                            ),
+                              CheckboxListTile(
+                                title: Text("Tiredness"),
+                                value: symptomHasTiredness,
+                                onChanged: (bool newValue) {
+                                  setState(() {
+                                    symptomHasTiredness = newValue;
+                                  });
+                                },
+                              ),
+                              CheckboxListTile(
+                                title: Text("Difficulty Breathing"),
+                                value: symptomHasDifficultyBreathing,
+                                onChanged: (bool newValue) {
+                                  setState(() {
+                                    symptomHasDifficultyBreathing = newValue;
+                                  });
+                                },
+                              ),
+                            ],
                           ),
                         ),
                       ),
                     ],
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 8.0),
-            Card(
-              color: Colors.white,
-              elevation: 1.0,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(2.0)),
-              child: Column(
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Text(
-                        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua?'),
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Container(
-                          height: 48,
-                          color: Color(0xFF2347A2),
-                          child: Center(
-                            child: Text(
-                              'Yes',
-                              style: TextStyle(
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 1.0),
-                      Expanded(
-                        child: Container(
-                          height: 48,
-                          color: Color(0xFF2347A2),
-                          child: Center(
-                            child: Text(
-                              'NO',
-                              style: TextStyle(
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            Spacer(),
-            GestureDetector(
-              onTap: () => _proceed(context),
-              child: Container(
-                height: 64.0,
-                width: MediaQuery.of(context).size.width,
-                color: Theme.of(context).accentColor,
-                child: Center(
-                  child: Text(
-                    'PROCEED',
-                    style: Theme.of(context).textTheme.headline6,
                   ),
                 ),
               ),
             ),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                        width: MediaQuery.of(context).size.width,
+                        child: Text("Travel History",
+                            style: Theme.of(context)
+                                .textTheme
+                                .headline6
+                                .copyWith(color: Colors.black))),
+                    CheckboxListTile(
+                      title: Text(
+                          "Has the patient visited any other countries in the last 30 days?"),
+                      value: hasTravelledAbroad,
+                      onChanged: (bool value) {
+                        print(value);
+                        setState(() {
+                          hasTravelledAbroad = value;
+                        });
+                      },
+                    ),
+                    hasTravelledAbroad == true
+                        ? Container(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Row(
+                                children: <Widget>[
+                                  Flexible(
+                                    flex: 5,
+                                    child: TextFormField(
+                                      keyboardType: TextInputType.text,
+                                      validator: (value) {
+                                        if (value.isEmpty) {
+                                          return 'Enter valid country name';
+                                        }
+                                        return null;
+                                      },
+                                      //  style: Theme.of(context).textTheme.bodyText1,
+                                      decoration: InputDecoration(
+                                        labelText: "Country Name",
+                                        // hintText: "Event",
+                                        enabledBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: Colors.grey[300])),
+                                        focusedBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: Colors.grey[300])),
+                                      ),
+                                      onSaved: (String value) {},
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 20,
+                                  ),
+                                  Flexible(
+                                    flex: 5,
+                                    child: DateTimeField(
+                                      initialValue: DateTime.now(),
+                                      format: format,
+                                      onShowPicker:
+                                          (context, currentValue) async {
+                                        final date = await showDatePicker(
+                                            context: context,
+                                            firstDate: DateTime(2019),
+                                            initialDate:
+                                                currentValue ?? DateTime.now(),
+                                            lastDate: DateTime(2021));
+                                        setState(() {
+                                          travelDetails.arrivalDate = date;
+                                        });
+                                        return date;
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        : Container(),
+                  ],
+                ),
+              ),
+            ),
+
+            /*   Form(
+              child: Card(
+                color: Colors.white,
+                elevation: 1.0,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(2.0)),
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  child: Row(
+                    children: <Widget>[
+                      Flexible(
+                        flex: 5,
+                        child: Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Text(
+                              'Has the patient travelled to any country in the last 30 days?'),
+                        ),
+                      ),
+                      Flexible(
+                        flex: 3,
+                        child: Padding(
+                          padding: EdgeInsets.all(16),
+                          child: new Checkbox(
+                              value: hasTravelledAbroad,
+                              onChanged: (value) {
+                                setState(() {
+                                  hasTravelledAbroad = value;
+                                });
+                              }),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),*/
+            SizedBox(height: 8.0),
+            Flexible(
+              flex: 5,
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                          width: MediaQuery.of(context).size.width,
+                          child: Text("Comorbidities",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline6
+                                  .copyWith(color: Colors.black))),
+                      Expanded(
+                        child: Container(
+                          //     height: 300,
+                          child: GridView.count(
+                            childAspectRatio: (5 / 2),
+                            mainAxisSpacing: 0,
+                            crossAxisCount: 2,
+                            children: <Widget>[
+                              CheckboxListTile(
+                                title: Text("HyperTension"),
+                                value: hasHyperTension,
+                                onChanged: (bool newValue) {
+                                  setState(() {
+                                    hasHyperTension = newValue;
+                                  });
+                                },
+                              ),
+                              CheckboxListTile(
+                                title: Text("Heart Disease"),
+                                value: hasHeartDisease,
+                                onChanged: (bool newValue) {
+                                  setState(() {
+                                    hasHeartDisease = newValue;
+                                  });
+                                },
+                              ),
+                              CheckboxListTile(
+                                title: Text("Atrial Fibrilation"),
+                                value: hasAtrialFibrilation,
+                                onChanged: (bool newValue) {
+                                  setState(() {
+                                    hasAtrialFibrilation = newValue;
+                                  });
+                                },
+                              ),
+                              CheckboxListTile(
+                                title: Text("Diabetes"),
+                                value: hasDiabetes,
+                                onChanged: (bool newValue) {
+                                  setState(() {
+                                    hasDiabetes = newValue;
+                                  });
+                                },
+                              ),
+                              CheckboxListTile(
+                                title: Text("Active Cancer(last 5 yrs.)"),
+                                value: hasActiveCancer,
+                                onChanged: (bool newValue) {
+                                  setState(() {
+                                    hasActiveCancer = newValue;
+                                  });
+                                },
+                              ),
+                              CheckboxListTile(
+                                title: Text("Chronic Kidney Disease"),
+                                value: hasChronicKidneyDisease,
+                                onChanged: (bool newValue) {
+                                  setState(() {
+                                    hasChronicKidneyDisease = newValue;
+                                  });
+                                },
+                              ),
+                              CheckboxListTile(
+                                title: Text("COPD"),
+                                value: hasCOPD,
+                                onChanged: (bool newValue) {
+                                  setState(() {
+                                    hasCOPD = newValue;
+                                  });
+                                },
+                              ),
+                              CheckboxListTile(
+                                title: Text("Stroke"),
+                                value: hasStroke,
+                                onChanged: (bool newValue) {
+                                  setState(() {
+                                    hasStroke = newValue;
+                                  });
+                                },
+                              ),
+                              CheckboxListTile(
+                                title: Text("Dementia"),
+                                value: hasDementia,
+                                onChanged: (bool newValue) {
+                                  setState(() {
+                                    hasDementia = newValue;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            //Spacer(),
+            Flexible(
+              flex: 1,
+              child: Container(
+                padding: EdgeInsets.all(2.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    FlatButton(
+                      color: Colors.lightGreen,
+                      child: Text(
+                        "Home Quarantine",
+                        style: Theme.of(context)
+                            .textTheme
+                            .headline6
+                            .copyWith(color: Colors.white),
+                      ),
+                      onPressed: () {},
+                    ),
+                    FlatButton(
+                      color: Colors.red[600],
+                      child: Text(
+                        "Move to Isolation",
+                        style: Theme.of(context)
+                            .textTheme
+                            .headline6
+                            .copyWith(color: Colors.white),
+                      ),
+                      onPressed: () {},
+                    ),
+                  ],
+                ),
+              ),
+            )
           ],
         ),
       ),

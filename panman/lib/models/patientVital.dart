@@ -91,7 +91,7 @@ class PatientVital {
   PatientVital.fromMap(Map data)
       : this(
           id: data['id'],
-          timestamp: data['timestamp'].toDate(),
+          timestamp: DateTime.parse(data['timestamp']),
           airvo: data['airvo'],
           consciousness: data['consciousness'] != ""
               ? Consciousness.fromMap(data['consciousness'])
@@ -139,7 +139,7 @@ class PatientVital {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'timestamp': Timestamp.fromDate(timestamp),
+      'timestamp': timestamp.toString(),
       'airvo': airvo != null ? airvo : "",
       'consciousness': consciousness != null ? consciousness.toMap() : "",
       'dbp': dbp != null ? dbp : "",

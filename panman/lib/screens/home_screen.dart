@@ -63,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future fetchDoctorAndHospitalDetails() async {
     print("fetchingDoctorAndHospitalDetials");
     await Provider.of<HealthCareWorkers>(context, listen: false)
-        .getHCWDetailsFromServer(
+        .getHCWDetailsFromServerUsingAPI(
             Provider.of<Auth>(context, listen: false).loggedinUser.uid);
 
     await Provider.of<Hospitals>(context, listen: false)
@@ -158,7 +158,8 @@ class _HomeScreenState extends State<HomeScreen> {
       country: country,
     );
     try {
-      await Provider.of<Patients>(context, listen: false).addPatient(Patient(
+      await Provider.of<Patients>(context, listen: false)
+          .addPatientUsingApi(Patient(
         Firstname: firstName,
         LastName: lastName,
         age: age,
@@ -270,30 +271,32 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: Icon(Icons.add),
                   label: Text("Add Patient"),
                   onPressed: () async {
-                    setState(() {
-                      newPatientID = randomAlphaNumeric(10);
-                    });
-                    //  _showDialog();
-                    await showDialog(
-                        context: context,
-                        child: new MyDialog(
-                          patientID: newPatientID,
-                          addHospitalGivenID: enterHospitalGivenID,
-                          ageChanged: enterAge,
-                          firstNameChanged: enterFirstName,
-                          lastNameChanged: enterLastName,
-                          sexChanged: enterSex,
-                          addressChanged: enterAddress,
-                          zipCodeChanged: enterZipCode,
-                          cityChanged: enterCity,
-                          stateChanged: enterState,
-                          countryChanged: enterCountry,
-                          phoneNumberChanged: enterPhoneNumber,
-                          addPatient: AddPatient,
-                        )).then((value) {
-                      print("Popped with $value");
-                      return setState(() {});
-                    });
+                    Navigator.of(context)
+                        .pushNamed('/patient_registration_screen');
+                    // setState(() {
+                    //   newPatientID = randomAlphaNumeric(10);
+                    // });
+                    // //  _showDialog();
+                    // await showDialog(
+                    //     context: context,
+                    //     child: new MyDialog(
+                    //       patientID: newPatientID,
+                    //       addHospitalGivenID: enterHospitalGivenID,
+                    //       ageChanged: enterAge,
+                    //       firstNameChanged: enterFirstName,
+                    //       lastNameChanged: enterLastName,
+                    //       sexChanged: enterSex,
+                    //       addressChanged: enterAddress,
+                    //       zipCodeChanged: enterZipCode,
+                    //       cityChanged: enterCity,
+                    //       stateChanged: enterState,
+                    //       countryChanged: enterCountry,
+                    //       phoneNumberChanged: enterPhoneNumber,
+                    //       addPatient: AddPatient,
+                    //     )).then((value) {
+                    //   print("Popped with $value");
+                    //   return setState(() {});
+                    // });
                   },
                 ),
                 appBar: AppBar(
