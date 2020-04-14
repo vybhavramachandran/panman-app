@@ -37,59 +37,64 @@ class _PatientDetailMoveScreenState extends State<PatientDetailMoveScreen> {
 
   localtionInHospitalCard(
       {String abbrv, String fullText, Color cardColor, int optionNo}) {
-    return Card(
-        clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-        child: Container(
-          padding: EdgeInsets.only(right: 10),
-          height: 100,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              // Container(
-              //   width: 15,
-              //   color: cardColor,
-              // ),
-              Flexible(
-                flex: 1,
-                child: Radio(
-                  value: optionNo,
-                  groupValue: selectedRadio,
-                  onChanged: (value) => radioOnTapped(value),
-                ),
-              ),
-              // Flexible(
-              //   flex: 2,
-              //   child: Text(
-              //     abbrv,
-              //     style: Theme.of(context)
-              //         .textTheme
-              //         .headline5
-              //         .copyWith(color: Colors.black),
-              //   ),
-              // ),
-              Flexible(
-                flex: 5,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    fullText,
-                    style: Theme.of(context).textTheme.bodyText2,
+    return GestureDetector(
+      onTap: (){
+        radioOnTapped(optionNo);
+      },
+          child: Card(
+          clipBehavior: Clip.antiAlias,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          child: Container(
+            padding: EdgeInsets.only(right: 10),
+            height: 100,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                // Container(
+                //   width: 15,
+                //   color: cardColor,
+                // ),
+                Flexible(
+                  flex: 1,
+                  child: Radio(
+                    value: optionNo,
+                    groupValue: selectedRadio,
+                    onChanged: (value) => radioOnTapped(value),
                   ),
                 ),
-              ),
-              Flexible(
-                flex: 1,
-                child: FaIcon(
-                  FontAwesomeIcons.infoCircle,
-                  size: 15,
+                // Flexible(
+                //   flex: 2,
+                //   child: Text(
+                //     abbrv,
+                //     style: Theme.of(context)
+                //         .textTheme
+                //         .headline5
+                //         .copyWith(color: Colors.black),
+                //   ),
+                // ),
+                Flexible(
+                  flex: 5,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      fullText,
+                      style: Theme.of(context).textTheme.bodyText2,
+                    ),
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ));
+                Flexible(
+                  flex: 1,
+                  child: FaIcon(
+                    FontAwesomeIcons.infoCircle,
+                    size: 15,
+                  ),
+                ),
+              ],
+            ),
+          )),
+    );
   }
 
   Future _showDialog(var oldState, var newState) async {

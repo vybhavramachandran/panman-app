@@ -117,6 +117,20 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
               crossAxisSpacing: 10,
               crossAxisCount: 2,
               children: <Widget>[
+                //  patientPageCard(
+                //   iconToDisplay: "assets/images/pencil.png",
+                //   titleOfCard: "EDIT SYMPTOMS",
+                //   moveToPage: "/patient_screening_page_edit",
+
+                //   //  patient: selectedPatient,
+                // ),
+                //  patientPageCard(
+                //   iconToDisplay: "assets/images/track.png",
+                //   titleOfCard: "CONTACT TRACING",
+                //   moveToPage: "/patient_contact_tracing_edit",
+
+                //   //  patient: selectedPatient,
+                // ),
                 patientPageCard(
                   iconToDisplay: "assets/images/monitor.png",
                   titleOfCard: "PATIENT VITALS",
@@ -150,6 +164,7 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
 
                   //  patient: selectedPatient,
                 ),
+                
               ],
             ),
           ),

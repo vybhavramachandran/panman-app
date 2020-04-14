@@ -72,16 +72,21 @@ class PatientSummaryWidget extends StatelessWidget {
                                     FontAwesomeIcons.mars,
                                     size: 15,
                                   )
-                                : FaIcon(
-                                    FontAwesomeIcons.female,
-                                    size: 15,
-                                  ),
+                                : patient.sex == Sex.Female
+                                    ? FaIcon(
+                                        FontAwesomeIcons.female,
+                                        size: 15,
+                                      )
+                                    : FaIcon(
+                                        FontAwesomeIcons.transgender,
+                                        size: 15,
+                                      ),
                             SizedBox(
                               width: 5,
                             ),
                             patient.sex == Sex.Male
                                 ? Text("MALE")
-                                : Text("FEMALE"),
+                                : patient.sex==Sex.Female?Text("FEMALE"):Text("OTHER"),
                           ],
                         ),
                         SizedBox(

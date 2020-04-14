@@ -39,6 +39,11 @@ class _PatientContactTracingScreenState
     sourcePatientLastName: "",
   );
 
+  var sourcePatientNumberFocusNode = FocusNode();
+  var sourcePatientAddressFocusNode = FocusNode();
+  var sourcePatientFirstNameFocusNode = FocusNode();
+  var sourcePatientLastNameFocusNode = FocusNode();
+
   submitTrackingAndMoveToState(int location) async {
     print("submitTrackingAndMoveToHome called");
 
@@ -47,12 +52,9 @@ class _PatientContactTracingScreenState
     await Provider.of<Patients>(context, listen: false)
         .addContactTracking(newContact, location);
     Navigator.pushAndRemoveUntil(
-      context, 
-      MaterialPageRoute(
-        builder: (context) => HomeScreen()
-      ), 
-     ModalRoute.withName("/home_screen")
-    );
+        context,
+        MaterialPageRoute(builder: (context) => HomeScreen()),
+        ModalRoute.withName("/home_screen"));
   }
 
   typeOfContactChosen(String value) {
@@ -93,257 +95,299 @@ class _PatientContactTracingScreenState
           ),
         ),
         body: Container(
-          height: MediaQuery.of(context).size.height,
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.all(8.0),
+          //   height: MediaQuery.of(context).size.height,
+          child: Padding(
+            padding: EdgeInsets.all(8.0),
+            child: SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   SizedBox(
                     height: 5,
                   ),
-                  Padding(
-                      padding: const EdgeInsets.all(2.0),
-                      child: Container(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                              ),
-                              child: Text("Source of Infection",
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.normal)),
-                            ),
-                            SizedBox(width: 10),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                  Column(
+                    children: <Widget>[
+                      Padding(
+                          padding: const EdgeInsets.all(2.0),
+                          child: Container(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: <Widget>[
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
-                                    Radio(
-                                      value: "Foreign Travel",
-                                      groupValue: newContact.sourceOfInfection,
-                                      onChanged: (value) =>
-                                          typeOfContactChosen(value),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                      ),
+                                      child: Text("Source of Infection",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline5
+                                              .copyWith(
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.bold)),
                                     ),
-                                    Text("Foreign Travel"),
-                                  ],
-                                ),
-                                SizedBox(height: 20),
-                                Row(
-                                  children: <Widget>[
-                                    Radio(
-                                      value: "Contact with positive case",
-                                      groupValue: newContact.sourceOfInfection,
-                                      onChanged: (value) =>
-                                          typeOfContactChosen(value),
+                                    SizedBox(width: 30),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: <Widget>[
+                                        Radio(
+                                          value: "Foreign Travel",
+                                          groupValue:
+                                              newContact.sourceOfInfection,
+                                          onChanged: (value) =>
+                                              typeOfContactChosen(value),
+                                        ),
+                                        Text("Foreign Travel"),
+                                      ],
                                     ),
-                                    Text("Contact with +'ve case"),
-                                  ],
-                                ),
-                                SizedBox(height: 20),
-                                Row(
-                                  children: <Widget>[
-                                    Radio(
-                                      value: "Markaz",
-                                      groupValue: newContact.sourceOfInfection,
-                                      onChanged: (value) =>
-                                          typeOfContactChosen(value),
+                                    SizedBox(height: 5),
+                                    Row(
+                                      children: <Widget>[
+                                        Radio(
+                                          value: "Contact with positive case",
+                                          groupValue:
+                                              newContact.sourceOfInfection,
+                                          onChanged: (value) =>
+                                              typeOfContactChosen(value),
+                                        ),
+                                        Text("Contact with +'ve case"),
+                                      ],
                                     ),
-                                    Text("Markaz"),
+                                    SizedBox(height: 5),
+                                    Row(
+                                      children: <Widget>[
+                                        Radio(
+                                          value: "Markaz",
+                                          groupValue:
+                                              newContact.sourceOfInfection,
+                                          onChanged: (value) =>
+                                              typeOfContactChosen(value),
+                                        ),
+                                        Text("Markaz"),
+                                      ],
+                                    ),
                                   ],
                                 ),
                               ],
                             ),
-                          ],
+                          )),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(0.0),
+                        child: CheckboxListTile(
+                          title: Text("Is Source Patient Info Available?"),
+                          value: newContact.isMorePatientInfoAvailable,
+                          onChanged: (bool newValue) {
+                            setState(() {
+                              newContact.isMorePatientInfoAvailable = newValue;
+                            });
+                          },
                         ),
-                      )),
-                  SizedBox(
-                    height: 5,
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      newContact.isMorePatientInfoAvailable == true
+                          ? Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: TextFormField(
+                                onFieldSubmitted: (v) {
+                                  FocusScope.of(context).requestFocus(
+                                      sourcePatientLastNameFocusNode);
+                                },
+                                textInputAction: TextInputAction.next,
+                                focusNode: sourcePatientFirstNameFocusNode,
+                                onChanged: (value) {
+                                  this.setState(() {
+                                    newContact.sourcePatientFirstName = value;
+                                  });
+                                },
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal),
+                                keyboardType: TextInputType.text,
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Please enter some text';
+                                  }
+                                  return null;
+                                },
+                                //  style: Theme.of(context).textTheme.bodyText1,
+                                decoration: InputDecoration(
+                                  labelText: "Source Patient First Name",
+                                  // hintText: "Event",
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                ),
+                                onSaved: (String value) {
+                                  this.setState(() {
+                                    newContact.sourcePatientFirstName = value;
+                                  });
+                                },
+                              ),
+                            )
+                          : Container(),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      newContact.isMorePatientInfoAvailable == true
+                          ? Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: TextFormField(
+                                onFieldSubmitted: (v) {
+                                  FocusScope.of(context).requestFocus(
+                                      sourcePatientAddressFocusNode);
+                                },
+                                textInputAction: TextInputAction.next,
+                                focusNode: sourcePatientLastNameFocusNode,
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal),
+                                keyboardType: TextInputType.text,
+                                onChanged: (value) {
+                                  this.setState(() {
+                                    newContact.sourcePatientLastName = value;
+                                  });
+                                },
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Please enter some text';
+                                  }
+                                  return null;
+                                },
+                                //  style: Theme.of(context).textTheme.bodyText1,
+                                decoration: InputDecoration(
+                                  labelText: "Source Patient Last Name",
+                                  // hintText: "Event",
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                ),
+                                onSaved: (String value) {
+                                  this.setState(() {
+                                    newContact.sourcePatientLastName = value;
+                                  });
+                                },
+                              ),
+                            )
+                          : Container(),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      newContact.isMorePatientInfoAvailable == true
+                          ? Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: TextFormField(
+                                
+                                onFieldSubmitted: (v) {
+                                  FocusScope.of(context).requestFocus(
+                                      sourcePatientNumberFocusNode);
+                                },
+                                textInputAction: TextInputAction.next,
+                                focusNode: sourcePatientAddressFocusNode,
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal),
+                                keyboardType: TextInputType.text,
+                                onChanged: (value) {
+                                  this.setState(() {
+                                    newContact.sourcePatientAddress = value;
+                                  });
+                                },
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Please enter some text';
+                                  }
+                                  return null;
+                                },
+                                //  style: Theme.of(context).textTheme.bodyText1,
+                                decoration: InputDecoration(
+                                  labelText: "Source Patient Address",
+                                  // hintText: "Event",
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                ),
+                                onSaved: (String value) {
+                                  this.setState(() {
+                                    newContact.sourcePatientAddress = value;
+                                  });
+                                },
+                              ),
+                            )
+                          : Container(),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      newContact.isMorePatientInfoAvailable == true
+                          ? Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: TextFormField(
+                                onFieldSubmitted: (v) {
+                                  FocusScopeNode currentFocus =
+                                      FocusScope.of(context);
+
+                                  currentFocus.unfocus();
+                                },
+                                textInputAction: TextInputAction.done,
+                                focusNode: sourcePatientNumberFocusNode,
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal),
+                                keyboardType: TextInputType.text,
+                                onChanged: (value) {
+                                  this.setState(() {
+                                    newContact.sourcePatientNumber = value;
+                                  });
+                                },
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Please enter some text';
+                                  }
+                                  return null;
+                                },
+                                //  style: Theme.of(context).textTheme.bodyText1,
+                                decoration: InputDecoration(
+                                  labelText: "Source Patient Number",
+                                  // hintText: "Event",
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey[300])),
+                                ),
+                                onSaved: (String value) {
+                                  this.setState(() {
+                                    newContact.sourcePatientNumber = value;
+                                  });
+                                },
+                              ),
+                            )
+                          : Container(),
+                    ],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(0.0),
-                    child: CheckboxListTile(
-                      title: Text("Is Source Patient Info Available?"),
-                      value: newContact.isMorePatientInfoAvailable,
-                      onChanged: (bool newValue) {
-                        setState(() {
-                          newContact.isMorePatientInfoAvailable = newValue;
-                        });
-                      },
-                    ),
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  newContact.isMorePatientInfoAvailable == true
-                      ? Padding(
-                          padding: const EdgeInsets.all(2.0),
-                          child: TextFormField(
-                            onChanged: (value) {
-                              this.setState(() {
-                                newContact.sourcePatientFirstName = value;
-                              });
-                            },
-                            style: TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.normal),
-                            keyboardType: TextInputType.text,
-                            validator: (value) {
-                              if (value.isEmpty) {
-                                return 'Please enter some text';
-                              }
-                              return null;
-                            },
-                            //  style: Theme.of(context).textTheme.bodyText1,
-                            decoration: InputDecoration(
-                              labelText: "Source Patient First Name",
-                              // hintText: "Event",
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Colors.grey[300])),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Colors.grey[300])),
-                            ),
-                            onSaved: (String value) {
-                              this.setState(() {
-                                newContact.sourcePatientFirstName = value;
-                              });
-                            },
-                          ),
-                        )
-                      : Container(),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  newContact.isMorePatientInfoAvailable == true
-                      ? Padding(
-                          padding: const EdgeInsets.all(2.0),
-                          child: TextFormField(
-                            style: TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.normal),
-                            keyboardType: TextInputType.text,
-                            onChanged: (value) {
-                              this.setState(() {
-                                newContact.sourcePatientLastName = value;
-                              });
-                            },
-                            validator: (value) {
-                              if (value.isEmpty) {
-                                return 'Please enter some text';
-                              }
-                              return null;
-                            },
-                            //  style: Theme.of(context).textTheme.bodyText1,
-                            decoration: InputDecoration(
-                              labelText: "Source Patient Last Name",
-                              // hintText: "Event",
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Colors.grey[300])),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Colors.grey[300])),
-                            ),
-                            onSaved: (String value) {
-                              this.setState(() {
-                                newContact.sourcePatientLastName = value;
-                              });
-                            },
-                          ),
-                        )
-                      : Container(),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  newContact.isMorePatientInfoAvailable == true
-                      ? Padding(
-                          padding: const EdgeInsets.all(2.0),
-                          child: TextFormField(
-                            style: TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.normal),
-                            keyboardType: TextInputType.text,
-                            onChanged: (value) {
-                              this.setState(() {
-                                newContact.sourcePatientAddress = value;
-                              });
-                            },
-                            validator: (value) {
-                              if (value.isEmpty) {
-                                return 'Please enter some text';
-                              }
-                              return null;
-                            },
-                            //  style: Theme.of(context).textTheme.bodyText1,
-                            decoration: InputDecoration(
-                              labelText: "Source Patient Address",
-                              // hintText: "Event",
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Colors.grey[300])),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Colors.grey[300])),
-                            ),
-                            onSaved: (String value) {
-                              this.setState(() {
-                                newContact.sourcePatientAddress = value;
-                              });
-                            },
-                          ),
-                        )
-                      : Container(),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  newContact.isMorePatientInfoAvailable == true
-                      ? Padding(
-                          padding: const EdgeInsets.all(2.0),
-                          child: TextFormField(
-                            style: TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.normal),
-                            keyboardType: TextInputType.text,
-                            onChanged: (value) {
-                              this.setState(() {
-                                newContact.sourcePatientNumber = value;
-                              });
-                            },
-                            validator: (value) {
-                              if (value.isEmpty) {
-                                return 'Please enter some text';
-                              }
-                              return null;
-                            },
-                            //  style: Theme.of(context).textTheme.bodyText1,
-                            decoration: InputDecoration(
-                              labelText: "Source Patient Number",
-                              // hintText: "Event",
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Colors.grey[300])),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Colors.grey[300])),
-                            ),
-                            onSaved: (String value) {
-                              this.setState(() {
-                                newContact.sourcePatientNumber = value;
-                              });
-                            },
-                          ),
-                        )
-                      : Container(),
                   Text(
                     "Move the Patient to",
                     style: Theme.of(context)
@@ -422,7 +466,7 @@ class _PatientContactTracingScreenState
                               color: Theme.of(context).accentColor,
                               child:
                                   Provider.of<Patients>(context, listen: true)
-                                              .isUpdating==
+                                              .isUpdating ==
                                           false
                                       ? Text("ICU",
                                           style: Theme.of(context)

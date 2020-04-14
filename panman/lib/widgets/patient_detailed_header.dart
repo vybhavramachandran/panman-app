@@ -67,8 +67,13 @@ class PatientDetailedHeader extends StatelessWidget {
                                 size: 15,
                                 color: Colors.white,
                               )
-                            : FaIcon(
+                            : newPatient.sex == Sex.Female?
+                            FaIcon(
                                 FontAwesomeIcons.female,
+                                size: 15,
+                                color: Colors.white,
+                              ):FaIcon(
+                                FontAwesomeIcons.transgender,
                                 size: 15,
                                 color: Colors.white,
                               ),
@@ -77,7 +82,8 @@ class PatientDetailedHeader extends StatelessWidget {
                         ),
                         newPatient.sex == Sex.Male
                             ? Text("MALE", style: TextStyle(color: textColor))
-                            : Text("FEMALE",
+                            : newPatient.sex == Sex.Female?Text("FEMALE",
+                                style: TextStyle(color: textColor)): Text("OTHER",
                                 style: TextStyle(color: textColor)),
                       ],
                     ),

@@ -6,6 +6,8 @@ import 'package:panman/models/contactTracing.dart';
 import 'package:random_string/random_string.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:encrypt/encrypt.dart' as encryption;
+import 'package:flutter_cipher/flutter_cipher.dart';
 
 import '../models/address.dart';
 import '../models/c19data.dart';
@@ -16,8 +18,16 @@ import '../models/patientVital.dart';
 import '../models/travelHistory.dart';
 import '../models/delhiSpecificDetails.dart';
 import '../models/test.dart';
+import '../keys/key.dart';
 
 class Patients with ChangeNotifier {
+  static final newKey = encryption.Key.fromUtf8(aes_key);
+  static final newiv = encryption.IV.fromUtf8(aes_iv);
+
+  final encrypter = encryption.Encrypter(encryption.AES(newKey));
+
+  
+
   List<Patient> fetchedPatientsList = [];
   Patient selectedPatient;
   Patient newPatient = Patient();
@@ -34,31 +44,39 @@ class Patients with ChangeNotifier {
   Future fetchPatientsListFromServer(String hospitalID) async {
     print("fetchPatientsList Called");
 
-    
-    DelhiSpecificDetails dummyDetails = DelhiSpecificDetails(	
-      district: "",	
-      fromMarkaz: false,	
-      revenueDistrict: "",	
-    );	
-    Screening dummyScreening = Screening(	
-      hasComorbdityOrganTransplant: false,	
-      hasComorbidityCOPD: false,	
-      hasComorbidityChronicNeuro: false,	
-      hasComorbidityChronicRenalDisease: false,	
-      hasComorbidityDiabetes: false,	
-      hasComorbidityHIV: false,	
-      hasComorbidityHeartDisease: false,	
-      hasComorbidityHypertension: false,	
-      hasComorbidityLiverDisease: false,	
-      hasComorbidityMalignancy: false,	
-      hasComorbidityPregnancy: false,	
-      hasCough: false,	
-      hasDifficultyBreathing: false,	
-      hasFever: false,	
-      hasTravelledAboard: false,	
-      hasTiredness: false,	
-      returnDate: DateTime.now(),	
-      visitedCountry: "No Data",	
+    DelhiSpecificDetails dummyDetails = DelhiSpecificDetails(
+      district: "",
+      fromMarkaz: false,
+      revenueDistrict: "",
+    );
+
+    contactTracing dummyContact = contactTracing(
+      isMorePatientInfoAvailable: false,
+      sourceOfInfection: "",
+      sourcePatientAddress: "",
+      sourcePatientFirstName: "",
+      sourcePatientLastName: "",
+    );
+
+    Screening dummyScreening = Screening(
+      hasComorbdityOrganTransplant: false,
+      hasComorbidityCOPD: false,
+      hasComorbidityChronicNeuro: false,
+      hasComorbidityChronicRenalDisease: false,
+      hasComorbidityDiabetes: false,
+      hasComorbidityHIV: false,
+      hasComorbidityHeartDisease: false,
+      hasComorbidityHypertension: false,
+      hasComorbidityLiverDisease: false,
+      hasComorbidityMalignancy: false,
+      hasComorbidityPregnancy: false,
+      hasCough: false,
+      hasDifficultyBreathing: false,
+      hasFever: false,
+      hasTravelledAboard: false,
+      hasTiredness: false,
+      returnDate: DateTime.now(),
+      visitedCountry: "No Data",
     );
 
     try {
@@ -78,7 +96,7 @@ class Patients with ChangeNotifier {
           state: referenceCovid19SeverityLevelsList
               .firstWhere((element) => element.abbrv == patient['covidStatus']),
           fullAddress: FullAddress.fromMap(patient['fullAddress']),
-         sex: patient['sex'] == "Male"
+          sex: patient['sex'] == "Male"
               ? Sex.Male
               : patient['sex'] == "Female" ? Sex.Female : Sex.Other,
           ventilatorUsed: patient['ventilatorUsed'],
@@ -113,7 +131,9 @@ class Patients with ChangeNotifier {
               : patient['tests'].map<Test>((testToBeAdded) {
                   return Test.fromMap(testToBeAdded);
                 }).toList(),
-          tracingDetail: patient['tracingDetail'],
+          tracingDetail: patient['tracingDetail'] == null
+              ? dummyContact
+              : contactTracing.fromMap(patient['tracingDetail']),
         ));
       });
       isFetching = false;
@@ -238,6 +258,20 @@ class Patients with ChangeNotifier {
     }
   }
 
+  Future editScrening(Screening screeningVal) async {
+    isAddingPatient = true;
+    notifyListeners();
+    try {
+      selectedPatient.screeningResult = screeningVal;
+      await updatePatientProfileInFirebase();
+      notifyListeners();
+    } catch (e) {
+      print(e);
+    }
+    isAddingPatient = false;
+    notifyListeners();
+  }
+
   Future addScreening(Screening screeningVal, int location) async {
     isAddingPatient = true;
     notifyListeners();
@@ -250,6 +284,20 @@ class Patients with ChangeNotifier {
       print(e);
     }
     isAddingPatient = false;
+    notifyListeners();
+  }
+
+  Future editContactTracking(contactTracing newTracing) async {
+    isUpdating = true;
+    notifyListeners();
+    try {
+      selectedPatient.tracingDetail = newTracing;
+      await updatePatientProfileInFirebase();
+      notifyListeners();
+    } catch (e) {
+      print(e);
+    }
+    isUpdating = false;
     notifyListeners();
   }
 
@@ -434,7 +482,21 @@ class Patients with ChangeNotifier {
     }
   }
 
-  Future<bool> addPatient(Patient patientToAdd) async {
+  // String encryptThis({String plainText}) {
+  //   var value = encrypter.encrypt(plainText, iv: newiv);
+  //   return value.base64;
+  // }
+
+  // String decryptThis({String encryptedText}) {
+  //   return encrypter.decrypt64(encryptedText);
+  // }
+
+  Future<bool> addPatient(Patient patientReceived) async {
+    Patient patientToAdd = patientReceived;
+    patientToAdd.Firstname = patientToAdd.Firstname;
+    patientToAdd.LastName = patientToAdd.LastName;
+    patientToAdd.phoneNumber = patientToAdd.phoneNumber;
+
     final prefs = await SharedPreferences.getInstance();
     var userData = prefs.getString('userData');
     // print("userData+${userData}");
@@ -571,10 +633,14 @@ class Patients with ChangeNotifier {
       // updatingInFirebase = true;
       // finishedUpdatingFirebase = false;
       notifyListeners();
-
+      Patient patientToAdd = selectedPatient;
+      patientToAdd.Firstname = patientToAdd.Firstname;
+      patientToAdd.LastName = patientToAdd.LastName;
+      patientToAdd.phoneNumber =
+           patientToAdd.phoneNumber;
       await patientsCollection
           .document(selectedPatient.id)
-          .updateData(selectedPatient.toMap());
+          .updateData(patientToAdd.toMap());
       isUpdating = false;
       notifyListeners();
 
@@ -639,7 +705,7 @@ class Patients with ChangeNotifier {
     fetchedPatientsList.forEach((patient) {
       if (patient.Firstname.toLowerCase().contains(searchTerm) ||
           patient.LastName.toLowerCase().contains(searchTerm) ||
-          patient.idGivenByHospital.toLowerCase().contains(searchTerm)){
+          patient.idGivenByHospital.toLowerCase().contains(searchTerm)) {
         filteredPatientsList.add(patient);
         print(patient.Firstname);
       }

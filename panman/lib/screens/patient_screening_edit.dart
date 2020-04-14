@@ -15,14 +15,14 @@ import '../widgets/patient_detailed_header.dart';
 import '../models/screening.dart';
 import '../models/travelHistory.dart';
 
-class PatientScreeningScreen extends StatefulWidget {
-  static const routeName = '/patient_screening_page';
+class EditPatientScreeningScreen extends StatefulWidget {
+  static const routeName = '/patient_screening_page_edit';
 
   @override
-  _PatientScreeningScreenState createState() => _PatientScreeningScreenState();
+  _EditPatientScreeningScreenState createState() => _EditPatientScreeningScreenState();
 }
 
-class _PatientScreeningScreenState extends State<PatientScreeningScreen> {
+class _EditPatientScreeningScreenState extends State<EditPatientScreeningScreen> {
   // _proceed(BuildContext context) {
   //   Navigator.of(context).push(MaterialPageRoute(
   //       builder: (BuildContext context) => PatientRecommendationScreen()));
@@ -44,8 +44,6 @@ class _PatientScreeningScreenState extends State<PatientScreeningScreen> {
   bool symptomHasFever = false;
   bool symptomHasTiredness = false;
   bool symptomHasDifficultyBreathing = false;
-
-  bool isComorbidityPlanned = false;
 
   Screening screeningResult = new Screening(
     hasComorbdityOrganTransplant: false,
@@ -78,13 +76,21 @@ class _PatientScreeningScreenState extends State<PatientScreeningScreen> {
   //   Navigator.of(context).pop(true);
   // }
 
+  saveScreening() async {
+    print("saveScreeningCalled called");
+
+    await Provider.of<Patients>(context, listen: false)
+        .editScrening(screeningResult);
+    Navigator.of(context).pop();
+  }
+
   saveScreeningAndIsolate() async {
     print("saveScreeningAndMoveToIsolationCalled called");
 
     await Provider.of<Patients>(context, listen: false)
         .addScreening(screeningResult, 3);
     Navigator.of(context).push(MaterialPageRoute(
-        builder: (BuildContext context) => PatientContactTracingScreen()));
+          builder: (BuildContext context) => PatientContactTracingScreen()));
   }
 
   @override
@@ -122,7 +128,7 @@ class _PatientScreeningScreenState extends State<PatientScreeningScreen> {
                 Flexible(
                   flex: 20,
                   child: SingleChildScrollView(
-                    child: Column(
+                                      child: Column(
                       children: <Widget>[
                         Padding(
                           padding: const EdgeInsets.all(16.0),
@@ -165,19 +171,17 @@ class _PatientScreeningScreenState extends State<PatientScreeningScreen> {
                                       value: screeningResult.hasTiredness,
                                       onChanged: (bool newValue) {
                                         setState(() {
-                                          screeningResult.hasTiredness =
-                                              newValue;
+                                          screeningResult.hasTiredness = newValue;
                                         });
                                       },
                                     ),
                                     CheckboxListTile(
                                       title: Text("Difficulty Breathing"),
-                                      value: screeningResult
-                                          .hasDifficultyBreathing,
+                                      value:
+                                          screeningResult.hasDifficultyBreathing,
                                       onChanged: (bool newValue) {
                                         setState(() {
-                                          screeningResult
-                                                  .hasDifficultyBreathing =
+                                          screeningResult.hasDifficultyBreathing =
                                               newValue;
                                         });
                                       },
@@ -226,8 +230,7 @@ class _PatientScreeningScreenState extends State<PatientScreeningScreen> {
                                                         .visitedCountry = value;
                                                   });
                                                 },
-                                                keyboardType:
-                                                    TextInputType.text,
+                                                keyboardType: TextInputType.text,
                                                 validator: (value) {
                                                   if (value.isEmpty) {
                                                     return 'Enter valid country name';
@@ -240,18 +243,14 @@ class _PatientScreeningScreenState extends State<PatientScreeningScreen> {
                                                   // hintText: "Event",
                                                   enabledBorder:
                                                       OutlineInputBorder(
-                                                          borderSide:
-                                                              BorderSide(
-                                                                  color: Colors
-                                                                          .grey[
-                                                                      300])),
+                                                          borderSide: BorderSide(
+                                                              color: Colors
+                                                                  .grey[300])),
                                                   focusedBorder:
                                                       OutlineInputBorder(
-                                                          borderSide:
-                                                              BorderSide(
-                                                                  color: Colors
-                                                                          .grey[
-                                                                      300])),
+                                                          borderSide: BorderSide(
+                                                              color: Colors
+                                                                  .grey[300])),
                                                 ),
                                                 onSaved: (String value) {},
                                               ),
@@ -279,8 +278,7 @@ class _PatientScreeningScreenState extends State<PatientScreeningScreen> {
                                                               DateTime(2019),
                                                           initialDate:
                                                               currentValue ??
-                                                                  DateTime
-                                                                      .now(),
+                                                                  DateTime.now(),
                                                           lastDate:
                                                               DateTime(2021));
                                                   setState(() {
@@ -304,43 +302,15 @@ class _PatientScreeningScreenState extends State<PatientScreeningScreen> {
                           child: Column(
                             children: <Widget>[
                               Container(
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: <Widget>[
-                                    Flexible(
-                                      flex: 5,
-                                      child: Container(
-                                          width:
-                                              MediaQuery.of(context).size.width,
-                                          child: Text("Comorbidities",
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .headline6
-                                                  .copyWith(
-                                                      color: Colors.black))),
-                                    ),
-                                    Flexible(
-                                      flex: 2,
-                                      child: Switch(
-                                        value: isComorbidityPlanned,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            isComorbidityPlanned = value;
-                                            print(isComorbidityPlanned);
-                                          });
-                                        },
-                                        activeTrackColor:
-                                            Colors.lightGreenAccent,
-                                        activeColor: Colors.green,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(height: 30),
-                              isComorbidityPlanned==false?Container():Container(
-                                //  height: 700,
+                                  width: MediaQuery.of(context).size.width,
+                                  child: Text("Comorbidities",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline6
+                                          .copyWith(color: Colors.black))),
+                              SizedBox(height:30),
+                              Container(
+                              //  height: 700,
                                 child: Column(
                                   // shrinkWrap: true,
                                   // childAspectRatio: (3 / 2),
@@ -348,8 +318,7 @@ class _PatientScreeningScreenState extends State<PatientScreeningScreen> {
                                   // crossAxisCount: 2,
                                   children: <Widget>[
                                     CheckboxListTile(
-                                      title:
-                                          Text("COPD, Bronchitis, or Asthma"),
+                                      title: Text("COPD, Bronchitis, or Asthma"),
                                       value: screeningResult.hasComorbidityCOPD,
                                       onChanged: (bool newValue) {
                                         setState(() {
@@ -384,12 +353,11 @@ class _PatientScreeningScreenState extends State<PatientScreeningScreen> {
                                     ),
                                     CheckboxListTile(
                                       title: Text("Diabetes"),
-                                      value: screeningResult
-                                          .hasComorbidityDiabetes,
+                                      value:
+                                          screeningResult.hasComorbidityDiabetes,
                                       onChanged: (bool newValue) {
                                         setState(() {
-                                          screeningResult
-                                                  .hasComorbidityDiabetes =
+                                          screeningResult.hasComorbidityDiabetes =
                                               newValue;
                                         });
                                       },
@@ -409,13 +377,12 @@ class _PatientScreeningScreenState extends State<PatientScreeningScreen> {
                                     CheckboxListTile(
                                       title: Text(
                                           "Pregnancy (trimester) or Post-partum (<6 weeks)"),
-                                      value: screeningResult
-                                          .hasComorbidityPregnancy,
+                                      value:
+                                          screeningResult.hasComorbidityPregnancy,
                                       onChanged: (bool newValue) {
                                         setState(() {
                                           screeningResult
-                                                  .hasComorbidityPregnancy =
-                                              newValue;
+                                              .hasComorbidityPregnancy = newValue;
                                         });
                                       },
                                     ),
@@ -482,7 +449,7 @@ class _PatientScreeningScreenState extends State<PatientScreeningScreen> {
                   child: Container(
                     height: 90,
                     child: Padding(
-                      padding: const EdgeInsets.only(top: 10, bottom: 10),
+                      padding: const EdgeInsets.only(top:10,bottom: 10),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -498,7 +465,7 @@ class _PatientScreeningScreenState extends State<PatientScreeningScreen> {
                                   Provider.of<Patients>(context, listen: true)
                                               .isAddingPatient ==
                                           false
-                                      ? Text("PROCEED TO CONTACT TRACING",
+                                      ? Text("SAVE",
                                           style: Theme.of(context)
                                               .textTheme
                                               .caption
@@ -509,6 +476,7 @@ class _PatientScreeningScreenState extends State<PatientScreeningScreen> {
                             ),
                           ),
 
+                          
                           // FlatButton(
                           //   onPressed: () async {
                           //     await savePatientAndGoToScreening();
@@ -517,6 +485,8 @@ class _PatientScreeningScreenState extends State<PatientScreeningScreen> {
                           //   child: Text("START SCREENING",
                           //       style: Theme.of(context).textTheme.caption),
                           // ),
+
+                          
                         ],
                       ),
                     ),

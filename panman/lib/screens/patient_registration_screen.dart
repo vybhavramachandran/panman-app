@@ -1771,6 +1771,11 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: TextFormField(
+                                
+                                onFieldSubmitted: (v){
+                                    FocusScope.of(context).nextFocus();
+                                },
+                                textInputAction: TextInputAction.next,
                                 style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.normal),
@@ -1810,6 +1815,10 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: TextFormField(
+                                onFieldSubmitted: (v){
+                                    FocusScope.of(context).nextFocus();
+                                },
+                                textInputAction: TextInputAction.next,
                                 autovalidate: true,
                                 style: TextStyle(
                                     fontSize: 15,
@@ -1854,6 +1863,10 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: TextFormField(
+                                onFieldSubmitted: (v){
+                                    FocusScope.of(context).nextFocus();
+                                },
+                                textInputAction: TextInputAction.next,
                                 autovalidate: true,
                                 style: TextStyle(
                                     fontSize: 15,
@@ -1942,6 +1955,10 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             Padding(
                               padding: EdgeInsets.all(2),
                               child: TextFormField(
+                                onFieldSubmitted: (v){
+                                    FocusScope.of(context).nextFocus();
+                                },
+                                textInputAction: TextInputAction.next,
                                 autovalidate: true,
                                 onChanged: (value) {
                                   this.setState(() {
@@ -1988,6 +2005,10 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: TextFormField(
+                                onFieldSubmitted: (v){
+                                    FocusScope.of(context).nextFocus();
+                                },
+                                textInputAction: TextInputAction.next,
                                 autovalidate: true,
                                 onChanged: (value) {
                                   this.setState(() {
@@ -2001,6 +2022,9 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                 validator: (value) {
                                   if (value.isEmpty) {
                                     return 'Please enter some text';
+                                  }
+                                  else if(value.length<7 || value.length>12){
+                                    return 'Phone Number is either too short or too long';
                                   }
                                   else if (isNumeric(value)==false){
                                     return 'Phone Number only allows numbers';
@@ -2081,6 +2105,10 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: TextFormField(
+                                onFieldSubmitted: (v){
+                                    FocusScope.of(context).nextFocus();
+                                },
+                                textInputAction: TextInputAction.next,
                                 onChanged: (value) {
                                   this.setState(() {
                                     address = value;
@@ -2125,6 +2153,10 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                   Flexible(
                                     flex: 6,
                                     child: TextFormField(
+                                      onFieldSubmitted: (v){
+                                    FocusScope.of(context).nextFocus();
+                                },
+                                textInputAction: TextInputAction.next,
                                       style: TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.normal),
@@ -2250,7 +2282,10 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: TextFormField(
-                                
+                                onFieldSubmitted: (v){
+                                    FocusScope.of(context).nextFocus();
+                                },
+                                textInputAction: TextInputAction.next,
                                 onChanged: (value) {
                                   this.setState(() {
                                     city = value;
@@ -2291,6 +2326,10 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: TextFormField(
+                                onFieldSubmitted: (v){
+                                    FocusScope.of(context).nextFocus();
+                                },
+                                textInputAction: TextInputAction.next,
                                 onChanged: (value) {
                                   this.setState(() {
                                     state = value;
@@ -2331,6 +2370,10 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: TextFormField(
+                                onFieldSubmitted: (v){
+                                    FocusScope.of(context).nextFocus();
+                                },
+                                textInputAction: TextInputAction.next,
                                 onChanged: (value) {
                                   this.setState(() {
                                     country = value;
@@ -2415,6 +2458,10 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: TextFormField(
+                                onFieldSubmitted: (v){
+                                    FocusScope.of(context).nextFocus();
+                                },
+                                textInputAction: TextInputAction.next,
                                 autovalidate: true,
                                 onChanged: (value) {
                                   this.setState(() {
@@ -2458,6 +2505,10 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: TextFormField(
+                                onFieldSubmitted: (v){
+                                    FocusScope.of(context).nextFocus();
+                                },
+                                textInputAction: TextInputAction.next,
                                 autovalidate: true,
                                 onChanged: (value) {
                                   this.setState(() {
@@ -2501,6 +2552,10 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: TextFormField(
+                                onFieldSubmitted: (v){
+                                    FocusScope.of(context).nextFocus();
+                                },
+                                textInputAction: TextInputAction.next,
                                 autovalidate: true,
                                 onChanged: (value) {
                                   this.setState(() {

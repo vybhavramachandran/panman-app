@@ -63,11 +63,12 @@ class _HomePagePatientsWidgetState extends State<HomePagePatientsWidget> {
       height: MediaQuery.of(context).size.height,
       child: Column(
         children: <Widget>[
-          Flexible(
-            flex: 1,
+          Container(
+            height:100,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
+                
                 controller: searchTextController,
                 onChanged: (String value) {
                   return Provider.of<Patients>(context, listen: false)
