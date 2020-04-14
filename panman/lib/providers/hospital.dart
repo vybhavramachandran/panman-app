@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:panman/models/hospital.dart';
 import 'package:panman/models/medicalSupply.dart';
-import 'package:panman/utils/analytics_client.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
@@ -28,6 +27,7 @@ class FetchedHospitalLocationReference {
 class Hospitals with ChangeNotifier {
   var hospitalsCollection = Firestore.instance.collection('hospitals');
   var hospitalSnapshot;
+  var isUpdatingHospital=false;
 
   List<FetchedMedicalSupply> referenceMedicalSupplyList = [];
   List<FetchedHospitalLocationReference> referenceHospitalLocationList = [];
@@ -53,7 +53,6 @@ class Hospitals with ChangeNotifier {
 
       notifyListeners();
 
-      Analytics.instance.logEvent(name: 'getReferenceMedicalSupplyList');
     } catch (e) {
       print(e);
     }
@@ -74,7 +73,7 @@ class Hospitals with ChangeNotifier {
       });
 
       notifyListeners();
-      Analytics.instance.logEvent(name: 'getReferenceHospitalLocationList');
+
     } catch (e) {
       print(e);
     }
@@ -95,7 +94,7 @@ class Hospitals with ChangeNotifier {
       print("Fetched Hospital Name is" + fetchedHospital.toString());
 
       notifyListeners();
-      Analytics.instance.logEvent(name: 'getHospitalDetailsFromServer');
+
       return true;
     } catch (e) {
       print(e);
@@ -133,7 +132,7 @@ class Hospitals with ChangeNotifier {
       print("Fetched Hospital Name is" + fetchedHospital.toString());
 
       notifyListeners();
-      Analytics.instance.logEvent(name: 'getHospitalDetailsFromServer');
+
       return true;
     } catch (e) {
       print(e);
@@ -143,7 +142,7 @@ class Hospitals with ChangeNotifier {
   Future<bool> decrementVentilatorCount() async {
     try {
       fetchedHospital.equipments[0].qty = fetchedHospital.equipments[0].qty - 1;
-      await updateHospitalUsingAPI();
+      await updateHospital();
 
       // ventilatorCountAvailable = ventilatorCountAvailable-1;
       notifyListeners();
@@ -156,7 +155,7 @@ class Hospitals with ChangeNotifier {
     try {
       fetchedHospital.equipments[0].qty = fetchedHospital.equipments[0].qty + 1;
 
-      await updateHospitalUsingAPI();
+      await updateHospital();
 
       //   ventilatorCountAvailable = ventilatorCountAvailable+1;
       notifyListeners();
@@ -166,13 +165,18 @@ class Hospitals with ChangeNotifier {
   }
 
   Future addPatientToTheHospital() async {
+    isUpdatingHospital=true;
+    notifyListeners();
+    print("addPatientToTheHospital");
     try {
       var location =
-          fetchedHospital.locations.indexWhere((element) => element.id == "1");
+          fetchedHospital.locations.indexWhere((element) => element.id == "2");
 
       fetchedHospital.locations[location].count =
           fetchedHospital.locations[location].count + 1;
-      await updateHospitalUsingAPI();
+      await updateHospital();
+      isUpdatingHospital = false;
+      notifyListeners();
     } catch (e) {
       print(e);
     }
@@ -186,7 +190,7 @@ class Hospitals with ChangeNotifier {
           .indexWhere((element) => element.id == locationToBeDecremented);
       fetchedHospital.locations[oldLocation].count =
           fetchedHospital.locations[oldLocation].count - 1;
-      await updateHospitalUsingAPI();
+      await updateHospital();
     } catch (e) {
       print(e);
     }
@@ -201,7 +205,7 @@ class Hospitals with ChangeNotifier {
       fetchedHospital.locations[newLocation].count =
           fetchedHospital.locations[newLocation].count + 1;
 
-      await updateHospitalUsingAPI();
+      await updateHospital();
     } catch (e) {
       print(e);
     }
@@ -214,7 +218,7 @@ class Hospitals with ChangeNotifier {
           .indexWhere((element) => element.id == item.id);
       fetchedHospital.medicalSupplies[itemToUpdate].qty = newQuantity;
       print(fetchedHospital.medicalSupplies[itemToUpdate].qty);
-      await updateHospitalUsingAPI();
+      await updateHospital();
     } catch (e) {
       print(e);
     }
@@ -236,10 +240,6 @@ class Hospitals with ChangeNotifier {
       isUpdating = false;
       notifyListeners();
 
-      Analytics.instance.logEvent(
-          name: 'getHospitalDetailsFromServer',
-          parameters: fetchedHospital.toMap());
-
       // updatingInFirebase = false;
       // finishedUpdatingFirebase = true;
       // notifyListeners();
@@ -248,7 +248,7 @@ class Hospitals with ChangeNotifier {
     }
   }
 
-  Future updateHospitalUsingAPI() async {
+  Future updateHospitalUsingAPI2() async {
     isUpdating = true;
     // updatingInFirebase = true;
     // finishedUpdatingFirebase = false;
@@ -279,9 +279,6 @@ class Hospitals with ChangeNotifier {
       isUpdating = false;
       notifyListeners();
 
-      Analytics.instance.logEvent(
-          name: 'getHospitalDetailsFromServer',
-          parameters: fetchedHospital.toMap());
 
       // updatingInFirebase = false;
       // finishedUpdatingFirebase = true;

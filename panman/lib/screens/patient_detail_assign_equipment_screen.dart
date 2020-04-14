@@ -20,6 +20,7 @@ class _PatientDetailAssignEquipmentState
   bool setOnce = false;
   bool ventilatorCheck = false;
   bool showConfirmButton = false;
+  bool isUpdating = false;
 
   void onChanged(bool value) {
     setState(() {
@@ -61,13 +62,13 @@ class _PatientDetailAssignEquipmentState
                   style: Theme.of(context).textTheme.bodyText1,
                 ),
               ),
-              Flexible(
-                flex: 5,
-                child: Text(
-                  "${Provider.of<Hospitals>(context, listen: true).getVentilatorCount().toString()} remaining",
-                  style: Theme.of(context).textTheme.bodyText2,
-                ),
-              ),
+              // Flexible(
+              //   flex: 5,
+              //   child: Text(
+              //     "${Provider.of<Hospitals>(context, listen: true).getVentilatorCount().toString()} remaining",
+              //     style: Theme.of(context).textTheme.bodyText2,
+              //   ),
+              // ),
               Flexible(
                 flex: 1,
                 child: FaIcon(
@@ -92,7 +93,8 @@ class _PatientDetailAssignEquipmentState
       _isLoading = true;
     });
     await Provider.of<Hospitals>(context, listen: false)
-        .getHospitalDetailsFromServer('bGxFisQYmYl8ypnsBDtN');
+        .getHospitalDetailsFromServer(
+            Provider.of<Hospitals>(context, listen: false).fetchedHospital.id);
     setState(() {
       _isLoading = false;
     });
@@ -166,29 +168,35 @@ class _PatientDetailAssignEquipmentState
                                 width: MediaQuery.of(context).size.width,
                                 child: RaisedButton(
                                   color: Theme.of(context).accentColor,
-                                  child: Text(
-                                    "CHANGE STATE",
-                                    style: Theme.of(context).textTheme.caption,
-                                  ),
+                                  child: isUpdating == true
+                                      ? CircularProgressIndicator(
+                                          backgroundColor: Colors.white)
+                                      : Text(
+                                          "CHANGE STATE",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .caption,
+                                        ),
                                   onPressed: () async {
-                                    if ( await Provider.of<Patients>(context,
-                                                listen: false)
-                                            .toggleVentilatorAssignment(
-                                                ventilatorCheck) ==
-                                        true) {
-                                      ventilatorCheck
-                                          ? await Provider.of<Hospitals>(context,
-                                                  listen: false)
-                                              .decrementVentilatorCount()
-                                          : await Provider.of<Hospitals>(context,
-                                                  listen: false)
-                                              .incrementVentilatorCount();
+                                    setState(() {
+                                      isUpdating = true;
+                                    });
+                                    var result = await Provider.of<Patients>(
+                                            context,
+                                            listen: false)
+                                        .toggleVentilatorAssignment(
+                                            ventilatorCheck);
+                                    if (result == true) {
                                       setState(() {
+                                        isUpdating = false;
                                         showConfirmButton = false;
+                                        Navigator.of(context).pop();
+                                      });
+                                    } else {
+                                      setState(() {
+                                        ventilatorCheck != ventilatorCheck;
                                       });
                                     }
-
-                                    return;
                                   },
                                 ),
                               ),

@@ -1,34 +1,37 @@
 class Test {
+  bool isSelfInitiated;
   String id;
-  DateTime submissionDate;
   DateTime resultDate;
+  DateTime requestedDate;
   String testCenterName;
   String result;
-  String reportStatus;
 
   Test(
-      {this.submissionDate,
+      {this.id,
+      this.isSelfInitiated,
       this.testCenterName,
       this.result,
-      this.reportStatus,
+      this.requestedDate,
       this.resultDate});
 
   Test.fromMap(Map data)
       : this(
-          submissionDate: DateTime.parse(data['submissionDate']),
+          id: data['id'],
+          isSelfInitiated : data['isSelfInitiated'],
           testCenterName: data['testCenterName'],
           result: data['result'],
-          reportStatus: data['reportStatus'],
-          resultDate: data['resultDate'],
+          resultDate: DateTime.parse(data['resultDate']),
+          requestedDate: DateTime.parse(data['requestedDate']),
         );
 
   Map<String, dynamic> toMap() {
     return {
       'resultDate': resultDate.toString(),
+      'requestedDate': requestedDate!=null?requestedDate.toString():"",
       'testCenterName': testCenterName,
       'result': result,
-      'reportStatus': reportStatus,
-      'submissionDate': submissionDate.toString(),
+      'isSelfInitiated': isSelfInitiated,
+      'id': id,
     };
   }
 }

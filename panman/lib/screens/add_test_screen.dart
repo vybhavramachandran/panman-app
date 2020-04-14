@@ -1,6 +1,7 @@
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:random_string/random_string.dart';
 
 import '../models/test.dart';
 
@@ -17,6 +18,13 @@ class AddTestScreen extends StatefulWidget {
 
 class _AddTestScreenState extends State<AddTestScreen> {
   Test newTest = Test();
+
+  DateTime submissionDate;
+  DateTime resultDate;
+  String testingCenter;
+  String result;
+
+  var formKey = new GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +52,7 @@ class _AddTestScreenState extends State<AddTestScreen> {
         body: Container(
           padding: EdgeInsets.all(16),
           child: Form(
+            key: formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisAlignment: MainAxisAlignment.start,
@@ -63,36 +72,7 @@ class _AddTestScreenState extends State<AddTestScreen> {
                             .copyWith(color: Colors.black)),
                   ],
                 ),
-                SizedBox(
-                  height: 50,
-                ),
-                DateTimeField(
-                  decoration: InputDecoration(
-                    labelStyle: Theme.of(context)
-                        .textTheme
-                        .caption
-                        .copyWith(color: Colors.black),
-                    labelText: "Select Submission Date",
-                    // hintText: "Event",
-                    enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.grey[300])),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.grey[300])),
-                  ),
-                  initialValue: DateTime.now(),
-                  format: format,
-                  onShowPicker: (context, currentValue) async {
-                    final date = await showDatePicker(
-                        context: context,
-                        firstDate: DateTime(2019),
-                        initialDate: currentValue ?? DateTime.now(),
-                        lastDate: DateTime(2021));
-                    setState(() {
-                      newTest.submissionDate = date;
-                    });
-                    return date;
-                  },
-                ),
+
                 SizedBox(
                   height: 10,
                 ),
@@ -117,25 +97,30 @@ class _AddTestScreenState extends State<AddTestScreen> {
                     focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.grey[300])),
                   ),
-                  onSaved: (String value) {},
+                  onSaved: (String value) {
+                    setState(() {
+                      newTest.testCenterName = value;
+                      newTest.isSelfInitiated=false;
+                    });
+                  },
                 ),
                 SizedBox(
                   height: 10,
                 ),
-                 DateTimeField(
+                DateTimeField(
                   decoration: InputDecoration(
                     labelStyle: Theme.of(context)
                         .textTheme
                         .caption
                         .copyWith(color: Colors.black),
-                    labelText: "Select result date",
+                    labelText: "Test result date",
                     // hintText: "Event",
                     enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.grey[300])),
                     focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.grey[300])),
                   ),
-                //  initialValue: DateTime.now(),
+                  //  initialValue: DateTime.now(),
                   format: format,
                   onShowPicker: (context, currentValue) async {
                     final date = await showDatePicker(
@@ -170,38 +155,52 @@ class _AddTestScreenState extends State<AddTestScreen> {
                     },
                   ),
                 ),
-                SizedBox(
-                  height: 10,
-                ),
-                Container(
-                  child: DropdownButton<String>(
-                    value: newTest.reportStatus,
-                    hint: Text("Test Report Status"),
-                    items: ["Pending", "Received"].map((String selectedStatus) {
-                      return new DropdownMenuItem<String>(
-                        value: selectedStatus,
-                        child: new Text(selectedStatus),
-                      );
-                    }).toList(),
-                    onChanged: (String a) {
-                      setState(() {
-                        newTest.reportStatus = a;
-                      });
-                    },
-                  ),
-                ),
+                // SizedBox(
+                //   height: 10,
+                // ),
+                // Container(
+                //   child: DropdownButton<String>(
+                //     value: newTest.reportStatus,
+                //     hint: Text("Test Report Status"),
+                //     items: ["Pending", "Received"].map((String selectedStatus) {
+                //       return new DropdownMenuItem<String>(
+                //         value: selectedStatus,
+                //         child: new Text(selectedStatus),
+                //       );
+                //     }).toList(),
+                //     onChanged: (String a) {
+                //       setState(() {
+                //         newTest.reportStatus = a;
+                //       });
+                //     },
+                //   ),
+                // ),
                 Spacer(),
                 GestureDetector(
-                  onTap: () => {},
+                  onTap: () async {
+                    newTest.id = randomAlphaNumeric(20);
+                    if (formKey.currentState.validate()) {
+                      formKey.currentState.save();
+                      print("onTap called ${newTest.toString()}");
+                      await Provider.of<Patients>(context, listen: false)
+                          .addTest(newTest);
+                      Navigator.of(context).pop();
+                    }
+                  },
                   child: Container(
                     height: 64.0,
                     width: MediaQuery.of(context).size.width,
                     color: Theme.of(context).accentColor,
                     child: Center(
-                      child: Text(
-                        'Submit',
-                        style: Theme.of(context).textTheme.headline6,
-                      ),
+                      child: Provider.of<Patients>(context, listen: true)
+                              .isUpdating
+                          ? CircularProgressIndicator(
+                              backgroundColor: Colors.white30,
+                            )
+                          : Text(
+                              'Add Test',
+                              style: Theme.of(context).textTheme.headline6,
+                            ),
                     ),
                   ),
                 ),

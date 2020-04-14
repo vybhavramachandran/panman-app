@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:panman/screens/patient_contact_tracing.dart';
+import 'package:panman/screens/patient_screening.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/patients.dart';
@@ -26,6 +28,16 @@ class PatientSummaryWidget extends StatelessWidget {
         onTap: () {
           Provider.of<Patients>(context, listen: false)
               .selectPatient(patient.id);
+
+          if (Provider.of<Patients>(context, listen: false)
+                  .selectedPatient
+                  .currentLocation ==
+              2) {
+            return Navigator.pushNamed(
+              context,
+              PatientScreeningScreen.routeName,
+            );
+          }
           return Navigator.pushNamed(context, PatientDetailScreen.routeName,
               arguments: PatientDetailArguments(patient));
         },
@@ -44,13 +56,13 @@ class PatientSummaryWidget extends StatelessWidget {
                       fullname,
                       style: Theme.of(context).textTheme.bodyText1,
                     ),
-                     Text(
-                  "ID : ${patient.idGivenByHospital}",
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyText2
-                      .copyWith(color: Colors.black),
-                ),
+                    Text(
+                      "ID : ${patient.idGivenByHospital}",
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyText2
+                          .copyWith(color: Colors.black),
+                    ),
                     Row(
                       children: <Widget>[
                         Row(
@@ -99,19 +111,22 @@ class PatientSummaryWidget extends StatelessWidget {
                           width: 10,
                         ),
                         Container(
-                          width:200,
-                          child: Text(Provider.of<Hospitals>(context, listen: true)
-                              .referenceHospitalLocationList[
-                                  patient.currentLocation]
-                              .name),
+                          width: 200,
+                          child: Text(
+                              Provider.of<Hospitals>(context, listen: true)
+                                  .referenceHospitalLocationList[
+                                      patient.currentLocation]
+                                  .name),
                         ),
                       ],
                     ),
                   ],
                 ),
-               patient.currentLocation>3?C19StateBox(
-                  patientState: patient.state,
-                ):Container(),
+                patient.currentLocation > 3
+                    ? C19StateBox(
+                        patientState: patient.state,
+                      )
+                    : Container(),
                 FaIcon(
                   FontAwesomeIcons.arrowRight,
                   size: 20,

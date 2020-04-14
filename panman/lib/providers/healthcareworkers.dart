@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:panman/utils/analytics_client.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
@@ -31,9 +30,7 @@ class HealthCareWorkers with ChangeNotifier {
           uid: hcwSnapshot['uid ']);
       notifyListeners();
 
-      Analytics.instance.logEvent(
-          name:
-              "Fetched HCW details ${hcwSnapshot['firstName']}, ${hcwSnapshot['lastName']}, ${hcwSnapshot['hospitalID']}");
+
       print(
           "Fetched HCW details ${hcwSnapshot['firstName']}, ${hcwSnapshot['lastName']}, ${hcwSnapshot['hospitalID']}");
       return true;
@@ -78,9 +75,6 @@ class HealthCareWorkers with ChangeNotifier {
           uid: hcwSnapshot[0]['uid']);
       notifyListeners();
 
-      Analytics.instance.logEvent(
-          name:
-              "Fetched HCW details ${hcwloggedin.firstName}, ${hcwloggedin.lastName}, ${hcwloggedin.hospitalID}");
       print(
           "Fetched HCW details ${hcwloggedin.firstName}, ${hcwloggedin.lastName}, ${hcwloggedin.hospitalID}");
       return true;
