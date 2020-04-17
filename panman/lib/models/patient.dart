@@ -11,7 +11,7 @@ import './emergency_contact.dart';
 import './contactTracing.dart';
 import 'dart:io';
 
-enum Sex { Male, Female, Other}
+enum Sex { Male, Female, Other }
 
 class Patient {
   String id;
@@ -79,11 +79,11 @@ class Patient {
       'id': id,
       'idGivenByHospital': idGivenByHospital,
       'age': age,
-      'sex': sex == Sex.Male ? "Male" : sex== Sex.Female?"Female" :"Other",
+      'sex': sex == Sex.Male ? "Male" : sex == Sex.Female ? "Female" : "Other",
       'ventilatorUsed': ventilatorUsed,
       'locationInHospital': this.currentLocation,
       'hospitalID': this.hospitalID,
-      'phoneNumber':this.phoneNumber,
+      'phoneNumber': this.phoneNumber,
       'covidStatus': this.state.abbrv,
       'fullAddress': fullAddress != null ? fullAddress.toMap() : "",
       'firstName': Firstname,
@@ -92,14 +92,12 @@ class Patient {
       'vitals': mapifyList(vitals),
       'delhiDetails': delhiDetails != null ? delhiDetails.toMap() : "",
       'tests': mapifyList(tests),
-      'contactTracing' : tracingDetail !=null?tracingDetail.toMap():"",
-      'screeningResult':screeningResult!=null?screeningResult.toMap():"",
-      'emergencyContactFirstName':emergencyContactFirstName,
-      'emergencyContactLastName':emergencyContactLastName,
-      'emergencyContactPhoneNumber':emergencyContactPhoneNumber,
-      'emergencyContactRelation':emergencyContactRelation,
-
-
+      'contactTracing': tracingDetail != null ? tracingDetail.toMap() : "",
+      'screeningResult': screeningResult != null ? screeningResult.toMap() : "",
+      'emergencyContactFirstName': emergencyContactFirstName,
+      'emergencyContactLastName': emergencyContactLastName,
+      'emergencyContactPhoneNumber': emergencyContactPhoneNumber,
+      'emergencyContactRelation': emergencyContactRelation,
     };
   }
 }

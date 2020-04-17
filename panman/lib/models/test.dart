@@ -1,3 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+
 class Test {
   bool isSelfInitiated;
   String id;
@@ -20,14 +23,14 @@ class Test {
           isSelfInitiated : data['isSelfInitiated'],
           testCenterName: data['testCenterName'],
           result: data['result'],
-          resultDate: DateTime.parse(data['resultDate']),
-          requestedDate: DateTime.parse(data['requestedDate']),
+          resultDate: data['resultDate'].toDate(),
+          requestedDate: data['requestedDate'].toDate(),
         );
 
   Map<String, dynamic> toMap() {
     return {
-      'resultDate': resultDate.toString(),
-      'requestedDate': requestedDate!=null?requestedDate.toString():"",
+      'resultDate': Timestamp.fromDate(resultDate),
+      'requestedDate': Timestamp.fromDate(requestedDate),
       'testCenterName': testCenterName,
       'result': result,
       'isSelfInitiated': isSelfInitiated,

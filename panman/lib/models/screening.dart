@@ -1,4 +1,6 @@
 import './travelHistory.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 class Screening {
   bool hasCough;
@@ -70,7 +72,7 @@ class Screening {
           hasTiredness: data['hasTiredness'],
           hasDifficultyBreathing: data['hasDifficultyBreathing'],
           visitedCountry: data['visitedCountry'],
-          returnDate: DateTime.parse(data['returnDate']),
+          returnDate: data['returnDate'].toDate(),
           hasTravelledAboard :data['hasTravelledAboard'],
         );
 
@@ -81,7 +83,7 @@ class Screening {
       'hasTiredness':hasTiredness,
       'hasDifficultyBreathing':hasDifficultyBreathing,
       'visitedCountry':visitedCountry,
-      'returnDate':returnDate.toString(),
+      'returnDate':Timestamp.fromDate(returnDate),
       'hasComorbidityCOPD':hasComorbidityCOPD,
       'hasComorbidityChronicRenalDisease':hasComorbidityChronicRenalDisease,
       'hasComorbidityDiabetes':hasComorbidityDiabetes,

@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class TravelHistory {
   String countryVisited;
   DateTime arrivalDate;
@@ -7,13 +9,13 @@ class TravelHistory {
   TravelHistory.fromMap(Map data)
       : this(
           countryVisited: data['countryVisited'],
-          arrivalDate: DateTime.parse(data['arrivalDate']),
+          arrivalDate: data['arrivalDate'].toDate(),
         );
 
   Map<String, dynamic> toMap() {
     return {
       'countryVisited': countryVisited,
-      'arrivalDate': arrivalDate.toString(),
+      'arrivalDate': Timestamp.fromDate(arrivalDate),
     };
   }
 }

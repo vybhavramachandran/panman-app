@@ -24,9 +24,8 @@ class Patients with ChangeNotifier {
   static final newKey = encryption.Key.fromUtf8(aes_key);
   static final newiv = encryption.IV.fromUtf8(aes_iv);
 
-  final encrypter = encryption.Encrypter(encryption.AES(newKey));
-
-  
+  final encrypter = encryption.Encrypter(
+      encryption.AES(newKey, mode: encryption.AESMode.cbc));
 
   List<Patient> fetchedPatientsList = [];
   Patient selectedPatient;
@@ -89,8 +88,12 @@ class Patients with ChangeNotifier {
       patientSnapshot.documents.forEach((patient) async {
         print(patient['firstName'] + patient['covidStatus']);
         fetchedPatientsList.add(Patient(
-          Firstname: patient['firstName'],
-          LastName: patient['lastName'],
+          Firstname: decryptThis(
+            encryptedText: patient['firstName'],
+          ),
+          LastName: decryptThis(
+            encryptedText: patient['lastName'],
+          ),
           age: patient['age'],
           currentLocation: patient['locationInHospital'],
           state: referenceCovid19SeverityLevelsList
@@ -101,7 +104,9 @@ class Patients with ChangeNotifier {
               : patient['sex'] == "Female" ? Sex.Female : Sex.Other,
           ventilatorUsed: patient['ventilatorUsed'],
           id: patient['id'],
-          phoneNumber: patient['phoneNumber'],
+          phoneNumber: decryptThis(
+            encryptedText: patient['phoneNumber'],
+          ),
           hospitalID: patient['hospitalID'],
           screeningResult: patient['screeningResult'] == null ||
                   patient['screeningResult'] == ""
@@ -482,20 +487,21 @@ class Patients with ChangeNotifier {
     }
   }
 
-  // String encryptThis({String plainText}) {
-  //   var value = encrypter.encrypt(plainText, iv: newiv);
-  //   return value.base64;
-  // }
+  String encryptThis({String plainText}) {
+    var value = encrypter.encrypt(plainText, iv: newiv);
+    return value.base64;
+  }
 
-  // String decryptThis({String encryptedText}) {
-  //   return encrypter.decrypt64(encryptedText);
-  // }
+  String decryptThis({String encryptedText}) {
+    return encrypter.decrypt64(encryptedText, iv: newiv);
+  }
 
   Future<bool> addPatient(Patient patientReceived) async {
     Patient patientToAdd = patientReceived;
-    patientToAdd.Firstname = patientToAdd.Firstname;
-    patientToAdd.LastName = patientToAdd.LastName;
-    patientToAdd.phoneNumber = patientToAdd.phoneNumber;
+    print(encryptThis(plainText: patientToAdd.Firstname));
+    patientToAdd.Firstname = encryptThis(plainText: patientToAdd.Firstname);
+    patientToAdd.LastName = encryptThis(plainText: patientToAdd.LastName);
+    patientToAdd.phoneNumber = encryptThis(plainText: patientToAdd.phoneNumber);
 
     final prefs = await SharedPreferences.getInstance();
     var userData = prefs.getString('userData');
@@ -633,14 +639,19 @@ class Patients with ChangeNotifier {
       // updatingInFirebase = true;
       // finishedUpdatingFirebase = false;
       notifyListeners();
-      Patient patientToAdd = selectedPatient;
-      patientToAdd.Firstname = patientToAdd.Firstname;
-      patientToAdd.LastName = patientToAdd.LastName;
-      patientToAdd.phoneNumber =
-           patientToAdd.phoneNumber;
+
+      var mappedPatient = selectedPatient.toMap();
+      mappedPatient['firstName'] =
+          encryptThis(plainText: mappedPatient['firstName']);
+      mappedPatient['lastName'] =
+          encryptThis(plainText: mappedPatient['lastName']);
+      mappedPatient['phoneNumber'] =
+          encryptThis(plainText: mappedPatient['phoneNumber']);
+
       await patientsCollection
           .document(selectedPatient.id)
-          .updateData(patientToAdd.toMap());
+          .updateData(mappedPatient);
+   
       isUpdating = false;
       notifyListeners();
 
