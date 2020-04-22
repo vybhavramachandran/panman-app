@@ -38,6 +38,32 @@ class _PatientDetailCov19ScreenState extends State<PatientDetailCov19Screen> {
     print("radioOnTapped state $selectedRadio $selectedAbbrv");
   }
 
+  didChangeDependencies(){
+    
+    if (setOnce == false) {
+      if (Provider.of<Covid19>(context, listen: true)
+              .referenceCovid19SeverityLevelsList
+              .firstWhere((element) =>
+                  element.abbrv ==
+                  Provider.of<Patients>(context, listen: true)
+                      .selectedPatient
+                      .covidStatusString)
+              .index <=
+          1) {
+        this.selectedRadio = 0;
+      } else {
+        this.selectedRadio = Provider.of<Covid19>(context, listen: true)
+            .referenceCovid19SeverityLevelsList
+            .firstWhere((element) =>
+                element.abbrv ==
+                Provider.of<Patients>(context, listen: true)
+                    .selectedPatient
+                    .covidStatusString)
+            .index;
+      }
+    }
+  }
+
   //
   Patient localPatient;
 
@@ -126,7 +152,8 @@ class _PatientDetailCov19ScreenState extends State<PatientDetailCov19Screen> {
   }
 
   getListOfCards() {
-    var list = Provider.of<Covid19>(context, listen: true)
+    
+     var list = Provider.of<Covid19>(context, listen: true)
         .referenceCovid19SeverityLevelsList
         .map<Widget>(
       (c19 e) {
@@ -150,28 +177,6 @@ class _PatientDetailCov19ScreenState extends State<PatientDetailCov19Screen> {
   Widget build(BuildContext context) {
     // PatientDetailArguments args = ModalRoute.of(context).settings.arguments;
 
-    if (setOnce == false) {
-      if (Provider.of<Covid19>(context, listen: true)
-              .referenceCovid19SeverityLevelsList
-              .firstWhere((element) =>
-                  element.abbrv ==
-                  Provider.of<Patients>(context, listen: true)
-                      .selectedPatient
-                      .covidStatusString)
-              .index <=
-          1) {
-        this.selectedRadio = 0;
-      } else {
-        this.selectedRadio = Provider.of<Covid19>(context, listen: true)
-            .referenceCovid19SeverityLevelsList
-            .firstWhere((element) =>
-                element.abbrv ==
-                Provider.of<Patients>(context, listen: true)
-                    .selectedPatient
-                    .covidStatusString)
-            .index;
-      }
-    }
 
     // setState(() {
     //   this.localPatient = args.currentPatient;
@@ -202,7 +207,7 @@ class _PatientDetailCov19ScreenState extends State<PatientDetailCov19Screen> {
                   children: getListOfCards(),
                 ),
               ),
-              Align(
+              showConfirmButton==true?Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
                   margin: EdgeInsets.all(10),
@@ -231,7 +236,7 @@ class _PatientDetailCov19ScreenState extends State<PatientDetailCov19Screen> {
                     },
                   ),
                 ),
-              )
+              ):Container(),
             ],
           )),
     );

@@ -1413,7 +1413,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
         phoneNumber: phoneNumber,
         emergencyContactFirstName: emergencyContactFirstNametest,
         emergencyContactLastName: emergencyContactLastName,
-        emergencyContactPhoneNumber: emergencyContactLastName,
+        emergencyContactPhoneNumber: emergencyContactPhoneNumber,
         emergencyContactRelation: emergencyContactRelation
         // travelHistory: [],
         );

@@ -84,13 +84,13 @@ class _PatientDetailMoveScreenState extends State<PatientDetailMoveScreen> {
                     ),
                   ),
                 ),
-                Flexible(
-                  flex: 1,
-                  child: FaIcon(
-                    FontAwesomeIcons.infoCircle,
-                    size: 15,
-                  ),
-                ),
+                // Flexible(
+                //   flex: 1,
+                //   child: FaIcon(
+                //     FontAwesomeIcons.infoCircle,
+                //     size: 15,
+                //   ),
+                // ),
               ],
             ),
           )),
@@ -228,21 +228,21 @@ class _PatientDetailMoveScreenState extends State<PatientDetailMoveScreen> {
                           .copyWith(color: Colors.black54),
                     ),
                   ),
-                  localtionInHospitalCard(
-                    fullText: "Registration",
-                    cardColor: Colors.lightGreen,
-                    optionNo: 2,
-                  ),
-                  localtionInHospitalCard(
-                    fullText: "Screening",
-                    cardColor: Colors.lightGreen,
-                    optionNo: 3,
-                  ),
-                  localtionInHospitalCard(
-                    fullText: "Suspected C19 Isolation Ward/Holding area",
-                    cardColor: Colors.lightGreen,
-                    optionNo: 4,
-                  ),
+                  // localtionInHospitalCard(
+                  //   fullText: "Registration",
+                  //   cardColor: Colors.lightGreen,
+                  //   optionNo: 2,
+                  // ),
+                  // localtionInHospitalCard(
+                  //   fullText: "Screening",
+                  //   cardColor: Colors.lightGreen,
+                  //   optionNo: 3,
+                  // ),
+                  // localtionInHospitalCard(
+                  //   fullText: "Suspected C19 Isolation Ward/Holding area",
+                  //   cardColor: Colors.lightGreen,
+                  //   optionNo: 4,
+                  // ),
                   localtionInHospitalCard(
                     fullText: "Confirmed C19 Isolation Ward",
                     cardColor: Colors.lightGreen,
@@ -263,11 +263,11 @@ class _PatientDetailMoveScreenState extends State<PatientDetailMoveScreen> {
                           .copyWith(color: Colors.black54),
                     ),
                   ),
-                  localtionInHospitalCard(
-                    fullText: "Transferred to another hospital",
-                    cardColor: Colors.lightGreen,
-                    optionNo: 7,
-                  ),
+                  // localtionInHospitalCard(
+                  //   fullText: "Transferred to another hospital",
+                  //   cardColor: Colors.lightGreen,
+                  //   optionNo: 7,
+                  // ),
                   localtionInHospitalCard(
                     fullText: "Patient Deceased",
                     cardColor: Colors.lightGreen,

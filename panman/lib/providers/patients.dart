@@ -136,7 +136,7 @@ class Patients with ChangeNotifier {
               : patient['tests'].map<Test>((testToBeAdded) {
                   return Test.fromMap(testToBeAdded);
                 }).toList(),
-          tracingDetail: patient['contactTracing'] == null
+          tracingDetail: patient['contactTracing'] == ""
               ? dummyContact
               : contactTracing.fromMap(patient['contactTracing']),
         ));
