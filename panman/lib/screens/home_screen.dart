@@ -177,7 +177,7 @@ class _HomeScreenState extends State<HomeScreen> {
         hospitalID:
             Provider.of<Hospitals>(context, listen: false).fetchedHospital.id,
         sex: patientSex,
-        state: referenceCovid19SeverityLevelsList[0],
+        covidStatusString: "NP-1",
         ventilatorUsed: false,
         events: [],
         vitals: [],
@@ -190,6 +190,8 @@ class _HomeScreenState extends State<HomeScreen> {
       Navigator.pop(context);
     } catch (error) {}
   }
+
+ 
 
   @override
   Widget build(BuildContext context) {

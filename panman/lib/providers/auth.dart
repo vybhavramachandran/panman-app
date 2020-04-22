@@ -17,6 +17,8 @@ class Auth with ChangeNotifier {
   String _token;
   String _userID;
 
+  bool authFlag;
+
   Future login(String email, String password) async {
     tryingToAuthenticate = true;
     notifyListeners();
@@ -26,15 +28,13 @@ class Auth with ChangeNotifier {
         password: password,
       );
 
-
       FirebaseUser user = result.user;
       loggedinUser = result.user;
-
 
       if (user != null) {
         var temp = await user.getIdToken();
         _token = temp.token;
-        print("_token is"+_token);
+        print("_token is" + _token);
         _userEmail = user.email;
         _userID = user.uid;
         tryingToAuthenticate = false;
@@ -76,19 +76,25 @@ class Auth with ChangeNotifier {
     prefs.clear();
   }
 
+ 
+
   Future<FirebaseUser> tryAutoLogin() async {
+    print("Tryautologin called");
     if (loggedinUser == null) {
+      print("loggedinUser is null");
       final FirebaseUser user = await _auth.currentUser();
-      //  print("Auto Login called ${user.toString()}");
+        print("Auto Login called ${user.toString()}");
       if (user != null) {
         loggedinUser = user;
+        notifyListeners();
+
         var temp = await user.getIdToken();
         _token = temp.token;
         _userID = user.uid;
         _userEmail = user.email;
-          final prefs = await SharedPreferences.getInstance();
-          
-          print("tryautologin called ${_token}");
+        final prefs = await SharedPreferences.getInstance();
+
+        print("tryautologin called ${_token}");
         final userData = json.encode(
           {
             'token': _token,
@@ -100,11 +106,12 @@ class Auth with ChangeNotifier {
         prefs.setString('userData', userData);
         notifyListeners();
         //  print("TryAutoLogin returning user ${user.toString()}");
-        return user;
+        return loggedinUser;
       } else {
-        return null;
+        return loggedinUser;
       }
     }
+
     return loggedinUser;
     // print("tryAutoLogin called");
   }

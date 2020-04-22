@@ -151,6 +151,7 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
 
                   // patient: selectedPatient,
                 ),
+                 
                 // patientPageCard(
                 //   iconToDisplay: "assets/images/ventilator.png",
                 //   titleOfCard: "ASSIGN EQUIPMENT",
@@ -163,6 +164,13 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
                   moveToPage: "/patient_tests_screen",
 
                   //  patient: selectedPatient,
+                ),
+                patientPageCard(
+                  iconToDisplay: "assets/images/track.png",
+                  titleOfCard: "CONTACT TRACING",
+                  moveToPage: "/patient_contact_tracing",
+
+                  // patient: selectedPatient,
                 ),
                 
               ],

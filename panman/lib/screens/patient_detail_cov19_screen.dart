@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 // import 'package:font_awesome_flutter/fa_icon.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:panman/providers/covid19.dart';
 import 'package:provider/provider.dart';
 import '../models/c19data.dart';
 
 import '../providers/patients.dart';
+import '../providers/covid19.dart';
 
 import '../models/patient.dart';
 import '../models/arguments/patient_detail_arguments.dart';
@@ -23,94 +25,154 @@ class _PatientDetailCov19ScreenState extends State<PatientDetailCov19Screen> {
   // Radio controls
   bool setOnce = false;
   int selectedRadio;
+  String selectedAbbrv;
   bool showConfirmButton = false;
-  radioOnTapped(int value) {
+
+  radioOnTapped(int value, String abbrv) {
+    print("radioOnTapped $value $abbrv");
     setState(() {
       showConfirmButton = true;
       selectedRadio = value;
+      selectedAbbrv = abbrv;
     });
+    print("radioOnTapped state $selectedRadio $selectedAbbrv");
   }
 
   //
   Patient localPatient;
 
   c19card({String abbrv, String fullText, Color cardColor, int optionNo}) {
-    return Card(
-        clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-        child: Container(
-          padding: EdgeInsets.only(right: 10),
-          height: 100,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Container(
-                width: 15,
-                color: cardColor,
-              ),
-             Expanded(child: Container(
-               child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                 children: <Widget>[
-                  Flexible(
-                flex: 1,
-                child: Radio(
-                  value: optionNo,
-                  groupValue: selectedRadio,
-                  onChanged: (value) => radioOnTapped(value),
-                ),
-              ),
-              Flexible(
-                flex: 2,
-                child: Text(
-                  abbrv,
-                  style: Theme.of(context)
-                      .textTheme
-                      .headline5
-                      .copyWith(color: Colors.black),
-                ),
-              ),
-              Flexible(
-                flex: 5,
-                child: Text(
-                  fullText,
-                  style: Theme.of(context).textTheme.bodyText2,
-                ),
-              ),
-              Flexible(
-                flex: 1,
-                child: FaIcon(
-                  FontAwesomeIcons.infoCircle,
-                  size: 15,
-                ),
-              ),
-               ],),
-             ),)
-            ],
+    return GestureDetector(
+      onTap: () {
+        print("Gesture Detector called $optionNo $abbrv");
+        radioOnTapped(optionNo, abbrv);
+      },
+      child: Card(
+          clipBehavior: Clip.antiAlias,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
           ),
-        ));
+          child: Container(
+            padding: EdgeInsets.only(right: 10),
+            height: 100,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Container(
+                  width: 15,
+                  color: cardColor,
+                ),
+                Container(
+                  child: Expanded(
+                    child: Row(
+                      children: <Widget>[
+                        Flexible(
+                          fit: FlexFit.tight,
+                          flex: 1,
+                          child: Container(
+                            child: Radio(
+                              value: optionNo,
+                              groupValue: selectedRadio,
+                              onChanged: (value) => radioOnTapped(value, abbrv),
+                            ),
+                          ),
+                        ),
+                        Flexible(
+                          fit: FlexFit.tight,
+                          flex: 1,
+                          child: SizedBox(),
+                        ),
+                        Flexible(
+                          fit: FlexFit.tight,
+                          flex: 2,
+                          child: Container(
+                            child: Text(
+                              abbrv,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline5
+                                  .copyWith(color: Colors.black),
+                            ),
+                          ),
+                        ),
+                        Flexible(
+                          flex: 5,
+                          fit: FlexFit.tight,
+                          child: Container(
+                            child: Text(
+                              fullText,
+                              style: Theme.of(context).textTheme.bodyText2,
+                            ),
+                          ),
+                        ),
+                        Flexible(
+                          fit: FlexFit.tight,
+                          flex: 1,
+                          child: Container(
+                            child: FaIcon(
+                              FontAwesomeIcons.infoCircle,
+                              size: 15,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )),
+    );
+  }
+
+  getListOfCards() {
+    var list = Provider.of<Covid19>(context, listen: true)
+        .referenceCovid19SeverityLevelsList
+        .map<Widget>(
+      (c19 e) {
+        if (e.index > 1) {
+          print(e.index);
+          return c19card(
+            abbrv: e.abbrv,
+            fullText: e.fullText,
+            cardColor: e.stateColor,
+            optionNo: e.index,
+          );
+        }
+        return Container();
+      },
+    ).toList();
+    list.add(SizedBox(height: 100));
+    return list;
   }
 
   @override
   Widget build(BuildContext context) {
     // PatientDetailArguments args = ModalRoute.of(context).settings.arguments;
+
     if (setOnce == false) {
-      if (Provider.of<Patients>(context, listen: true)
-              .selectedPatient
-              .state
+      if (Provider.of<Covid19>(context, listen: true)
+              .referenceCovid19SeverityLevelsList
+              .firstWhere((element) =>
+                  element.abbrv ==
+                  Provider.of<Patients>(context, listen: true)
+                      .selectedPatient
+                      .covidStatusString)
               .index <=
           1) {
         this.selectedRadio = 0;
       } else {
-        this.selectedRadio = Provider.of<Patients>(context, listen: true)
-                .selectedPatient
-                .state
-                .index -
-            1;
+        this.selectedRadio = Provider.of<Covid19>(context, listen: true)
+            .referenceCovid19SeverityLevelsList
+            .firstWhere((element) =>
+                element.abbrv ==
+                Provider.of<Patients>(context, listen: true)
+                    .selectedPatient
+                    .covidStatusString)
+            .index;
       }
-      setOnce = true;
     }
+
     // setState(() {
     //   this.localPatient = args.currentPatient;
     // });
@@ -135,107 +197,41 @@ class _PatientDetailCov19ScreenState extends State<PatientDetailCov19Screen> {
           ),
           body: Stack(
             children: <Widget>[
-              ListView(
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      "Asymptomatic",
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyText1
-                          .copyWith(color: Colors.black54),
-                    ),
-                  ),
-                  c19card(
-                    abbrv: "AS-1",
-                    fullText: "Asymptomatic - Without Comorbity",
-                    cardColor: Colors.green,
-                    optionNo: 1,
-                  ),
-                  c19card(
-                    abbrv: "AS-2",
-                    fullText: "Asymptomatic - With Comorbity",
-                    cardColor: Colors.lightGreen,
-                    optionNo: 2,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      "Symptomatic",
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyText1
-                          .copyWith(color: Colors.black54),
-                    ),
-                  ),
-                  c19card(
-                    abbrv: "S-1",
-                    fullText: "Symptomatic/URTI - Without comorbity",
-                    cardColor: Colors.yellow[200],
-                    optionNo: 3,
-                  ),
-                  c19card(
-                    abbrv: "S-2",
-                    fullText: "Symptomatic/URTI - With comorbity",
-                    cardColor: Colors.yellow,
-                    optionNo: 4,
-                  ),
-                  c19card(
-                    abbrv: "S-3",
-                    fullText:
-                        "Symptomatic. Pneumonia. Without respiratory failure / MODS",
-                    cardColor: Colors.orange,
-                    optionNo: 5,
-                  ),
-                  c19card(
-                    abbrv: "S-4",
-                    fullText:
-                        "Symptomatic. Severe Pneumonia. Without respiratory failure / MODS",
-                    cardColor: Colors.red[200],
-                    optionNo: 6,
-                  ),
-                  c19card(
-                      abbrv: "S-5",
-                      fullText:
-                          "Symptomatic. Severe Pneumonia. With respiratory failure / MODS",
-                      cardColor: Colors.red,
-                      optionNo: 7),
-
-                ],
+              SingleChildScrollView(
+                child: Column(
+                  children: getListOfCards(),
+                ),
               ),
-              showConfirmButton == true
-                  ? Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Container(
-                        margin: EdgeInsets.all(10),
-                        height: 60,
-                        width: MediaQuery.of(context).size.width,
-                        child: RaisedButton(
-                          color: Theme.of(context).accentColor,
-                          child: Provider.of<Patients>(context, listen: true)
-                                  .isUpdating
-                              ? CircularProgressIndicator(
-                                  backgroundColor: Colors.white30,
-                                )
-                              : Text(
-                                  "CHANGE STATE",
-                                  style: Theme.of(context).textTheme.caption,
-                                ),
-                          onPressed: () {
-                            if (Provider.of<Patients>(context, listen: false)
-                                    .changePatientState(selectedRadio - 1) ==
-                                true) {
-                              setState(() {
-                                showConfirmButton = false;
-                              });
-                              return;
-                            }
-                          },
-                        ),
-                      ),
-                    )
-                  : Container(),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  margin: EdgeInsets.all(10),
+                  height: 60,
+                  width: MediaQuery.of(context).size.width,
+                  child: RaisedButton(
+                    color: Theme.of(context).accentColor,
+                    child:
+                        Provider.of<Patients>(context, listen: true).isUpdating
+                            ? CircularProgressIndicator(
+                                backgroundColor: Colors.white30,
+                              )
+                            : Text(
+                                "CHANGE STATE",
+                                style: Theme.of(context).textTheme.caption,
+                              ),
+                    onPressed: () async {
+                      if (await Provider.of<Patients>(context, listen: false)
+                              .changePatientState(selectedAbbrv) ==
+                          true) {
+                        setState(() {
+                          showConfirmButton = false;
+                        });
+                        return;
+                      }
+                    },
+                  ),
+                ),
+              )
             ],
           )),
     );

@@ -29,7 +29,7 @@ import './screens/patient_tests_screen.dart';
 import './screens/patient_screening.dart';
 import './screens/patient_contact_tracing.dart';
 import './screens/patient_screening_edit.dart';
-import './screens/patient_contact_tracing_edit.dart';
+import './screens/patient_detail_screen_screening.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -153,9 +153,12 @@ class MyApp extends StatelessWidget {
                                 fontSize: 20, fontWeight: FontWeight.bold),
                           )),
                       home: FutureBuilder<FirebaseUser>(
-                          future: auth.tryAutoLogin(),
+                          future: auth.loggedinUser == null
+                              ? auth.tryAutoLogin()
+                              : null,
                           builder: (ctx,
                               AsyncSnapshot<FirebaseUser> authResultSnapshot) {
+                            print("Builder called $authResultSnapshot");
                             if (authResultSnapshot.connectionState ==
                                     ConnectionState.done ||
                                 authResultSnapshot.hasData) {
@@ -167,14 +170,20 @@ class MyApp extends StatelessWidget {
                             }
                           }),
                       routes: {
-                        EditPatientContactTracingScreen.routeName:(ctx)=>EditPatientContactTracingScreen(),
-                        EditPatientScreeningScreen.routeName:(ctx)=>EditPatientScreeningScreen(),
-                        PatientContactTracingScreen.routeName:(ctx)=> PatientContactTracingScreen(),
-                        PatientScreeningScreen.routeName : (ctx) => PatientScreeningScreen(),
-                        PatientTestsScreen.routeName: (ctx) => PatientTestsScreen(),
-                        AddTestScreen.routeName :(ctx)=>AddTestScreen(),
-                        PatientRegistrationScreen.routeName :(ctx)=> PatientRegistrationScreen(),
-                        PatientDashboardScreen.routeName :(ctx) => PatientDashboardScreen(),
+                
+                        EditPatientScreeningScreen.routeName: (ctx) =>
+                            EditPatientScreeningScreen(),
+                        PatientContactTracingScreen.routeName: (ctx) =>
+                            PatientContactTracingScreen(),
+                        PatientScreeningScreen.routeName: (ctx) =>
+                            PatientScreeningScreen(),
+                        PatientTestsScreen.routeName: (ctx) =>
+                            PatientTestsScreen(),
+                        AddTestScreen.routeName: (ctx) => AddTestScreen(),
+                        PatientRegistrationScreen.routeName: (ctx) =>
+                            PatientRegistrationScreen(),
+                        PatientDashboardScreen.routeName: (ctx) =>
+                            PatientDashboardScreen(),
                         HomeScreen.routeName: (ctx) => HomeScreen(),
                         PatientDetailScreen.routeName: (ctx) =>
                             PatientDetailScreen(),
@@ -190,6 +199,8 @@ class MyApp extends StatelessWidget {
                             PatientVitalsAddScreen(),
                         PatientVitalsScreen.routeName: (ctx) =>
                             PatientVitalsScreen(),
+                        PatientScreeningDetailedScreen.routeName: (ctx) =>
+                            PatientScreeningDetailedScreen(),
                       },
                     )),
           );

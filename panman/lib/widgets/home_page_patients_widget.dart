@@ -24,8 +24,9 @@ class _HomePagePatientsWidgetState extends State<HomePagePatientsWidget> {
   TextEditingController searchTextController = new TextEditingController();
 
   initState() {
+        super.initState();
+
     fetchFuture = refreshListOfPatients(context);
-    super.initState();
     shouldSkip = true;
   }
 
@@ -64,7 +65,7 @@ class _HomePagePatientsWidgetState extends State<HomePagePatientsWidget> {
       child: Column(
         children: <Widget>[
           Container(
-            height:100,
+           // height:100,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(

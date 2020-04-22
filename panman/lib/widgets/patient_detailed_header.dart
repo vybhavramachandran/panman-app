@@ -128,7 +128,7 @@ class PatientDetailedHeader extends StatelessWidget {
                 ? C19StateBox(
                     patientState: Provider.of<Patients>(context, listen: true)
                         .selectedPatient
-                        .state,
+                        .covidStatusString,
                   )
                 : Container(),
           ],

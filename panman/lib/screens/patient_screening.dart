@@ -68,23 +68,22 @@ class _PatientScreeningScreenState extends State<PatientScreeningScreen> {
     visitedCountry: "No Data",
   );
 
-  // saveScreeningAndQuarantine() async {
-  //   print("saveScreeningAndQuarantine called");
+  saveScreeningAndQuarantine() async {
+    print("saveScreeningAndQuarantine called");
 
-  //   //print(json.encode(screeningResult));
+    //print(json.encode(screeningResult));
 
-  //   await Provider.of<Patients>(context, listen: false)
-  //       .addScreening(screeningResult, 0);
-  //   Navigator.of(context).pop(true);
-  // }
+    await Provider.of<Patients>(context, listen: false)
+        .addScreening(screeningResult, 0);
+    Navigator.of(context).pop(true);
+  }
 
-  saveScreeningAndIsolate() async {
+  saveScreeningAndTest() async {
     print("saveScreeningAndMoveToIsolationCalled called");
 
     await Provider.of<Patients>(context, listen: false)
         .addScreening(screeningResult, 3);
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (BuildContext context) => PatientContactTracingScreen()));
+    Navigator.of(context).pop(true);
   }
 
   @override
@@ -339,137 +338,145 @@ class _PatientScreeningScreenState extends State<PatientScreeningScreen> {
                                 ),
                               ),
                               SizedBox(height: 30),
-                              isComorbidityPlanned==false?Container():Container(
-                                //  height: 700,
-                                child: Column(
-                                  // shrinkWrap: true,
-                                  // childAspectRatio: (3 / 2),
-                                  // //   mainAxisSpacing: 1,
-                                  // crossAxisCount: 2,
-                                  children: <Widget>[
-                                    CheckboxListTile(
-                                      title:
-                                          Text("COPD, Bronchitis, or Asthma"),
-                                      value: screeningResult.hasComorbidityCOPD,
-                                      onChanged: (bool newValue) {
-                                        setState(() {
-                                          screeningResult.hasComorbidityCOPD =
-                                              newValue;
-                                        });
-                                      },
+                              isComorbidityPlanned == false
+                                  ? Container()
+                                  : Container(
+                                      //  height: 700,
+                                      child: Column(
+                                        // shrinkWrap: true,
+                                        // childAspectRatio: (3 / 2),
+                                        // //   mainAxisSpacing: 1,
+                                        // crossAxisCount: 2,
+                                        children: <Widget>[
+                                          CheckboxListTile(
+                                            title: Text(
+                                                "COPD, Bronchitis, or Asthma"),
+                                            value: screeningResult
+                                                .hasComorbidityCOPD,
+                                            onChanged: (bool newValue) {
+                                              setState(() {
+                                                screeningResult
+                                                        .hasComorbidityCOPD =
+                                                    newValue;
+                                              });
+                                            },
+                                          ),
+                                          CheckboxListTile(
+                                            title:
+                                                Text("Chronic Renal Disease"),
+                                            value: screeningResult
+                                                .hasComorbidityChronicRenalDisease,
+                                            onChanged: (bool newValue) {
+                                              setState(() {
+                                                screeningResult
+                                                        .hasComorbidityChronicRenalDisease =
+                                                    newValue;
+                                              });
+                                            },
+                                          ),
+                                          CheckboxListTile(
+                                            title: Text("Malignancy"),
+                                            value: screeningResult
+                                                .hasComorbidityMalignancy,
+                                            onChanged: (bool newValue) {
+                                              setState(() {
+                                                screeningResult
+                                                        .hasComorbidityMalignancy =
+                                                    newValue;
+                                              });
+                                            },
+                                          ),
+                                          CheckboxListTile(
+                                            title: Text("Diabetes"),
+                                            value: screeningResult
+                                                .hasComorbidityDiabetes,
+                                            onChanged: (bool newValue) {
+                                              setState(() {
+                                                screeningResult
+                                                        .hasComorbidityDiabetes =
+                                                    newValue;
+                                              });
+                                            },
+                                          ),
+                                          CheckboxListTile(
+                                            title: Text("Hypertension"),
+                                            value: screeningResult
+                                                .hasComorbidityHypertension,
+                                            onChanged: (bool newValue) {
+                                              setState(() {
+                                                screeningResult
+                                                        .hasComorbidityHypertension =
+                                                    newValue;
+                                              });
+                                            },
+                                          ),
+                                          CheckboxListTile(
+                                            title: Text(
+                                                "Pregnancy (trimester) or Post-partum (<6 weeks)"),
+                                            value: screeningResult
+                                                .hasComorbidityPregnancy,
+                                            onChanged: (bool newValue) {
+                                              setState(() {
+                                                screeningResult
+                                                        .hasComorbidityPregnancy =
+                                                    newValue;
+                                              });
+                                            },
+                                          ),
+                                          CheckboxListTile(
+                                            title: Text("Liver Disease"),
+                                            value: screeningResult
+                                                .hasComorbidityLiverDisease,
+                                            onChanged: (bool newValue) {
+                                              setState(() {
+                                                screeningResult
+                                                        .hasComorbidityLiverDisease =
+                                                    newValue;
+                                              });
+                                            },
+                                          ),
+                                          CheckboxListTile(
+                                            title: Text(
+                                                "Chronic neurological or neuromuscular disease "),
+                                            value: screeningResult
+                                                .hasComorbidityChronicNeuro,
+                                            onChanged: (bool newValue) {
+                                              setState(() {
+                                                screeningResult
+                                                        .hasComorbidityChronicNeuro =
+                                                    newValue;
+                                              });
+                                            },
+                                          ),
+                                          CheckboxListTile(
+                                            title: Text(
+                                                "Immune Compromised/Suspressed including HIV/TB"),
+                                            value: screeningResult
+                                                .hasComorbidityHIV,
+                                            onChanged: (bool newValue) {
+                                              setState(() {
+                                                screeningResult
+                                                        .hasComorbidityHIV =
+                                                    newValue;
+                                              });
+                                            },
+                                          ),
+                                          CheckboxListTile(
+                                            title: Text(
+                                                "Organ transplant patient"),
+                                            value: screeningResult
+                                                .hasComorbdityOrganTransplant,
+                                            onChanged: (bool newValue) {
+                                              setState(() {
+                                                screeningResult
+                                                        .hasComorbdityOrganTransplant =
+                                                    newValue;
+                                              });
+                                            },
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                    CheckboxListTile(
-                                      title: Text("Chronic Renal Disease"),
-                                      value: screeningResult
-                                          .hasComorbidityChronicRenalDisease,
-                                      onChanged: (bool newValue) {
-                                        setState(() {
-                                          screeningResult
-                                                  .hasComorbidityChronicRenalDisease =
-                                              newValue;
-                                        });
-                                      },
-                                    ),
-                                    CheckboxListTile(
-                                      title: Text("Malignancy"),
-                                      value: screeningResult
-                                          .hasComorbidityMalignancy,
-                                      onChanged: (bool newValue) {
-                                        setState(() {
-                                          screeningResult
-                                                  .hasComorbidityMalignancy =
-                                              newValue;
-                                        });
-                                      },
-                                    ),
-                                    CheckboxListTile(
-                                      title: Text("Diabetes"),
-                                      value: screeningResult
-                                          .hasComorbidityDiabetes,
-                                      onChanged: (bool newValue) {
-                                        setState(() {
-                                          screeningResult
-                                                  .hasComorbidityDiabetes =
-                                              newValue;
-                                        });
-                                      },
-                                    ),
-                                    CheckboxListTile(
-                                      title: Text("Hypertension"),
-                                      value: screeningResult
-                                          .hasComorbidityHypertension,
-                                      onChanged: (bool newValue) {
-                                        setState(() {
-                                          screeningResult
-                                                  .hasComorbidityHypertension =
-                                              newValue;
-                                        });
-                                      },
-                                    ),
-                                    CheckboxListTile(
-                                      title: Text(
-                                          "Pregnancy (trimester) or Post-partum (<6 weeks)"),
-                                      value: screeningResult
-                                          .hasComorbidityPregnancy,
-                                      onChanged: (bool newValue) {
-                                        setState(() {
-                                          screeningResult
-                                                  .hasComorbidityPregnancy =
-                                              newValue;
-                                        });
-                                      },
-                                    ),
-                                    CheckboxListTile(
-                                      title: Text("Liver Disease"),
-                                      value: screeningResult
-                                          .hasComorbidityLiverDisease,
-                                      onChanged: (bool newValue) {
-                                        setState(() {
-                                          screeningResult
-                                                  .hasComorbidityLiverDisease =
-                                              newValue;
-                                        });
-                                      },
-                                    ),
-                                    CheckboxListTile(
-                                      title: Text(
-                                          "Chronic neurological or neuromuscular disease "),
-                                      value: screeningResult
-                                          .hasComorbidityChronicNeuro,
-                                      onChanged: (bool newValue) {
-                                        setState(() {
-                                          screeningResult
-                                                  .hasComorbidityChronicNeuro =
-                                              newValue;
-                                        });
-                                      },
-                                    ),
-                                    CheckboxListTile(
-                                      title: Text(
-                                          "Immune Compromised/Suspressed including HIV/TB"),
-                                      value: screeningResult.hasComorbidityHIV,
-                                      onChanged: (bool newValue) {
-                                        setState(() {
-                                          screeningResult.hasComorbidityHIV =
-                                              newValue;
-                                        });
-                                      },
-                                    ),
-                                    CheckboxListTile(
-                                      title: Text("Organ transplant patient"),
-                                      value: screeningResult
-                                          .hasComorbdityOrganTransplant,
-                                      onChanged: (bool newValue) {
-                                        setState(() {
-                                          screeningResult
-                                                  .hasComorbdityOrganTransplant =
-                                              newValue;
-                                        });
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ),
                             ],
                           ),
                         ),
@@ -477,48 +484,65 @@ class _PatientScreeningScreenState extends State<PatientScreeningScreen> {
                     ),
                   ),
                 ),
-                Flexible(
-                  flex: 2,
-                  child: Container(
-                    height: 90,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 10, bottom: 10),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Container(
-                            //width: (MediaQuery.of(context).size.width - 50) / 2,
-                            child: FlatButton(
-                              onPressed: () async {
-                                saveScreeningAndIsolate();
-                              },
-                              color: Theme.of(context).accentColor,
-                              child:
-                                  Provider.of<Patients>(context, listen: true)
-                                              .isAddingPatient ==
-                                          false
-                                      ? Text("PROCEED TO CONTACT TRACING",
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .caption
-                                              .copyWith())
-                                      : CircularProgressIndicator(
-                                          backgroundColor: Colors.black,
-                                        ),
-                            ),
+                Container(
+                  height: 90,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 10, bottom: 10),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        Container(
+                          width: (MediaQuery.of(context).size.width - 50) / 2,
+                          child: FlatButton(
+                            onPressed: () async {
+                              saveScreeningAndQuarantine();
+                            },
+                            color: Theme.of(context).accentColor,
+                            child: Provider.of<Patients>(context, listen: true)
+                                        .isAddingPatient ==
+                                    false
+                                ? Text("SEND PATIENT TO HOME QUARANTINE",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .caption
+                                        .copyWith(),textAlign: TextAlign.center,)
+                                : CircularProgressIndicator(
+                                    backgroundColor: Colors.black,
+                                  ),
                           ),
+                        ),
 
-                          // FlatButton(
-                          //   onPressed: () async {
-                          //     await savePatientAndGoToScreening();
-                          //   },
-                          //   color: Theme.of(context).accentColor,
-                          //   child: Text("START SCREENING",
-                          //       style: Theme.of(context).textTheme.caption),
-                          // ),
-                        ],
-                      ),
+                        Container(
+                          width: (MediaQuery.of(context).size.width - 50) / 2,
+                          child: FlatButton(
+                            onPressed: () async {
+                              saveScreeningAndTest();
+                            },
+                            color: Theme.of(context).accentColor,
+                            child: Provider.of<Patients>(context, listen: true)
+                                        .isAddingPatient ==
+                                    false
+                                ? Text("SEND PATIENT TO TESTING",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .caption
+                                        .copyWith(),textAlign: TextAlign.center,)
+                                : CircularProgressIndicator(
+                                    backgroundColor: Colors.black,
+                                  ),
+                          ),
+                        ),
+
+                        // FlatButton(
+                        //   onPressed: () async {
+                        //     await savePatientAndGoToScreening();
+                        //   },
+                        //   color: Theme.of(context).accentColor,
+                        //   child: Text("START SCREENING",
+                        //       style: Theme.of(context).textTheme.caption),
+                        // ),
+                      ],
                     ),
                   ),
                 ),

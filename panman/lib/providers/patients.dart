@@ -85,6 +85,7 @@ class Patients with ChangeNotifier {
       patientSnapshot = await patientsCollection
           .where('hospitalID', isEqualTo: hospitalID)
           .getDocuments();
+      print("PatientSnapshot retreived");
       patientSnapshot.documents.forEach((patient) async {
         print(patient['firstName'] + patient['covidStatus']);
         fetchedPatientsList.add(Patient(
@@ -96,8 +97,7 @@ class Patients with ChangeNotifier {
           ),
           age: patient['age'],
           currentLocation: patient['locationInHospital'],
-          state: referenceCovid19SeverityLevelsList
-              .firstWhere((element) => element.abbrv == patient['covidStatus']),
+          covidStatusString:  patient['covidStatus'],
           fullAddress: FullAddress.fromMap(patient['fullAddress']),
           sex: patient['sex'] == "Male"
               ? Sex.Male
@@ -128,17 +128,17 @@ class Patients with ChangeNotifier {
           //     : patient['travelHistory'].map<TravelHistory>((travel) {
           //         return TravelHistory.fromMap(travel);
           //       }).toList(),
-          delhiDetails: patient['delhiDetails'] == null
-              ? dummyDetails
-              : DelhiSpecificDetails.fromMap(patient['delhiDetails']),
+          // delhiDetails: patient['delhiDetails'] == null
+          //     ? dummyDetails
+          //     : DelhiSpecificDetails.fromMap(patient['delhiDetails']),
           tests: patient['tests'] == null
               ? []
               : patient['tests'].map<Test>((testToBeAdded) {
                   return Test.fromMap(testToBeAdded);
                 }).toList(),
-          tracingDetail: patient['tracingDetail'] == null
+          tracingDetail: patient['contactTracing'] == null
               ? dummyContact
-              : contactTracing.fromMap(patient['tracingDetail']),
+              : contactTracing.fromMap(patient['contactTracing']),
         ));
       });
       isFetching = false;
@@ -214,8 +214,7 @@ class Patients with ChangeNotifier {
           LastName: patient['lastName'],
           age: patient['age'],
           currentLocation: patient['locationInHospital'],
-          state: referenceCovid19SeverityLevelsList
-              .firstWhere((element) => element.abbrv == patient['covidStatus']),
+          covidStatusString: patient['covidStatus'],
           fullAddress: FullAddress.fromMap(patient['fullAddress']),
           sex: patient['sex'] == "Male"
               ? Sex.Male
@@ -244,9 +243,9 @@ class Patients with ChangeNotifier {
           //     : patient['travelHistory'].map<TravelHistory>((travel) {
           //         return TravelHistory.fromMap(travel);
           //       }).toList(),
-          delhiDetails: patient['delhiDetails'] == null
-              ? dummyDetails
-              : DelhiSpecificDetails.fromMap(patient['delhiDetails']),
+          // delhiDetails: patient['delhiDetails'] == null
+          //     ? dummyDetails
+          //     : DelhiSpecificDetails.fromMap(patient['delhiDetails']),
           tests: patient['tests'] == null
               ? []
               : patient['tests'].map<Test>((testToBeAdded) {
@@ -306,12 +305,12 @@ class Patients with ChangeNotifier {
     notifyListeners();
   }
 
-  Future addContactTracking(contactTracing newTracing, int location) async {
+  
+  Future saveTracking(contactTracing newTracing) async {
     isUpdating = true;
     notifyListeners();
     try {
       selectedPatient.tracingDetail = newTracing;
-      selectedPatient.currentLocation = location;
       await updatePatientProfileInFirebase();
       notifyListeners();
     } catch (e) {
@@ -320,6 +319,21 @@ class Patients with ChangeNotifier {
     isUpdating = false;
     notifyListeners();
   }
+
+  // Future addContactTracking(contactTracing newTracing, int location) async {
+  //   isUpdating = true;
+  //   notifyListeners();
+  //   try {
+  //     selectedPatient.tracingDetail = newTracing;
+  //     selectedPatient.currentLocation = location;
+  //     await updatePatientProfileInFirebase();
+  //     notifyListeners();
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  //   isUpdating = false;
+  //   notifyListeners();
+  // }
 
   Future addVitalMeasurement(PatientVital vital) async {
     try {
@@ -353,11 +367,11 @@ class Patients with ChangeNotifier {
 
   getCovidvsNonCovidforDashboard() {
     var covidCount = fetchedPatientsList
-        .where((element) => !element.state.abbrv.contains("NP"))
+        .where((element) => !element.covidStatusString.contains("NP"))
         .length;
 
     var nonCovidCount = fetchedPatientsList
-        .where((element) => element.state.abbrv.contains("NP"))
+        .where((element) => element.covidStatusString.contains("NP"))
         .length;
 
     return ([covidCount, nonCovidCount]);
@@ -366,28 +380,28 @@ class Patients with ChangeNotifier {
   getCovid19SummaryForTheDashboard() {
     List covid19Summary;
     var AS1patientcount = fetchedPatientsList
-        .where((element) => element.state.abbrv == "AS-1")
+        .where((element) => element.covidStatusString == "AS-1")
         .length;
     var AS2patientcount = fetchedPatientsList
-        .where((element) => element.state.abbrv == "AS-2")
+        .where((element) => element.covidStatusString == "AS-2")
         .length;
     var S1patientcount = fetchedPatientsList
-        .where((element) => element.state.abbrv == "S-1")
+        .where((element) => element.covidStatusString == "S-1")
         .length;
     var S2patientcount = fetchedPatientsList
-        .where((element) => element.state.abbrv == "S-2")
+        .where((element) => element.covidStatusString == "S-2")
         .length;
     var S3patientcount = fetchedPatientsList
-        .where((element) => element.state.abbrv == "S-3")
+        .where((element) => element.covidStatusString == "S-3")
         .length;
     var S4patientcount = fetchedPatientsList
-        .where((element) => element.state.abbrv == "S-4")
+        .where((element) => element.covidStatusString == "S-4")
         .length;
     var S5patientcount = fetchedPatientsList
-        .where((element) => element.state.abbrv == "S-5")
+        .where((element) => element.covidStatusString == "S-5")
         .length;
     var S6patientcount = fetchedPatientsList
-        .where((element) => element.state.abbrv == "S-6")
+        .where((element) => element.covidStatusString == "S-6")
         .length;
 
     return ([
@@ -450,15 +464,14 @@ class Patients with ChangeNotifier {
     }
   }
 
-  Future<bool> changePatientState(int newStateIndex) async {
+  Future<bool> changePatientState(String newState) async {
     try {
-      c19 oldState = selectedPatient.state;
-      selectedPatient.state =
-          referenceCovid19SeverityLevelsList[newStateIndex + 2];
+      String oldState = selectedPatient.covidStatusString;
+      selectedPatient.covidStatusString =newState;
       await addEvent(
           eventType: "covid19_severity_change",
           eventTime: DateTime.now(),
-          eventData: "${oldState.abbrv}->${selectedPatient.state.abbrv}");
+          eventData: "${oldState}->${selectedPatient.covidStatusString}");
       await updatePatientProfileInFirebase();
 
       notifyListeners();

@@ -12,7 +12,6 @@ import 'package:random_string/random_string.dart';
 import 'dart:math' show Random;
 import 'package:string_validator/string_validator.dart';
 
-
 import '../providers/hospital.dart';
 
 import '../models/delhiSpecificDetails.dart';
@@ -1335,7 +1334,6 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
       markazRadioGroupValue = value;
     });
   }
-  
 
   isResidentRadioTapped(bool value) {
     setState(() {
@@ -1403,20 +1401,11 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
         id: newPatientID,
         idGivenByHospital: hospitalGivenID,
         currentLocation: 2,
-        delhiDetails: DelhiSpecificDetails(
-          fromMarkaz: markazRadioGroupValue,
-          district: selectedDistrict,
-          revenueDistrict: selectedRevenueDistrict,
-          isResidentOfDelhi: isResidentOfDelhi,
-          isHealthCareWorker: isHealthCareWorker,
-          fatherOrHusbandFirstName: fatherOrHusbandLastName,
-          fatherOrHusbandLastName: fatherOrHusbandLastName,
-        ),
+       
         hospitalID:
             Provider.of<Hospitals>(context, listen: false).fetchedHospital.id,
         sex: patientSexToBeSaved,
-        state: Provider.of<Covid19>(context, listen: false)
-            .referenceCovid19SeverityLevelsList[0],
+        covidStatusString: "NP-1",
         ventilatorUsed: false,
         events: [],
         vitals: [],
@@ -1440,8 +1429,6 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
     } catch (error) {}
   }
 
-  
-
   AddPatientAndScreen() async {
     print("AddPatientAndScreen called");
     patientAddress = FullAddress(
@@ -1460,20 +1447,11 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
         id: newPatientID,
         idGivenByHospital: hospitalGivenID,
         currentLocation: 2,
-        delhiDetails: DelhiSpecificDetails(
-          fromMarkaz: markazRadioGroupValue,
-          district: selectedDistrict,
-          revenueDistrict: selectedRevenueDistrict,
-          isResidentOfDelhi: isResidentOfDelhi,
-          isHealthCareWorker: isHealthCareWorker,
-          fatherOrHusbandFirstName: fatherOrHusbandLastName,
-          fatherOrHusbandLastName: fatherOrHusbandLastName,
-        ),
+       
         hospitalID:
             Provider.of<Hospitals>(context, listen: false).fetchedHospital.id,
         sex: patientSexToBeSaved,
-        state: Provider.of<Covid19>(context, listen: false)
-            .referenceCovid19SeverityLevelsList[0],
+        covidStatusString: "NP-1",
         ventilatorUsed: false,
         events: [],
         vitals: [],
@@ -1486,18 +1464,18 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
         // travelHistory: [],
         );
     try {
-      
       await Provider.of<Patients>(context, listen: false)
           .addPatient(patientToBeCrated);
 
-      await Provider.of<Patients>(context,listen:false).fetchPatientsListFromServer(
-        Provider.of<Hospitals>(context,listen:false).fetchedHospital.id
-      );
+      await Provider.of<Patients>(context, listen: false)
+          .fetchPatientsListFromServer(
+              Provider.of<Hospitals>(context, listen: false)
+                  .fetchedHospital
+                  .id);
 
-      
       await Provider.of<Patients>(context, listen: false)
           .selectPatient(patientToBeCrated.id);
-          
+
       await Provider.of<Hospitals>(context, listen: false)
           .addPatientToTheHospital();
 
@@ -1546,8 +1524,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
 
     if (formKey2.currentState.validate()) {
       formKey2.currentState.save();
-         await AddPatientAndScreen();
-
+      await AddPatientAndScreen();
 
       Navigator.of(context).push(MaterialPageRoute(
           builder: (BuildContext context) => PatientScreeningScreen()));
@@ -1694,86 +1671,54 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                     ],
                                   ),
                                 )),
+                            // SizedBox(
+                            //   height: 5,
+                            // ),
+                            // Padding(
+                            //   padding: const EdgeInsets.all(2.0),
+                            //   child: Row(
+                            //     mainAxisAlignment:
+                            //         MainAxisAlignment.spaceBetween,
+                            //     children: <Widget>[
+                            //       Container(
+                            //         width: 200,
+                            //         child: Text("Markaz",
+                            //             style: TextStyle(
+                            //                 fontSize: 15,
+                            //                 fontWeight: FontWeight.normal)),
+                            //       ),
+                            //       Row(
+                            //         children: <Widget>[
+                            //           Text("Yes"),
+                            //           Radio(
+                            //             value: true,
+                            //             groupValue: markazRadioGroupValue,
+                            //             onChanged: (value) =>
+                            //                 markazRadioTapped(value),
+                            //           ),
+                            //           SizedBox(width: 20),
+                            //           Text("No"),
+                            //           Radio(
+                            //             value: false,
+                            //             groupValue: markazRadioGroupValue,
+                            //             onChanged: (value) =>
+                            //                 markazRadioTapped(value),
+                            //           ),
+                            //         ],
+                            //       ),
+                            //     ],
+                            //   ),
+
+                            // ),
                             SizedBox(
                               height: 5,
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  Container(
-                                    width: 200,
-                                    child: Text("Markaz",
-                                        style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.normal)),
-                                  ),
-                                  Row(
-                                    children: <Widget>[
-                                      Text("Yes"),
-                                      Radio(
-                                        value: true,
-                                        groupValue: markazRadioGroupValue,
-                                        onChanged: (value) =>
-                                            markazRadioTapped(value),
-                                      ),
-                                      SizedBox(width: 20),
-                                      Text("No"),
-                                      Radio(
-                                        value: false,
-                                        groupValue: markazRadioGroupValue,
-                                        onChanged: (value) =>
-                                            markazRadioTapped(value),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              // child: TextFormField(
-                              //   onChanged: (value) {
-                              //     this.setState(() {
-                              //       markaz = value;
-                              //     });
-                              //   },
-                              //   style: TextStyle(
-                              //       fontSize: 15,
-                              //       fontWeight: FontWeight.normal),
-                              //   keyboardType: TextInputType.text,
-                              //   validator: (value) {
-                              //     if (value.isEmpty) {
-                              //       return 'Please enter some text';
-                              //     }
-                              //     return null;
-                              //   },
-                              //   //  style: Theme.of(context).textTheme.bodyText1,
-                              //   decoration: InputDecoration(
-                              //     labelText: "Markaz",
-                              //     // hintText: "Event",
-                              //     enabledBorder: OutlineInputBorder(
-                              //         borderSide:
-                              //             BorderSide(color: Colors.grey[300])),
-                              //     focusedBorder: OutlineInputBorder(
-                              //         borderSide:
-                              //             BorderSide(color: Colors.grey[300])),
-                              //   ),
-                              //   onSaved: (String value) {
-                              //     this.setState(() {
-                              //       markaz = value;
-                              //     });
-                              //   },
-                              // ),
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
+
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: TextFormField(
-                                
-                                onFieldSubmitted: (v){
-                                    FocusScope.of(context).nextFocus();
+                                onFieldSubmitted: (v) {
+                                  FocusScope.of(context).nextFocus();
                                 },
                                 textInputAction: TextInputAction.next,
                                 style: TextStyle(
@@ -1812,11 +1757,12 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             SizedBox(
                               height: 10,
                             ),
+
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: TextFormField(
-                                onFieldSubmitted: (v){
-                                    FocusScope.of(context).nextFocus();
+                                onFieldSubmitted: (v) {
+                                  FocusScope.of(context).nextFocus();
                                 },
                                 textInputAction: TextInputAction.next,
                                 autovalidate: true,
@@ -1832,8 +1778,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                 validator: (value) {
                                   if (value.isEmpty) {
                                     return 'Please enter some text';
-                                  }
-                                  else if (isAlpha(value)==false){
+                                  } else if (isAlpha(value) == false) {
                                     print("Here");
                                     return 'Names can contain only alphabets';
                                   }
@@ -1860,11 +1805,12 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             SizedBox(
                               height: 5,
                             ),
+
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: TextFormField(
-                                onFieldSubmitted: (v){
-                                    FocusScope.of(context).nextFocus();
+                                onFieldSubmitted: (v) {
+                                  FocusScope.of(context).nextFocus();
                                 },
                                 textInputAction: TextInputAction.next,
                                 autovalidate: true,
@@ -1880,8 +1826,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                 validator: (value) {
                                   if (value.isEmpty) {
                                     return 'Please enter some text';
-                                  }
-                                   else if (isAlpha(value)==false){
+                                  } else if (isAlpha(value) == false) {
                                     print("Here");
                                     return 'Names can contain only alphabets';
                                   }
@@ -1955,8 +1900,8 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             Padding(
                               padding: EdgeInsets.all(2),
                               child: TextFormField(
-                                onFieldSubmitted: (v){
-                                    FocusScope.of(context).nextFocus();
+                                onFieldSubmitted: (v) {
+                                  FocusScope.of(context).nextFocus();
                                 },
                                 textInputAction: TextInputAction.next,
                                 autovalidate: true,
@@ -1972,11 +1917,9 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                 validator: (value) {
                                   if (value.isEmpty) {
                                     return 'Please enter some text';
-                                  }
-                                   else if (isNumeric(value)==false){
+                                  } else if (isNumeric(value) == false) {
                                     return 'Age can only be a number';
-                                  }
-                                  else if(int.parse(value)>120){
+                                  } else if (int.parse(value) > 120) {
                                     return ('Please enter a valid age');
                                   }
                                   return null;
@@ -2005,8 +1948,8 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: TextFormField(
-                                onFieldSubmitted: (v){
-                                    FocusScope.of(context).nextFocus();
+                                onFieldSubmitted: (v) {
+                                  FocusScope.of(context).nextFocus();
                                 },
                                 textInputAction: TextInputAction.next,
                                 autovalidate: true,
@@ -2022,11 +1965,10 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                 validator: (value) {
                                   if (value.isEmpty) {
                                     return 'Please enter some text';
-                                  }
-                                  else if(value.length<7 || value.length>12){
+                                  } else if (value.length < 7 ||
+                                      value.length > 12) {
                                     return 'Phone Number is either too short or too long';
-                                  }
-                                  else if (isNumeric(value)==false){
+                                  } else if (isNumeric(value) == false) {
                                     return 'Phone Number only allows numbers';
                                   }
                                   return null;
@@ -2058,44 +2000,44 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                         color: Colors.black,
                                         fontWeight: FontWeight.bold)),
                             SizedBox(height: 20),
-                            Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: Container(
-                                  child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  Container(
-                                    width: 200,
-                                    child: Text(
-                                        "Is the patient a resident of Delhi?",
-                                        style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.normal)),
-                                  ),
-                                  SizedBox(width: 10),
-                                  Row(
-                                    children: <Widget>[
-                                      Text("Yes"),
-                                      Radio(
-                                        value: true,
-                                        groupValue: isResidentOfDelhi,
-                                        onChanged: (value) =>
-                                            isResidentRadioTapped(value),
-                                      ),
-                                      SizedBox(width: 20),
-                                      Text("No"),
-                                      Radio(
-                                        value: false,
-                                        groupValue: isResidentOfDelhi,
-                                        onChanged: (value) =>
-                                            isResidentRadioTapped(value),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              )),
-                            ),
+                            // Padding(
+                            //   padding: const EdgeInsets.all(2.0),
+                            //   child: Container(
+                            //       child: Row(
+                            //     mainAxisAlignment:
+                            //         MainAxisAlignment.spaceBetween,
+                            //     children: <Widget>[
+                            //       Container(
+                            //         width: 200,
+                            //         child: Text(
+                            //             "Is the patient a resident of Delhi?",
+                            //             style: TextStyle(
+                            //                 fontSize: 15,
+                            //                 fontWeight: FontWeight.normal)),
+                            //       ),
+                            //       SizedBox(width: 10),
+                            //       Row(
+                            //         children: <Widget>[
+                            //           Text("Yes"),
+                            //           Radio(
+                            //             value: true,
+                            //             groupValue: isResidentOfDelhi,
+                            //             onChanged: (value) =>
+                            //                 isResidentRadioTapped(value),
+                            //           ),
+                            //           SizedBox(width: 20),
+                            //           Text("No"),
+                            //           Radio(
+                            //             value: false,
+                            //             groupValue: isResidentOfDelhi,
+                            //             onChanged: (value) =>
+                            //                 isResidentRadioTapped(value),
+                            //           ),
+                            //         ],
+                            //       ),
+                            //     ],
+                            //   )),
+                            // ),
                             SizedBox(
                               height: 5,
                             ),
@@ -2105,8 +2047,8 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: TextFormField(
-                                onFieldSubmitted: (v){
-                                    FocusScope.of(context).nextFocus();
+                                onFieldSubmitted: (v) {
+                                  FocusScope.of(context).nextFocus();
                                 },
                                 textInputAction: TextInputAction.next,
                                 onChanged: (value) {
@@ -2153,10 +2095,10 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                   Flexible(
                                     flex: 6,
                                     child: TextFormField(
-                                      onFieldSubmitted: (v){
-                                    FocusScope.of(context).nextFocus();
-                                },
-                                textInputAction: TextInputAction.next,
+                                      onFieldSubmitted: (v) {
+                                        FocusScope.of(context).nextFocus();
+                                      },
+                                      textInputAction: TextInputAction.next,
                                       style: TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.normal),
@@ -2169,8 +2111,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                       validator: (value) {
                                         if (value.isEmpty) {
                                           return 'Please enter some text';
-                                        }
-                                        else if(isNumeric(value)==false){
+                                        } else if (isNumeric(value) == false) {
                                           return 'Pincode can only have numbers';
                                         }
                                         return null;
@@ -2210,37 +2151,37 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             SizedBox(
                               height: 5,
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: Row(
-                                children: <Widget>[
-                                  Container(
-                                    width: 200,
-                                    child: Text("Choose District",
-                                        style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.normal)),
-                                  ),
-                                  Container(
-                                      child: DropdownButton<String>(
-                                    value: selectedDistrict,
-                                    hint: Text("Select District"),
-                                    items:
-                                        delhiDistricts.map((String district) {
-                                      return new DropdownMenuItem<String>(
-                                        value: district,
-                                        child: new Text(district),
-                                      );
-                                    }).toList(),
-                                    onChanged: (String value) {
-                                      this.setState(() {
-                                        selectedDistrict = value;
-                                      });
-                                    },
-                                  )),
-                                ],
-                              ),
-                            ),
+                            // Padding(
+                            //   padding: const EdgeInsets.all(2.0),
+                            //   child: Row(
+                            //     children: <Widget>[
+                            //       Container(
+                            //         width: 200,
+                            //         child: Text("Choose District",
+                            //             style: TextStyle(
+                            //                 fontSize: 15,
+                            //                 fontWeight: FontWeight.normal)),
+                            //       ),
+                            //       Container(
+                            //           child: DropdownButton<String>(
+                            //         value: selectedDistrict,
+                            //         hint: Text("Select District"),
+                            //         items:
+                            //             delhiDistricts.map((String district) {
+                            //           return new DropdownMenuItem<String>(
+                            //             value: district,
+                            //             child: new Text(district),
+                            //           );
+                            //         }).toList(),
+                            //         onChanged: (String value) {
+                            //           this.setState(() {
+                            //             selectedDistrict = value;
+                            //           });
+                            //         },
+                            //       )),
+                            //     ],
+                            //   ),
+                            // ),
                             // SizedBox(
                             //   height: 5,
                             // ),
@@ -2282,8 +2223,8 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: TextFormField(
-                                onFieldSubmitted: (v){
-                                    FocusScope.of(context).nextFocus();
+                                onFieldSubmitted: (v) {
+                                  FocusScope.of(context).nextFocus();
                                 },
                                 textInputAction: TextInputAction.next,
                                 onChanged: (value) {
@@ -2294,7 +2235,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                 style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.normal),
-                                initialValue: "Delhi",
+                                // initialValue: "Delhi",
                                 keyboardType: TextInputType.text,
                                 validator: (value) {
                                   if (value.isEmpty) {
@@ -2326,8 +2267,8 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: TextFormField(
-                                onFieldSubmitted: (v){
-                                    FocusScope.of(context).nextFocus();
+                                onFieldSubmitted: (v) {
+                                  FocusScope.of(context).nextFocus();
                                 },
                                 textInputAction: TextInputAction.next,
                                 onChanged: (value) {
@@ -2338,7 +2279,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                 style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.normal),
-                                initialValue: "Delhi",
+                                //    initialValue: "Delhi",
                                 keyboardType: TextInputType.text,
                                 validator: (value) {
                                   if (value.isEmpty) {
@@ -2370,8 +2311,8 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: TextFormField(
-                                onFieldSubmitted: (v){
-                                    FocusScope.of(context).nextFocus();
+                                onFieldSubmitted: (v) {
+                                  FocusScope.of(context).nextFocus();
                                 },
                                 textInputAction: TextInputAction.next,
                                 onChanged: (value) {
@@ -2458,8 +2399,8 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: TextFormField(
-                                onFieldSubmitted: (v){
-                                    FocusScope.of(context).nextFocus();
+                                onFieldSubmitted: (v) {
+                                  FocusScope.of(context).nextFocus();
                                 },
                                 textInputAction: TextInputAction.next,
                                 autovalidate: true,
@@ -2475,8 +2416,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                 validator: (value) {
                                   if (value.isEmpty) {
                                     return 'Please enter some text';
-                                  }
-                                  else if (isAlpha(value)==false){
+                                  } else if (isAlpha(value) == false) {
                                     return 'Names can only have alphabets in them';
                                   }
                                   return null;
@@ -2505,8 +2445,8 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: TextFormField(
-                                onFieldSubmitted: (v){
-                                    FocusScope.of(context).nextFocus();
+                                onFieldSubmitted: (v) {
+                                  FocusScope.of(context).nextFocus();
                                 },
                                 textInputAction: TextInputAction.next,
                                 autovalidate: true,
@@ -2522,8 +2462,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                 validator: (value) {
                                   if (value.isEmpty) {
                                     return 'Please enter some text';
-                                  }
-                                   else if (isAlpha(value)==false){
+                                  } else if (isAlpha(value) == false) {
                                     return 'Names can only have alphabets in them';
                                   }
                                   return null;
@@ -2552,8 +2491,8 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                             Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: TextFormField(
-                                onFieldSubmitted: (v){
-                                    FocusScope.of(context).nextFocus();
+                                onFieldSubmitted: (v) {
+                                  FocusScope.of(context).nextFocus();
                                 },
                                 textInputAction: TextInputAction.next,
                                 autovalidate: true,
@@ -2569,8 +2508,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                                 validator: (value) {
                                   if (value.isEmpty) {
                                     return 'Please enter some text';
-                                  }
-                                   else if (isNumeric(value)==false){
+                                  } else if (isNumeric(value) == false) {
                                     return 'Phone Numbers can only have numbers in them';
                                   }
                                   return null;

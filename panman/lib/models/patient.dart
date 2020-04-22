@@ -23,12 +23,12 @@ class Patient {
   FullAddress fullAddress;
   String hospitalID;
   String phoneNumber;
-  c19 state;
+  String covidStatusString;
   int currentLocation;
   bool ventilatorUsed;
   List<event> events;
   List<PatientVital> vitals;
-  DelhiSpecificDetails delhiDetails;
+  // DelhiSpecificDetails delhiDetails;
   File pic;
   List<Test> tests;
   Screening screeningResult;
@@ -48,12 +48,12 @@ class Patient {
     this.idGivenByHospital,
     this.fullAddress,
     this.phoneNumber,
-    this.state,
+    this.covidStatusString,
     this.currentLocation,
     this.ventilatorUsed,
     this.events,
     this.vitals,
-    this.delhiDetails,
+    // this.delhiDetails,
     this.pic,
     this.tests,
     this.screeningResult,
@@ -84,13 +84,13 @@ class Patient {
       'locationInHospital': this.currentLocation,
       'hospitalID': this.hospitalID,
       'phoneNumber': this.phoneNumber,
-      'covidStatus': this.state.abbrv,
+      'covidStatus': covidStatusString,
       'fullAddress': fullAddress != null ? fullAddress.toMap() : "",
       'firstName': Firstname,
       'lastName': LastName,
       'events': mapifyList(events),
       'vitals': mapifyList(vitals),
-      'delhiDetails': delhiDetails != null ? delhiDetails.toMap() : "",
+      // 'delhiDetails': delhiDetails != null ? delhiDetails.toMap() : "",
       'tests': mapifyList(tests),
       'contactTracing': tracingDetail != null ? tracingDetail.toMap() : "",
       'screeningResult': screeningResult != null ? screeningResult.toMap() : "",

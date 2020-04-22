@@ -40,6 +40,8 @@ class Covid19 with ChangeNotifier {
         ));
       });
 
+      referenceCovid19SeverityLevelsList.sort((a,b)=>a.index.compareTo(b.index));
+
 
       notifyListeners();
     } catch (e) {

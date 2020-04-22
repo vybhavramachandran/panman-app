@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:panman/screens/patient_contact_tracing.dart';
+import 'package:panman/screens/patient_detail_screen_screening.dart';
 import 'package:panman/screens/patient_screening.dart';
 import 'package:provider/provider.dart';
 
@@ -36,6 +37,16 @@ class PatientSummaryWidget extends StatelessWidget {
             return Navigator.pushNamed(
               context,
               PatientScreeningScreen.routeName,
+            );
+          }
+          else if (Provider.of<Patients>(context, listen: false)
+                  .selectedPatient
+                  .currentLocation ==
+              3) {
+            return Navigator.pushNamed(
+              context,
+              PatientScreeningDetailedScreen.routeName,
+              arguments: PatientDetailArguments(patient),
             );
           }
           return Navigator.pushNamed(context, PatientDetailScreen.routeName,
@@ -86,7 +97,9 @@ class PatientSummaryWidget extends StatelessWidget {
                             ),
                             patient.sex == Sex.Male
                                 ? Text("MALE")
-                                : patient.sex==Sex.Female?Text("FEMALE"):Text("OTHER"),
+                                : patient.sex == Sex.Female
+                                    ? Text("FEMALE")
+                                    : Text("OTHER"),
                           ],
                         ),
                         SizedBox(
@@ -129,12 +142,24 @@ class PatientSummaryWidget extends StatelessWidget {
                 ),
                 patient.currentLocation > 3
                     ? C19StateBox(
-                        patientState: patient.state,
+                        patientState: patient.covidStatusString,
                       )
                     : Container(),
-                FaIcon(
-                  FontAwesomeIcons.arrowRight,
-                  size: 20,
+                Row(
+                  children: <Widget>[
+                    patient.currentLocation==2?Container(
+                      width: 80,
+                      child: Text(
+                        "Start Screening",
+                        style: Theme.of(context).textTheme.bodyText2.copyWith(color:Theme.of(context).accentColor),
+                        textAlign: TextAlign.center,
+                      ),
+                    ):Container(),
+                    FaIcon(
+                      FontAwesomeIcons.arrowRight,
+                      size: 20,
+                    ),
+                  ],
                 ),
               ],
             ),
