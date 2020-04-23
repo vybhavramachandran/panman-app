@@ -966,7 +966,7 @@ class _PatientVitalsAddScreenState extends State<PatientVitalsAddScreen> {
       padding: const EdgeInsets.only(top: 20, bottom: 20, left: 5),
       child: Column(
         children: <Widget>[
-          SizedBox(height:40),
+          name=="Record Event"?SizedBox(height:5):SizedBox(height:30),
           Text(
             name,
             style: Theme.of(context)
