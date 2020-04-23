@@ -18,11 +18,11 @@ import '../providers/patients.dart';
 class PatientDoctorNotesScreen extends StatefulWidget {
   static const routeName = '/patient_doctor_notes_screen';
   @override
-  _PatientDoctorNotesScreenState createState() => _PatientDoctorNotesScreenState();
+  _PatientDoctorNotesScreenState createState() =>
+      _PatientDoctorNotesScreenState();
 }
 
 class _PatientDoctorNotesScreenState extends State<PatientDoctorNotesScreen> {
-  
   Widget getNoteCard(PatientNote noteToDisplay) {
     var mappedNote = noteToDisplay.toMap();
     return Container(
@@ -45,6 +45,8 @@ class _PatientDoctorNotesScreenState extends State<PatientDoctorNotesScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: mappedNote.entries.map((e) {
+                  var fetchedKey = noteToDisplay.getDisplayName(e.key);
+
                   if (e.key == 'id' || e.key == 'timestamp') {
                     return Container();
                   } else {
@@ -62,9 +64,9 @@ class _PatientDoctorNotesScreenState extends State<PatientDoctorNotesScreen> {
                             .copyWith(color: Theme.of(context).accentColor),
                       );
                       return Text(
-                          "${e.key.toUpperCase()} : ${e.value.toString().split(",")[0].split(":")[1]}");
+                          "$fetchedKey : ${e.value.toString().split(",")[0].split(":")[1]}");
                     } else
-                      return Text("${e.key.toUpperCase()} : ${e.value}");
+                      return Text("$fetchedKey : ${e.value}");
                   }
                 }).toList(),
               ),
@@ -77,8 +79,6 @@ class _PatientDoctorNotesScreenState extends State<PatientDoctorNotesScreen> {
 
   @override
   Widget build(BuildContext context) {
-   
-
     return SafeArea(
         child: Scaffold(
       appBar: PreferredSize(

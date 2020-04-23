@@ -155,9 +155,7 @@ class MyApp extends StatelessWidget {
                                 fontSize: 20, fontWeight: FontWeight.bold),
                           )),
                       home: FutureBuilder<FirebaseUser>(
-                          future: auth.loggedinUser == null
-                              ? auth.tryAutoLogin()
-                              : null,
+                          future:  auth.tryAutoLogin(),
                           builder: (ctx,
                               AsyncSnapshot<FirebaseUser> authResultSnapshot) {
                             print("Builder called $authResultSnapshot");
@@ -172,7 +170,8 @@ class MyApp extends StatelessWidget {
                             }
                           }),
                       routes: {
-                        PatientDoctorNotesAddScreen.routeName:(ctx)=>PatientDoctorNotesAddScreen(),
+                        PatientDoctorNotesAddScreen.routeName: (ctx) =>
+                            PatientDoctorNotesAddScreen(),
                         PatientDoctorNotesScreen.routeName: (ctx) =>
                             PatientDoctorNotesScreen(),
                         EditPatientScreeningScreen.routeName: (ctx) =>

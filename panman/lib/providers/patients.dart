@@ -274,11 +274,15 @@ class Patients with ChangeNotifier {
     }
   }
 
-  Future editScrening(Screening screeningVal) async {
+  Future editScreening(Screening screeningVal) async {
     isAddingPatient = true;
     notifyListeners();
     try {
       selectedPatient.screeningResult = screeningVal;
+           await addEvent(
+            eventType: "screening_done",
+            eventTime: DateTime.now(),
+            eventData: "screening_done");
       await updatePatientProfileInFirebase();
       notifyListeners();
     } catch (e) {
@@ -294,6 +298,10 @@ class Patients with ChangeNotifier {
     try {
       selectedPatient.screeningResult = screeningVal;
       selectedPatient.currentLocation = location;
+      await addEvent(
+            eventType: "screening_done",
+            eventTime: DateTime.now(),
+            eventData: "screening_done");
       await updatePatientProfileInFirebase();
       notifyListeners();
     } catch (e) {
@@ -308,6 +316,10 @@ class Patients with ChangeNotifier {
     notifyListeners();
     try {
       selectedPatient.tracingDetail = newTracing;
+      await addEvent(
+            eventType: "contact_tracing_done",
+            eventTime: DateTime.now(),
+            eventData: "contact_tracing_done");
       await updatePatientProfileInFirebase();
       notifyListeners();
     } catch (e) {
@@ -349,6 +361,10 @@ class Patients with ChangeNotifier {
   Future addVitalMeasurement(PatientVital vital) async {
     try {
       selectedPatient.vitals.add(vital);
+        await addEvent(
+            eventType: "vital_recorded",
+            eventTime: vital.timestamp,
+            eventData: "${vital.id},${vital.timestamp.toString()}");
       await updatePatientProfileInFirebase();
       notifyListeners();
     } catch (e) {
@@ -359,6 +375,10 @@ class Patients with ChangeNotifier {
   Future addDoctorNote(PatientNote note) async {
     try {
       selectedPatient.notes.add(note);
+        await addEvent(
+            eventType: "doctor_note_recorded",
+            eventTime: note.timestamp,
+            eventData: "${note.id},${note.timestamp.toString()}");
       await updatePatientProfileInFirebase();
       notifyListeners();
     } catch (e) {
@@ -626,6 +646,10 @@ class Patients with ChangeNotifier {
 
     try {
       selectedPatient.tests.add(testToAdd);
+      await addEvent(
+            eventType: "patient_tested",
+            eventTime: testToAdd.resultDate,
+            eventData: "@${testToAdd.testCenterName}:${testToAdd.result}");
       await updatePatientProfileInFirebase();
       notifyListeners();
       return true;

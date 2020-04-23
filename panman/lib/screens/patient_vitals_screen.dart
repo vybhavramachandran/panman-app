@@ -43,6 +43,8 @@ class _PatientVitalsScreenState extends State<PatientVitalsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: mappedVital.entries.map((e) {
+                  var fetchedKey = vitalToDisplay.getDisplayName(e.key);
+
                   if (e.key == 'id' || e.key == 'timestamp') {
                     return Container();
                   } else {
@@ -60,9 +62,9 @@ class _PatientVitalsScreenState extends State<PatientVitalsScreen> {
                             .copyWith(color: Theme.of(context).accentColor),
                       );
                       return Text(
-                          "${e.key.toUpperCase()} : ${e.value.toString().split(",")[0].split(":")[1]}");
+                          "$fetchedKey : ${e.value.toString().split(",")[0].split(":")[1]}");
                     } else
-                      return Text("${e.key.toUpperCase()} : ${e.value}");
+                      return Text("$fetchedKey : ${e.value}");
                   }
                 }).toList(),
               ),
@@ -75,8 +77,6 @@ class _PatientVitalsScreenState extends State<PatientVitalsScreen> {
 
   @override
   Widget build(BuildContext context) {
-   
-
     return SafeArea(
         child: Scaffold(
       appBar: PreferredSize(

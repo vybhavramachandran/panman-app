@@ -80,7 +80,7 @@ class _EditPatientScreeningScreenState extends State<EditPatientScreeningScreen>
     print("saveScreeningCalled called");
 
     await Provider.of<Patients>(context, listen: false)
-        .editScrening(screeningResult);
+        .editScreening(screeningResult);
     Navigator.of(context).pop();
   }
 

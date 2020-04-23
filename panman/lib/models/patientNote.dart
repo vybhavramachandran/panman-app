@@ -9,8 +9,6 @@ import './patient_vitals/oxygenDelivery.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-
-
 class PatientNote {
   String id;
   DateTime timestamp;
@@ -53,6 +51,96 @@ class PatientNote {
     this.resp,
     this.timestamp,
   });
+
+  getDisplayName(String key) {
+    switch (key) {
+      case 'premorbids':
+        {
+          return 'Pre Morbidities';
+        }
+        break;
+      case 'abdomen':
+        {
+          return 'Abdomen';
+        }
+        break;
+      case 'admittedWith':
+        {
+          return 'Admitted With';
+        }
+        break;
+      case 'cns':
+        {
+          return 'CNS';
+        }
+        break;
+      case 'cvs':
+        {
+          return 'CVS';
+        }
+        break;
+      case 'resp':
+        {
+          return 'Respiration';
+        }
+        break;
+      case 'renal':
+        {
+          return 'Renal';
+        }
+        break;
+      case 'hematology':
+        {
+          return 'Hematology';
+        }
+        break;
+      case 'idtext':
+        {
+          return 'ID';
+        }
+        break;
+      case 'lines':
+        {
+          return 'Lines';
+        }
+        break;
+      case 'complications':
+        {
+          return 'Complications if any';
+        }
+        break;
+      case 'examination':
+        {
+          return 'Orthopedic/ ENT/ Ophthal/ Dermat/ Regional examination issue if any';
+        }
+        break;
+      case 'impression':
+        {
+          return 'Impression';
+        }
+        break;
+      case 'diagnosis':
+        {
+          return 'Diagnosis';
+        }
+        break;
+      case 'issues':
+        {
+          return 'Issues';
+        }
+        break;
+      case 'family':
+        {
+          return 'Family';
+        }
+        break;
+      case 'plan':
+        {
+          return 'Plan';
+        }
+        break;
+    }
+  }
 
   PatientNote.fromMap(Map data)
       : this(

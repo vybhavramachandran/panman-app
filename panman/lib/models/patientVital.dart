@@ -105,8 +105,10 @@ class PatientVital {
           etc02: data['etc02'],
           event: data['event'],
           fi02: data['fi02'] != "" ? Fi02.fromMap(data['fi02']) : null,
-          oxygenPerMin : data['oxygenPerMin'],
-          oxygenDeliverySelection : data['oxygenDeliverySelection']!=""? OxygenDelivery.fromMap(data['oxygenDeliverySelection']):null,
+          oxygenPerMin: data['oxygenPerMin'],
+          oxygenDeliverySelection: data['oxygenDeliverySelection'] != ""
+              ? OxygenDelivery.fromMap(data['oxygenDeliverySelection'])
+              : null,
           fi02ventilator: data['fi02ventilator'] != ""
               ? Fi02.fromMap(data['fi02ventilator'])
               : null,
@@ -119,14 +121,18 @@ class PatientVital {
           grbs: data['grbs'],
           hr: data['hr'],
           left_pupil: data['left_pupil'],
-          mode: data['mode']!=""?Mode.fromMap(data['mode']):null,
+          mode: data['mode'] != "" ? Mode.fromMap(data['mode']) : null,
           peep: data['peep'],
           peepepap: data['peepepap'],
-          periphery: data['periphery']!=""?Periphery.fromMap(data['periphery']):null,
-          position: data['position']!=""?Position.fromMap(data['position']):null,
+          periphery: data['periphery'] != ""
+              ? Periphery.fromMap(data['periphery'])
+              : null,
+          position: data['position'] != ""
+              ? Position.fromMap(data['position'])
+              : null,
           ppeak: data['ppeak'],
           psipap: data['psipap'],
-          rhythm: data['rhythm']!=""?Rhythm.fromMap(data['rhythm']):null,
+          rhythm: data['rhythm'] != "" ? Rhythm.fromMap(data['rhythm']) : null,
           right_pupil: data['right_pupil'],
           rr: data['rr'],
           rrsetactual: data['rrsetactual'],
@@ -142,6 +148,195 @@ class PatientVital {
           tve: data['tve'],
           urineOutput: data['urineOutput'],
         );
+  getDisplayName(String key) {
+    switch (key) {
+      case 'event':
+        {
+          return 'Recorded Event';
+        }
+        break;
+      case 'gcs_e':
+        {
+          return 'GCS-E';
+        }
+        break;
+      case 'gcs_v':
+        {
+          return 'GCS-V';
+        }
+        break;
+      case 'gcs_m':
+        {
+          return 'GCS-M';
+        }
+        break;
+      case 'left_pupil':
+        {
+          return 'Left Pupil';
+        }
+        break;
+      case 'right_pupil':
+        {
+          return 'Right Pupil';
+        }
+        break;
+      case 'consciousness':
+        {
+          return 'Consciousness';
+        }
+        break;
+      case 'rhythm':
+        {
+          return 'Rhythm';
+        }
+        break;
+      case 'hr':
+        {
+          return 'HR';
+        }
+        break;
+      case 'sbp':
+        {
+          return 'SBP';
+        }
+        break;
+      case 'dbp':
+        {
+          return 'DBP';
+        }
+        break;
+      case 'periphery':
+        {
+          return 'Periphery';
+        }
+        break;
+      case 'rr':
+        {
+          return 'RR';
+        }
+        break;
+      case 'sp02':
+        {
+          return 'SP02';
+        }
+        break;
+      case 'fi02':
+        {
+          return 'FI02';
+        }
+        break;
+      case 'oxygenPerMin':
+        {
+          return 'Oxygen Flow Per Minute';
+        }
+        break;
+      case 'oxygenDeliverySelection':
+        {
+          return 'Oxygen Delivery Device';
+        }
+        break;
+      case 'sputum_white':
+        {
+          return 'Sputum Quantity - White Color';
+        }
+        break;
+      case 'sputum_yellow':
+        {
+          return 'Sputum Quantity - Yellow Color';
+        }
+        break;
+      case 'sputum_red':
+        {
+          return 'Sputum Quantity - Red Color';
+        }
+        break;
+      case 'sputum_green':
+        {
+          return 'Sputum Quantity - Green Color';
+        }
+        break;
+      case 'sputum_other':
+        {
+          return 'Sputum Quantity - Other Colors';
+        }
+        break;
+      case 'etc02':
+        {
+          return 'EtCO2';
+        }
+        break;
+      case 'temperature':
+        {
+          return 'Temperature';
+        }
+        break;
+      case 'grbs':
+        {
+          return 'GRBS';
+        }
+        break;
+      case 'urineOutput':
+        {
+          return 'Urine Output';
+        }
+        break;
+      case 'position':
+        {
+          return 'Position';
+        }
+        break;
+      case 'rrsetactual':
+        {
+          return 'RR Set/Actual';
+        }
+        break;
+      case 'mode':
+        {
+          return 'Mode';
+        }
+        break;
+      case 'peep':
+        {
+          return 'Peep';
+        }
+        break;
+      case 'tve':
+        {
+          return 'TVe';
+        }
+        break;
+      case 'ppeak':
+        {
+          return 'P Peak';
+        }
+        break;
+      case 'fi02ventilator':
+        {
+          return 'Fi02 - Ventilator';
+        }
+        break;
+      case 'flowrate':
+        {
+          return 'Flow Rate';
+        }
+        break;
+      case 'peepepap':
+        {
+          return 'PEEP/EPAP';
+        }
+        break;
+      case 'psipap':
+        {
+          return 'PS/IPAP';
+        }
+        break;
+      case 'tv':
+        {
+          return 'TV';
+        }
+        break;
+    }
+  }
 
   Map<String, dynamic> toMap() {
     return {
@@ -153,8 +348,10 @@ class PatientVital {
       'etc02': etc02 != null ? etc02 : "",
       'event': event != null ? event : "",
       'fi02': fi02 != null ? fi02.toMap() : "",
-      'oxygenPerMin' : oxygenPerMin!=null?oxygenPerMin :"",
-      'oxygenDeliverySelection': oxygenDeliverySelection!=null?oxygenDeliverySelection.toMap():"",
+      'oxygenPerMin': oxygenPerMin != null ? oxygenPerMin : "",
+      'oxygenDeliverySelection': oxygenDeliverySelection != null
+          ? oxygenDeliverySelection.toMap()
+          : "",
       'fi02ventilator': fi02ventilator != null ? fi02ventilator.toMap() : "",
       'flowrate': flowrate != null ? flowrate.toMap() : "",
       'gcs_e': gcs_e != null ? gcs_e : "",

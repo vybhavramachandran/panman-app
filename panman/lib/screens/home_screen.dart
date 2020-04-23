@@ -191,8 +191,6 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (error) {}
   }
 
- 
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -200,168 +198,195 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (ctx, snapshot) {
           if (snapshot.connectionState != ConnectionState.done ||
               snapshot.hasError) {
-            return Center(
-                child: CircularProgressIndicator(
-              backgroundColor: Colors.white,
-            ));
+            return Scaffold(
+                          body: Center(
+                  child: CircularProgressIndicator(
+                backgroundColor: Colors.white,
+              )),
+            );
           } else if (snapshot.connectionState == ConnectionState.done ||
               snapshot.hasData) {
-            return DefaultTabController(
-              length: 2,
-              child: Scaffold(
-                drawer: SafeArea(
-                  child: Drawer(
-                    // Add a ListView to the drawer. This ensures the user can scroll
-                    // through the options in the drawer if there isn't enough vertical
-                    // space to fit everything.
-                    child: ListView(
-                      // Important: Remove any padding from the ListView.
-                      padding: EdgeInsets.zero,
-                      children: <Widget>[
-                        DrawerHeader(
-                          child: Text(
-                            'Menu',
-                            style: Theme.of(context).textTheme.headline5,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).accentColor,
-                          ),
-                        ),
-                        ListTile(
-                          title: Text('Dashboards'),
-                          onTap: () {
-                            // Update the state of the app
-                            // ...
-                            // Then close the drawer
-                            Navigator.pop(context);
-                            return Navigator.popAndPushNamed(
-                              context,
-                              DashboardScreen.routeName,
-                            );
-                          },
-                        ),
-                        ListTile(
-                          title: Text('Treatment'),
-                          onTap: () {
-                            // Update the state of the app
-                            // ...
-                            // Then close the drawer
-                            Navigator.pop(context);
-                            return Navigator.popAndPushNamed(
-                              context,
-                              HomeScreen.routeName,
-                            );
-                          },
-                        ),
-                        ListTile(
-                          title: Text(
-                            'Logout',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyText1
-                                .copyWith(color: Colors.red),
-                          ),
-                          onTap: () {
-                            // Update the state of the app
-                            // ...
-                            // Then close the drawer
-                            Provider.of<HealthCareWorkers>(context,
-                                    listen: false)
-                                .logoutHCW();
-                            Provider.of<Auth>(context, listen: false).logout();
-                          },
-                        ),
-                      ],
+            return Scaffold(
+              // drawer: SafeArea(
+              //   child: Drawer(
+              //     // Add a ListView to the drawer. This ensures the user can scroll
+              //     // through the options in the drawer if there isn't enough vertical
+              //     // space to fit everything.
+              //     child: ListView(
+              //       // Important: Remove any padding from the ListView.
+              //       padding: EdgeInsets.zero,
+              //       children: <Widget>[
+              //         DrawerHeader(
+              //           child: Text(
+              //             'Menu',
+              //             style: Theme.of(context).textTheme.headline5,
+              //           ),
+              //           decoration: BoxDecoration(
+              //             color: Theme.of(context).accentColor,
+              //           ),
+              //         ),
+              //         ListTile(
+              //           title: Text('Dashboards'),
+              //           onTap: () {
+              //             // Update the state of the app
+              //             // ...
+              //             // Then close the drawer
+              //             Navigator.pop(context);
+              //             return Navigator.popAndPushNamed(
+              //               context,
+              //               DashboardScreen.routeName,
+              //             );
+              //           },
+              //         ),
+              //         ListTile(
+              //           title: Text('Treatment'),
+              //           onTap: () {
+              //             // Update the state of the app
+              //             // ...
+              //             // Then close the drawer
+              //             Navigator.pop(context);
+              //             return Navigator.popAndPushNamed(
+              //               context,
+              //               HomeScreen.routeName,
+              //             );
+              //           },
+              //         ),
+              //         ListTile(
+              //           title: Text(
+              //             'Logout',
+              //             style: Theme.of(context)
+              //                 .textTheme
+              //                 .bodyText1
+              //                 .copyWith(color: Colors.red),
+              //           ),
+              //           onTap: () {
+              //             // Update the state of the app
+              //             // ...
+              //             // Then close the drawer
+              // Provider.of<HealthCareWorkers>(context,
+              //         listen: false)
+              //     .logoutHCW();
+              // Provider.of<Auth>(context, listen: false).logout();
+              //           },
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              // ),
+              floatingActionButton: FloatingActionButton.extended(
+                backgroundColor: Theme.of(context).accentColor,
+                icon: Icon(Icons.add),
+                label: Text("Add Patient"),
+                onPressed: () async {
+                  Navigator.of(context)
+                      .pushNamed('/patient_registration_screen');
+                  // setState(() {
+                  //   newPatientID = randomAlphaNumeric(10);
+                  // });
+                  // //  _showDialog();
+                  // await showDialog(
+                  //     context: context,
+                  //     child: new MyDialog(
+                  //       patientID: newPatientID,
+                  //       addHospitalGivenID: enterHospitalGivenID,
+                  //       ageChanged: enterAge,
+                  //       firstNameChanged: enterFirstName,
+                  //       lastNameChanged: enterLastName,
+                  //       sexChanged: enterSex,
+                  //       addressChanged: enterAddress,
+                  //       zipCodeChanged: enterZipCode,
+                  //       cityChanged: enterCity,
+                  //       stateChanged: enterState,
+                  //       countryChanged: enterCountry,
+                  //       phoneNumberChanged: enterPhoneNumber,
+                  //       addPatient: AddPatient,
+                  //     )).then((value) {
+                  //   print("Popped with $value");
+                  //   return setState(() {});
+                  // });
+                },
+              ),
+
+              appBar: PreferredSize(
+                preferredSize: Size.fromHeight(100),
+                child: AppBar(
+                  backgroundColor: Theme.of(context).accentColor,
+                  actions: <Widget>[
+                    // action button
+                    IconButton(
+                      icon: FaIcon(
+                        FontAwesomeIcons.signOutAlt,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        Provider.of<HealthCareWorkers>(context, listen: false)
+                            .logoutHCW();
+                        Provider.of<Auth>(context, listen: false).logout();
+                      },
                     ),
-                  ),
-                ),
-                floatingActionButton: FloatingActionButton.extended(
-                  backgroundColor: Theme.of(context).accentColor,
-                  icon: Icon(Icons.add),
-                  label: Text("Add Patient"),
-                  onPressed: () async {
-                    Navigator.of(context)
-                        .pushNamed('/patient_registration_screen');
-                    // setState(() {
-                    //   newPatientID = randomAlphaNumeric(10);
-                    // });
-                    // //  _showDialog();
-                    // await showDialog(
-                    //     context: context,
-                    //     child: new MyDialog(
-                    //       patientID: newPatientID,
-                    //       addHospitalGivenID: enterHospitalGivenID,
-                    //       ageChanged: enterAge,
-                    //       firstNameChanged: enterFirstName,
-                    //       lastNameChanged: enterLastName,
-                    //       sexChanged: enterSex,
-                    //       addressChanged: enterAddress,
-                    //       zipCodeChanged: enterZipCode,
-                    //       cityChanged: enterCity,
-                    //       stateChanged: enterState,
-                    //       countryChanged: enterCountry,
-                    //       phoneNumberChanged: enterPhoneNumber,
-                    //       addPatient: AddPatient,
-                    //     )).then((value) {
-                    //   print("Popped with $value");
-                    //   return setState(() {});
-                    // });
-                  },
-                ),
-                appBar: AppBar(
-                  backgroundColor: Theme.of(context).accentColor,
-                  title: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      SizedBox(
-                        width: 200.0,
-                        child: FittedBox(
-                          child: Text(
-                              Provider.of<Hospitals>(context, listen: true)
-                                  .fetchedHospital
-                                  .hospitalName,
-                              style: Theme.of(context).textTheme.headline6),
-                          fit: BoxFit.scaleDown,
+                  ],
+                  flexibleSpace: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 16),
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Container(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            SizedBox(
+                              width: 200.0,
+                              child: FittedBox(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  Provider.of<Hospitals>(context, listen: true)
+                                      .fetchedHospital
+                                      .hospitalName,
+                                  style: Theme.of(context).textTheme.headline6,
+                                  textAlign: TextAlign.left,
+                                ),
+                                fit: BoxFit.scaleDown,
+                              ),
+                            ),
+                            Row(
+                              children: <Widget>[
+                                FaIcon(
+                                  FontAwesomeIcons.userMd,
+                                  color: Colors.white,
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Text(
+                                    Provider.of<HealthCareWorkers>(context,
+                                            listen: true)
+                                        .hcwloggedin
+                                        .firstName,
+                                    style:
+                                        Theme.of(context).textTheme.headline6),
+                              ],
+                            )
+                          ],
                         ),
                       ),
-                      Row(
-                        children: <Widget>[
-                          FaIcon(
-                            FontAwesomeIcons.userMd,
-                            color: Colors.white,
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text(
-                              Provider.of<HealthCareWorkers>(context,
-                                      listen: true)
-                                  .hcwloggedin
-                                  .firstName,
-                              style: Theme.of(context).textTheme.headline6),
-                        ],
-                      )
-                    ],
-                  ),
-                  bottom: TabBar(
-                    labelStyle: Theme.of(context).textTheme.caption,
-                    labelColor: Colors.white,
-                    //  isScrollable: true,
-                    tabs: <Widget>[
-                      Tab(text: "PATIENTS"),
-                      Tab(text: "MEDICAL SUPPLIES"),
-                    ],
-                  ),
-                ),
-                body: TabBarView(
-                  children: <Widget>[
-                    HomePagePatientsWidget(
-                      triggerRefreshOfPatientList: triggerRefreshOfPatientList,
                     ),
-                    HomePageInvetoryWidget(),
-                  ],
+                  ),
+                  //   bottom: TabBar(
+                  //     labelStyle: Theme.of(context).textTheme.caption,
+                  //     labelColor: Colors.white,
+                  //     //  isScrollable: true,
+                  //     tabs: <Widget>[
+                  //       Tab(text: "PATIENTS"),
+                  //  //     Tab(text: "MEDICAL SUPPLIES"),
+                  //     ],
+                  //   ),
                 ),
               ),
+              body: HomePagePatientsWidget(
+                triggerRefreshOfPatientList: triggerRefreshOfPatientList,
+              ),
+              //  HomePageInvetoryWidget(),
             );
           }
         });
