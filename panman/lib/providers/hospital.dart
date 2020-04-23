@@ -225,7 +225,8 @@ class Hospitals with ChangeNotifier {
   }
 
   getVentilatorCount() {
-    return fetchedHospital.equipments[0].qty;
+   // return fetchedHospital.equipments[0].qty;
+   return 100;
   }
 
   Future updateHospital() async {

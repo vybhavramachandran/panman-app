@@ -7,6 +7,7 @@ import './patient_vitals/mode.dart';
 import './patient_vitals/periphery.dart';
 import './patient_vitals/position.dart';
 import './patient_vitals/rhythm.dart';
+import './patient_vitals/oxygenDelivery.dart';
 
 class PatientVital {
   String id;
@@ -26,6 +27,8 @@ class PatientVital {
   String rr;
   String sp02;
   Fi02 fi02;
+  String oxygenPerMin;
+  OxygenDelivery oxygenDeliverySelection;
   String sputum_white;
   String sputum_yellow;
   String sputum_red;
@@ -57,6 +60,8 @@ class PatientVital {
       this.etc02,
       this.event,
       this.fi02,
+      this.oxygenDeliverySelection,
+      this.oxygenPerMin,
       this.fi02ventilator,
       this.flowrate,
       this.gcs_e,
@@ -100,6 +105,8 @@ class PatientVital {
           etc02: data['etc02'],
           event: data['event'],
           fi02: data['fi02'] != "" ? Fi02.fromMap(data['fi02']) : null,
+          oxygenPerMin : data['oxygenPerMin'],
+          oxygenDeliverySelection : data['oxygenDeliverySelection']!=""? OxygenDelivery.fromMap(data['oxygenDeliverySelection']):null,
           fi02ventilator: data['fi02ventilator'] != ""
               ? Fi02.fromMap(data['fi02ventilator'])
               : null,
@@ -146,6 +153,8 @@ class PatientVital {
       'etc02': etc02 != null ? etc02 : "",
       'event': event != null ? event : "",
       'fi02': fi02 != null ? fi02.toMap() : "",
+      'oxygenPerMin' : oxygenPerMin!=null?oxygenPerMin :"",
+      'oxygenDeliverySelection': oxygenDeliverySelection!=null?oxygenDeliverySelection.toMap():"",
       'fi02ventilator': fi02ventilator != null ? fi02ventilator.toMap() : "",
       'flowrate': flowrate != null ? flowrate.toMap() : "",
       'gcs_e': gcs_e != null ? gcs_e : "",

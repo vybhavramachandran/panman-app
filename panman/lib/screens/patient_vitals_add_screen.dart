@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:panman/models/patientVital.dart';
+import 'package:panman/models/patient_vitals/oxygenDelivery.dart';
 import 'package:provider/provider.dart';
 
 import 'package:random_string/random_string.dart';
@@ -63,6 +64,7 @@ class _PatientVitalsAddScreenState extends State<PatientVitalsAddScreen> {
   String peepepap;
   String psipap;
   String tv;
+  String oxygen;
   String gcs_e;
   String gcs_v;
   String gcs_m;
@@ -77,6 +79,7 @@ class _PatientVitalsAddScreenState extends State<PatientVitalsAddScreen> {
   var peripheryGroupValue;
   var fi02GroupValue;
   var fi02VentilatorGroupValue;
+  var oxygenDeliveryGroupValue;
   var positionGroupValue;
   var modeGroupValue;
   var flowRateGroupValue;
@@ -108,6 +111,12 @@ class _PatientVitalsAddScreenState extends State<PatientVitalsAddScreen> {
   fi02VentilatorRadioTapped(int value) {
     setState(() {
       fi02VentilatorGroupValue = value;
+    });
+  }
+
+  oxygeDeliveryRadioTapped(int value) {
+    setState(() {
+      oxygenDeliveryGroupValue = value;
     });
   }
 
@@ -724,7 +733,7 @@ class _PatientVitalsAddScreenState extends State<PatientVitalsAddScreen> {
                     .textTheme
                     .bodyText1
                     .copyWith(color: Colors.black),
-                labelText: "HR",
+                //labelText: "HR",
                 // hintText: "Event",
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey[300])),
@@ -769,7 +778,7 @@ class _PatientVitalsAddScreenState extends State<PatientVitalsAddScreen> {
                     .textTheme
                     .bodyText1
                     .copyWith(color: Colors.black),
-                labelText: "SBP",
+                //labelText: "SBP",
                 // hintText: "Event",
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey[300])),
@@ -814,7 +823,7 @@ class _PatientVitalsAddScreenState extends State<PatientVitalsAddScreen> {
                     .textTheme
                     .bodyText1
                     .copyWith(color: Colors.black),
-                labelText: "DBP",
+                //labelText: "DBP",
                 // hintText: "Event",
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey[300])),
@@ -955,12 +964,17 @@ class _PatientVitalsAddScreenState extends State<PatientVitalsAddScreen> {
   DividerText(String name) {
     return Padding(
       padding: const EdgeInsets.only(top: 20, bottom: 20, left: 5),
-      child: Text(
-        name,
-        style: Theme.of(context)
-            .textTheme
-            .headline4
-            .copyWith(color: Colors.blue, fontWeight: FontWeight.bold),
+      child: Column(
+        children: <Widget>[
+          SizedBox(height:40),
+          Text(
+            name,
+            style: Theme.of(context)
+                .textTheme
+                .headline5
+                .copyWith(color: Theme.of(context).accentColor, fontWeight: FontWeight.bold),
+          ),
+        ],
       ),
     );
   }
@@ -991,7 +1005,7 @@ class _PatientVitalsAddScreenState extends State<PatientVitalsAddScreen> {
                     .textTheme
                     .bodyText1
                     .copyWith(color: Colors.black),
-                labelText: "RR",
+                //labelText: "RR",
                 // hintText: "Event",
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey[300])),
@@ -1037,7 +1051,7 @@ validator: (value) {
                     .textTheme
                     .bodyText1
                     .copyWith(color: Colors.black),
-                labelText: "Sp02",
+                //labelText: "Sp02",
                 // hintText: "Event",
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey[300])),
@@ -1050,6 +1064,169 @@ validator: (value) {
                 });
               },
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  oxygenSection() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text("Oxygen",
+                style: Theme.of(context).textTheme.headline6.copyWith(
+                    fontWeight: FontWeight.bold, color: Colors.black54)),
+            SizedBox(height: 10,),
+             Text("Flow in litres/minute",
+                style: Theme.of(context).textTheme.bodyText2.copyWith(
+                      color: Colors.grey,
+                      fontSize: 10,
+                    )),
+            SizedBox(
+              height: 20,
+            ),
+            TextFormField(
+              /*
+validator: (value) {
+                if (value.isEmpty) {
+                  return 'Please enter some text';
+                }
+                return null;
+              },*/
+              keyboardType: TextInputType.number,
+              style: Theme.of(context).textTheme.bodyText1,
+              decoration: InputDecoration(
+                labelStyle: Theme.of(context)
+                    .textTheme
+                    .bodyText1
+                    .copyWith(color: Colors.black),
+                //labelText: "Oxygen L/min",
+                // hintText: "Event",
+                enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey[300])),
+                focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey[300])),
+              ),
+              onSaved: (String value) {
+                setState(() {
+                  oxygen = value;
+                });
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  oxygenDeliverySection() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text("Oxygen Delivery Device ",
+                style: Theme.of(context).textTheme.headline6.copyWith(
+                    fontWeight: FontWeight.bold, color: Colors.black54)),
+            SizedBox(
+              height: 20,
+            ),
+            Column(
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Flexible(
+                      flex: 1,
+                      child: Radio(
+                        value: 0,
+                        groupValue: oxygenDeliveryGroupValue,
+                        onChanged: (value) => oxygeDeliveryRadioTapped(value),
+                      ),
+                    ),
+                    Flexible(
+                      flex: 5,
+                      child: Text(
+                        "Nasal Prongs",
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText1
+                            .copyWith(color: Colors.black),
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: <Widget>[
+                    Flexible(
+                      flex: 1,
+                      child: Radio(
+                        value: 1,
+                        groupValue: oxygenDeliveryGroupValue,
+                        onChanged: (value) => oxygeDeliveryRadioTapped(value),
+                      ),
+                    ),
+                    Flexible(
+                      flex: 5,
+                      child: Text(
+                        "Face Mask",
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText1
+                            .copyWith(color: Colors.black),
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: <Widget>[
+                    Flexible(
+                      flex: 1,
+                      child: Radio(
+                        value: 2,
+                        groupValue: oxygenDeliveryGroupValue,
+                        onChanged: (value) => oxygeDeliveryRadioTapped(value),
+                      ),
+                    ),
+                    Flexible(
+                      flex: 5,
+                      child: Text(
+                        "Venturi Mask",
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText1
+                            .copyWith(color: Colors.black),
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: <Widget>[
+                    Flexible(
+                      flex: 1,
+                      child: Radio(
+                        value: 3,
+                        groupValue: oxygenDeliveryGroupValue,
+                        onChanged: (value) => oxygeDeliveryRadioTapped(value),
+                      ),
+                    ),
+                    Flexible(
+                      flex: 5,
+                      child: Text(
+                        "NRBM",
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText1
+                            .copyWith(color: Colors.black),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            )
           ],
         ),
       ),
@@ -1481,7 +1658,7 @@ validator: (value) {
                     .textTheme
                     .bodyText1
                     .copyWith(color: Colors.black),
-                labelText: "EtCo2",
+                //labelText: "EtCo2",
                 // hintText: "Event",
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey[300])),
@@ -1745,7 +1922,7 @@ validator: (value) {
                     .textTheme
                     .bodyText1
                     .copyWith(color: Colors.black),
-                labelText: "Temperature",
+                //labelText: "Temperature",
                 // hintText: "Event",
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey[300])),
@@ -1799,7 +1976,7 @@ validator: (value) {
                     .textTheme
                     .bodyText1
                     .copyWith(color: Colors.black),
-                labelText: "GRBS",
+                //labelText: "GRBS",
                 // hintText: "Event",
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey[300])),
@@ -1853,7 +2030,7 @@ validator: (value) {
                     .textTheme
                     .bodyText1
                     .copyWith(color: Colors.black),
-                labelText: "Urine Output",
+                //labelText: "Urine Output",
                 // hintText: "Event",
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey[300])),
@@ -2120,7 +2297,7 @@ validator: (value) {
                     .textTheme
                     .bodyText1
                     .copyWith(color: Colors.black),
-                labelText: "RR Set/Actual",
+                //labelText: "RR Set/Actual",
                 // hintText: "Event",
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey[300])),
@@ -2166,7 +2343,7 @@ validator: (value) {
                     .textTheme
                     .bodyText1
                     .copyWith(color: Colors.black),
-                labelText: "Peep",
+                //labelText: "Peep",
                 // hintText: "Event",
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey[300])),
@@ -2212,7 +2389,7 @@ validator: (value) {
                     .textTheme
                     .bodyText1
                     .copyWith(color: Colors.black),
-                labelText: "TVe",
+                //labelText: "TVe",
                 // hintText: "Event",
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey[300])),
@@ -2258,7 +2435,7 @@ validator: (value) {
                     .textTheme
                     .bodyText1
                     .copyWith(color: Colors.black),
-                labelText: "P Peak",
+                //labelText: "P Peak",
                 // hintText: "Event",
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey[300])),
@@ -2304,7 +2481,7 @@ validator: (value) {
                     .textTheme
                     .bodyText1
                     .copyWith(color: Colors.black),
-                labelText: "AIRVO",
+                //labelText: "AIRVO",
                 // hintText: "Event",
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey[300])),
@@ -2391,7 +2568,7 @@ validator: (value) {
                     .textTheme
                     .bodyText1
                     .copyWith(color: Colors.black),
-                labelText: "Peep/Epap",
+                //labelText: "Peep/Epap",
                 // hintText: "Event",
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey[300])),
@@ -2437,7 +2614,7 @@ validator: (value) {
                     .textTheme
                     .bodyText1
                     .copyWith(color: Colors.black),
-                labelText: "PS/IPAP",
+                //labelText: "PS/IPAP",
                 // hintText: "Event",
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey[300])),
@@ -2483,7 +2660,7 @@ validator: (value) {
                     .textTheme
                     .bodyText1
                     .copyWith(color: Colors.black),
-                labelText: "TV",
+                //labelText: "TV",
                 // hintText: "Event",
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey[300])),
@@ -2862,7 +3039,7 @@ validator: (value) {
                       .textTheme
                       .bodyText1
                       .copyWith(color: Colors.black),
-                  labelText: "Event",
+                  //labelText: "Event",
                   // hintText: "Event",
                   enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.grey[300])),
@@ -2894,7 +3071,9 @@ validator: (value) {
               DividerText("Respiratory System"),
               RRSection(),
               SP02Section(),
-              FI02Section(),
+              oxygenSection(),
+              oxygenDeliverySection(),
+           //   FI02Section(),
               SputumColorQuantitySection(),
               ETC02Section(),
               DividerText("Other Parameters"),
@@ -2911,7 +3090,7 @@ validator: (value) {
               AIRVOSection(),
               FI02VentilatorSection(),
               FlowRateSection(),
-              DividerText("Mechanical Ventilation"),
+              // DividerText("Mechanical Ventilation"),
               PeepEpapSection(),
               PSIPAPSection(),
               TVSection(),
@@ -2948,7 +3127,8 @@ validator: (value) {
             children: <Widget>[
               PatientVitalsAddScreenBody(
                   Provider.of<Patients>(context, listen: true).selectedPatient),
-              Align(
+             MediaQuery.of(context).viewInsets.bottom == 0
+                  ? Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
                   margin: EdgeInsets.all(10),
@@ -2980,9 +3160,14 @@ validator: (value) {
                               : null,
                           dbp: dbp,
                           etc02: etc02,
-                          fi02: fi02GroupValue != null
-                              ? Fi02Levels[fi02GroupValue]
+                          oxygenPerMin: oxygen,
+                          oxygenDeliverySelection: oxygenDeliveryGroupValue !=
+                                  null
+                              ? OxygenDeliveryTypes[oxygenDeliveryGroupValue]
                               : null,
+                          // fi02: fi02GroupValue != null
+                          //     ? Fi02Levels[fi02GroupValue]
+                          //     : null,
                           fi02ventilator: fi02VentilatorGroupValue != null
                               ? Fi02Levels[fi02VentilatorGroupValue]
                               : null,
@@ -3030,7 +3215,7 @@ validator: (value) {
                     },
                   ),
                 ),
-              ),
+              ):Container(),
             ],
           )),
     );

@@ -58,7 +58,7 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
                           style: Theme.of(context)
                               .textTheme
                               .caption
-                              .copyWith(color: Colors.black)),
+                              .copyWith(color: Colors.black),textAlign: TextAlign.center,),
                     ),
                   ),
                 ),
@@ -139,6 +139,13 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
                   //  patient: selectedPatient,
                 ),
                 patientPageCard(
+                  iconToDisplay: "assets/images/prescription.png",
+                  titleOfCard: "DOCTOR NOTES",
+                  moveToPage: "/patient_doctor_notes_screen",
+
+                  //  patient: selectedPatient,
+                ),
+                patientPageCard(
                   iconToDisplay: "assets/images/virus.png",
                   titleOfCard: "PATIENT COVID CATEGORY",
                   moveToPage: "/patient_detail_cov19_screen",
@@ -152,15 +159,15 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
                   // patient: selectedPatient,
                 ),
                  
-                // patientPageCard(
-                //   iconToDisplay: "assets/images/ventilator.png",
-                //   titleOfCard: "ASSIGN EQUIPMENT",
-                //   moveToPage: '/patient_detail_assign_equipment_screen',
-                //   // patient: selectedPatient,
-                // ),
+                patientPageCard(
+                  iconToDisplay: "assets/images/ventilator.png",
+                  titleOfCard: "ASSIGN EQUIPMENT",
+                  moveToPage: '/patient_detail_assign_equipment_screen',
+                  // patient: selectedPatient,
+                ),
                 patientPageCard(
                   iconToDisplay: "assets/images/laboratory.png",
-                  titleOfCard: "TESTS",
+                  titleOfCard: "COVID-19 TESTS",
                   moveToPage: "/patient_tests_screen",
 
                   //  patient: selectedPatient,

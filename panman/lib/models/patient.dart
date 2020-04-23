@@ -9,6 +9,7 @@ import './test.dart';
 import './screening.dart';
 import './emergency_contact.dart';
 import './contactTracing.dart';
+import './patientNote.dart';
 import 'dart:io';
 
 enum Sex { Male, Female, Other }
@@ -28,6 +29,7 @@ class Patient {
   bool ventilatorUsed;
   List<event> events;
   List<PatientVital> vitals;
+  List<PatientNote> notes;
   // DelhiSpecificDetails delhiDetails;
   File pic;
   List<Test> tests;
@@ -53,6 +55,7 @@ class Patient {
     this.ventilatorUsed,
     this.events,
     this.vitals,
+    this.notes,
     // this.delhiDetails,
     this.pic,
     this.tests,
@@ -90,6 +93,7 @@ class Patient {
       'lastName': LastName,
       'events': mapifyList(events),
       'vitals': mapifyList(vitals),
+      'notes':mapifyList(notes),
       // 'delhiDetails': delhiDetails != null ? delhiDetails.toMap() : "",
       'tests': mapifyList(tests),
       'contactTracing': tracingDetail != null ? tracingDetail.toMap() : "",

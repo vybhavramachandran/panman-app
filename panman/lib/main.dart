@@ -30,6 +30,8 @@ import './screens/patient_screening.dart';
 import './screens/patient_contact_tracing.dart';
 import './screens/patient_screening_edit.dart';
 import './screens/patient_detail_screen_screening.dart';
+import './screens/patient_doctor_notes_screen.dart';
+import './screens/patient_doctor_notes_add_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -170,7 +172,9 @@ class MyApp extends StatelessWidget {
                             }
                           }),
                       routes: {
-                
+                        PatientDoctorNotesAddScreen.routeName:(ctx)=>PatientDoctorNotesAddScreen(),
+                        PatientDoctorNotesScreen.routeName: (ctx) =>
+                            PatientDoctorNotesScreen(),
                         EditPatientScreeningScreen.routeName: (ctx) =>
                             EditPatientScreeningScreen(),
                         PatientContactTracingScreen.routeName: (ctx) =>

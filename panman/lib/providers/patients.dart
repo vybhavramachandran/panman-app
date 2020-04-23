@@ -16,6 +16,7 @@ import '../models/screening.dart';
 import '../models/patient.dart';
 import '../models/patientVital.dart';
 import '../models/travelHistory.dart';
+import '../models/patientNote.dart';
 import '../models/delhiSpecificDetails.dart';
 import '../models/test.dart';
 import '../keys/key.dart';
@@ -97,7 +98,7 @@ class Patients with ChangeNotifier {
           ),
           age: patient['age'],
           currentLocation: patient['locationInHospital'],
-          covidStatusString:  patient['covidStatus'],
+          covidStatusString: patient['covidStatus'],
           fullAddress: FullAddress.fromMap(patient['fullAddress']),
           sex: patient['sex'] == "Male"
               ? Sex.Male
@@ -131,6 +132,12 @@ class Patients with ChangeNotifier {
           // delhiDetails: patient['delhiDetails'] == null
           //     ? dummyDetails
           //     : DelhiSpecificDetails.fromMap(patient['delhiDetails']),
+          
+           notes: patient['notes'] == null
+              ? []
+              : patient['notes'].map<PatientNote>((noteToBeAdded) {
+                  return PatientNote.fromMap(noteToBeAdded);
+                }).toList(),
           tests: patient['tests'] == null
               ? []
               : patient['tests'].map<Test>((testToBeAdded) {
@@ -233,6 +240,11 @@ class Patients with ChangeNotifier {
               : patient['events'].map<event>((eventToBeAdded) {
                   return event.fromMap(eventToBeAdded);
                 }).toList(),
+           notes: patient['notes'] == null
+              ? []
+              : patient['notes'].map<PatientNote>((noteToBeAdded) {
+                  return PatientNote.fromMap(noteToBeAdded);
+                }).toList(),
           vitals: patient['vitals'] == null
               ? []
               : patient['vitals'].map<PatientVital>((vitalToBeAdded) {
@@ -305,7 +317,6 @@ class Patients with ChangeNotifier {
     notifyListeners();
   }
 
-  
   Future saveTracking(contactTracing newTracing) async {
     isUpdating = true;
     notifyListeners();
@@ -338,6 +349,16 @@ class Patients with ChangeNotifier {
   Future addVitalMeasurement(PatientVital vital) async {
     try {
       selectedPatient.vitals.add(vital);
+      await updatePatientProfileInFirebase();
+      notifyListeners();
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future addDoctorNote(PatientNote note) async {
+    try {
+      selectedPatient.notes.add(note);
       await updatePatientProfileInFirebase();
       notifyListeners();
     } catch (e) {
@@ -467,7 +488,7 @@ class Patients with ChangeNotifier {
   Future<bool> changePatientState(String newState) async {
     try {
       String oldState = selectedPatient.covidStatusString;
-      selectedPatient.covidStatusString =newState;
+      selectedPatient.covidStatusString = newState;
       await addEvent(
           eventType: "covid19_severity_change",
           eventTime: DateTime.now(),
@@ -664,7 +685,7 @@ class Patients with ChangeNotifier {
       await patientsCollection
           .document(selectedPatient.id)
           .updateData(mappedPatient);
-   
+
       isUpdating = false;
       notifyListeners();
 
