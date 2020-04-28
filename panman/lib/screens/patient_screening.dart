@@ -484,7 +484,8 @@ class _PatientScreeningScreenState extends State<PatientScreeningScreen> {
                     ),
                   ),
                 ),
-                Container(
+                MediaQuery.of(context).viewInsets.bottom == 0
+                  ? Container(
                   height: 90,
                   child: Padding(
                     padding: const EdgeInsets.only(top: 10, bottom: 10),
@@ -545,7 +546,7 @@ class _PatientScreeningScreenState extends State<PatientScreeningScreen> {
                       ],
                     ),
                   ),
-                ),
+                ):Container(),
 
                 //Spacer(),
               ],

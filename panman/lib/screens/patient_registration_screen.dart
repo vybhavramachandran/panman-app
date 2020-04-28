@@ -2543,7 +2543,8 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
               ),
             ),
             SizedBox(height: 8.0),
-            Flexible(
+            MediaQuery.of(context).viewInsets.bottom == 0
+                  ? Flexible(
               flex: 2,
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 10),
@@ -2609,7 +2610,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                   ],
                 ),
               ),
-            ),
+            ):Container(),
           ],
         ),
       ),
