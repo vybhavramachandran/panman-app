@@ -31,12 +31,19 @@ class PatientVitalsAddScreen extends StatefulWidget {
 }
 
 class _PatientVitalsAddScreenState extends State<PatientVitalsAddScreen> {
+  bool isArvoFi02Enabled;
+  bool isVentilatorFi02Enabled;
+
   var textFocusField = FocusNode();
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    airvoFi02 = 21.0;
+    ventilatorFi02 = 21.0;
+    isArvoFi02Enabled = false;
+    isVentilatorFi02Enabled = false;
   }
 
   bool showConfirmButton = true;
@@ -61,6 +68,9 @@ class _PatientVitalsAddScreenState extends State<PatientVitalsAddScreen> {
   String tve;
   String ppeak;
   String airvo;
+  double airvoFi02;
+  double ventilatorFi02;
+  String airvoFlowRate;
   String peepepap;
   String psipap;
   String tv;
@@ -78,11 +88,11 @@ class _PatientVitalsAddScreenState extends State<PatientVitalsAddScreen> {
   var rhythmGroupValue;
   var peripheryGroupValue;
   var fi02GroupValue;
-  var fi02VentilatorGroupValue;
   var oxygenDeliveryGroupValue;
   var positionGroupValue;
   var modeGroupValue;
   var flowRateGroupValue;
+  var airvoFlowRateGroupValue;
 
   consciousnessRadioTapped(int value) {
     setState(() {
@@ -108,12 +118,6 @@ class _PatientVitalsAddScreenState extends State<PatientVitalsAddScreen> {
     });
   }
 
-  fi02VentilatorRadioTapped(int value) {
-    setState(() {
-      fi02VentilatorGroupValue = value;
-    });
-  }
-
   oxygeDeliveryRadioTapped(int value) {
     setState(() {
       oxygenDeliveryGroupValue = value;
@@ -135,6 +139,12 @@ class _PatientVitalsAddScreenState extends State<PatientVitalsAddScreen> {
   flowRateRadioTapped(int value) {
     setState(() {
       flowRateGroupValue = value;
+    });
+  }
+
+  airvoflowRateRadioTapped(int value) {
+    setState(() {
+      airvoFlowRateGroupValue = value;
     });
   }
 
@@ -966,13 +976,12 @@ class _PatientVitalsAddScreenState extends State<PatientVitalsAddScreen> {
       padding: const EdgeInsets.only(top: 20, bottom: 20, left: 5),
       child: Column(
         children: <Widget>[
-          name=="Record Event"?SizedBox(height:5):SizedBox(height:30),
+          name == "Record Event" ? SizedBox(height: 5) : SizedBox(height: 30),
           Text(
             name,
-            style: Theme.of(context)
-                .textTheme
-                .headline5
-                .copyWith(color: Theme.of(context).accentColor, fontWeight: FontWeight.bold),
+            style: Theme.of(context).textTheme.headline5.copyWith(
+                color: Theme.of(context).accentColor,
+                fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -1080,8 +1089,10 @@ validator: (value) {
             Text("Oxygen",
                 style: Theme.of(context).textTheme.headline6.copyWith(
                     fontWeight: FontWeight.bold, color: Colors.black54)),
-            SizedBox(height: 10,),
-             Text("Flow in litres/minute",
+            SizedBox(
+              height: 10,
+            ),
+            Text("Flow in litres/minute",
                 style: Theme.of(context).textTheme.bodyText2.copyWith(
                       color: Colors.grey,
                       fontSize: 10,
@@ -1122,6 +1133,7 @@ validator: (value) {
       ),
     );
   }
+
   oxygenDeliverySection() {
     return Card(
       child: Padding(
@@ -1439,192 +1451,74 @@ validator: (value) {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text("Fi02-Ventilator",
+            Text("Ventilator Fi02",
                 style: Theme.of(context).textTheme.headline6.copyWith(
                     fontWeight: FontWeight.bold, color: Colors.black54)),
+            Switch(
+              value: isVentilatorFi02Enabled,
+              onChanged: (value) {
+                setState(() {
+                  isVentilatorFi02Enabled = value;
+                });
+              },
+              activeTrackColor: Colors.lightGreenAccent,
+              activeColor: Colors.green,
+            ),
             SizedBox(
               height: 20,
             ),
-            Column(
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Flexible(
-                      flex: 1,
-                      child: Radio(
-                        value: 0,
-                        groupValue: fi02VentilatorGroupValue,
-                        onChanged: (value) => fi02VentilatorRadioTapped(value),
+            isVentilatorFi02Enabled == true
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        flex: 1,
+                        child: Text("21",
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText2
+                                .copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black54)),
                       ),
-                    ),
-                    Flexible(
-                      flex: 5,
-                      child: Text(
-                        "21 Room Air",
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyText1
-                            .copyWith(color: Colors.black),
+                      Flexible(
+                        flex: 8,
+                        child: Slider(
+                          useV2Slider: true,
+                          min: 21,
+                          max: 100,
+                          //     divisions:9,
+                          divisions: 79,
+                          value: ventilatorFi02,
+                          label: '$ventilatorFi02',
+                          onChanged: (value) {
+                            setState(() {
+                              ventilatorFi02 = value;
+                            });
+                          },
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Flexible(
-                      flex: 1,
-                      child: Radio(
-                        value: 1,
-                        groupValue: fi02VentilatorGroupValue,
-                        onChanged: (value) => fi02VentilatorRadioTapped(value),
+                      Flexible(
+                        flex: 1,
+                        child: Text("100",
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText2
+                                .copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black54)),
                       ),
-                    ),
-                    Flexible(
-                      flex: 5,
-                      child: Text(
-                        "24 - 1 L nasal",
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyText1
-                            .copyWith(color: Colors.black),
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Flexible(
-                      flex: 1,
-                      child: Radio(
-                        value: 2,
-                        groupValue: fi02VentilatorGroupValue,
-                        onChanged: (value) => fi02VentilatorRadioTapped(value),
-                      ),
-                    ),
-                    Flexible(
-                      flex: 5,
-                      child: Text(
-                        "28 - 2 L nasal",
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyText1
-                            .copyWith(color: Colors.black),
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Flexible(
-                      flex: 1,
-                      child: Radio(
-                        value: 3,
-                        groupValue: fi02VentilatorGroupValue,
-                        onChanged: (value) => fi02VentilatorRadioTapped(value),
-                      ),
-                    ),
-                    Flexible(
-                      flex: 5,
-                      child: Text(
-                        "32 - 3 L nasal",
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyText1
-                            .copyWith(color: Colors.black),
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Flexible(
-                      flex: 1,
-                      child: Radio(
-                        value: 4,
-                        groupValue: fi02VentilatorGroupValue,
-                        onChanged: (value) => fi02VentilatorRadioTapped(value),
-                      ),
-                    ),
-                    Flexible(
-                      flex: 5,
-                      child: Text(
-                        "36 - 4 L nasal",
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyText1
-                            .copyWith(color: Colors.black),
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Flexible(
-                      flex: 1,
-                      child: Radio(
-                        value: 5,
-                        groupValue: fi02VentilatorGroupValue,
-                        onChanged: (value) => fi02VentilatorRadioTapped(value),
-                      ),
-                    ),
-                    Flexible(
-                      flex: 5,
-                      child: Text(
-                        "40 - 6 L FM",
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyText1
-                            .copyWith(color: Colors.black),
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Flexible(
-                      flex: 1,
-                      child: Radio(
-                        value: 6,
-                        groupValue: fi02VentilatorGroupValue,
-                        onChanged: (value) => fi02VentilatorRadioTapped(value),
-                      ),
-                    ),
-                    Flexible(
-                      flex: 5,
-                      child: Text(
-                        "50 - 8 L FM",
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyText1
-                            .copyWith(color: Colors.black),
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Flexible(
-                      flex: 1,
-                      child: Radio(
-                        value: 7,
-                        groupValue: fi02VentilatorGroupValue,
-                        onChanged: (value) => fi02VentilatorRadioTapped(value),
-                      ),
-                    ),
-                    Flexible(
-                      flex: 5,
-                      child: Text(
-                        "60 - 10 L FM",
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyText1
-                            .copyWith(color: Colors.black),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            )
+                      Flexible(
+                          flex: 3,
+                          fit: FlexFit.tight,
+                          child: Text(
+                            "$ventilatorFi02",
+                            style: Theme.of(context).textTheme.bodyText1,
+                            textAlign: TextAlign.center,
+                          )),
+                    ],
+                  )
+                : Container(),
           ],
         ),
       ),
@@ -2454,51 +2348,309 @@ validator: (value) {
     );
   }
 
-  AIRVOSection() {
+  AIRVOFi02Section() {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(10.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text("AIRVO",
+            Text("AIRVO Fi02",
                 style: Theme.of(context).textTheme.headline6.copyWith(
                     fontWeight: FontWeight.bold, color: Colors.black54)),
+            Switch(
+              value: isArvoFi02Enabled,
+              onChanged: (value) {
+                setState(() {
+                  isArvoFi02Enabled = value;
+                });
+              },
+              activeTrackColor: Colors.lightGreenAccent,
+              activeColor: Colors.green,
+            ),
             SizedBox(
               height: 20,
             ),
-            TextFormField(
-              /*
-validator: (value) {
-                if (value.isEmpty) {
-                  return 'Please enter some text';
-                }
-                return null;
-              },*/
-              style: Theme.of(context).textTheme.bodyText1,
-              decoration: InputDecoration(
-                labelStyle: Theme.of(context)
-                    .textTheme
-                    .bodyText1
-                    .copyWith(color: Colors.black),
-                //labelText: "AIRVO",
-                // hintText: "Event",
-                enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey[300])),
-                focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey[300])),
-              ),
-              onSaved: (String value) {
-                setState(() {
-                  airvo = value;
-                });
-              },
-            ),
+            isArvoFi02Enabled == true
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        flex: 1,
+                        child: Text("21",
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText2
+                                .copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black54)),
+                      ),
+                      Flexible(
+                        flex: 8,
+                        child: Slider(
+                          useV2Slider: true,
+                          min: 21,
+                          max: 100,
+                          //     divisions:9,
+                          divisions: 79,
+                          value: airvoFi02,
+                          label: '$airvoFi02',
+                          onChanged: (value) {
+                            setState(() {
+                              airvoFi02 = value;
+                            });
+                          },
+                        ),
+                      ),
+                      Flexible(
+                        flex: 1,
+                        child: Text("100",
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText2
+                                .copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black54)),
+                      ),
+                      Flexible(
+                          flex: 3,
+                          fit: FlexFit.tight,
+                          child: Text(
+                            "$airvoFi02",
+                            style: Theme.of(context).textTheme.bodyText1,
+                            textAlign: TextAlign.center,
+                          )),
+                    ],
+                  )
+                : Container(),
           ],
         ),
       ),
     );
   }
+
+  AIRVOFlowRateSection() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text("AIRVO Flow Rate",
+                style: Theme.of(context).textTheme.headline6.copyWith(
+                    fontWeight: FontWeight.bold, color: Colors.black54)),
+            SizedBox(
+              height: 20,
+            ),
+            Column(
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Flexible(
+                      flex: 1,
+                      child: Radio(
+                        value: 0,
+                        groupValue: airvoFlowRateGroupValue,
+                        onChanged: (value) => airvoflowRateRadioTapped(value),
+                      ),
+                    ),
+                    Flexible(
+                      flex: 5,
+                      child: Text(
+                        "30",
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText1
+                            .copyWith(color: Colors.black),
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: <Widget>[
+                    Flexible(
+                      flex: 1,
+                      child: Radio(
+                        value: 1,
+                        groupValue: airvoFlowRateGroupValue,
+                        onChanged: (value) => airvoflowRateRadioTapped(value),
+                      ),
+                    ),
+                    Flexible(
+                      flex: 5,
+                      child: Text(
+                        "35",
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText1
+                            .copyWith(color: Colors.black),
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: <Widget>[
+                    Flexible(
+                      flex: 1,
+                      child: Radio(
+                        value: 2,
+                        groupValue: airvoFlowRateGroupValue,
+                        onChanged: (value) => airvoflowRateRadioTapped(value),
+                      ),
+                    ),
+                    Flexible(
+                      flex: 5,
+                      child: Text(
+                        "40",
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText1
+                            .copyWith(color: Colors.black),
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: <Widget>[
+                    Flexible(
+                      flex: 1,
+                      child: Radio(
+                        value: 3,
+                        groupValue: airvoFlowRateGroupValue,
+                        onChanged: (value) => airvoflowRateRadioTapped(value),
+                      ),
+                    ),
+                    Flexible(
+                      flex: 5,
+                      child: Text(
+                        "45",
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText1
+                            .copyWith(color: Colors.black),
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: <Widget>[
+                    Flexible(
+                      flex: 1,
+                      child: Radio(
+                        value: 4,
+                        groupValue: airvoFlowRateGroupValue,
+                        onChanged: (value) => airvoflowRateRadioTapped(value),
+                      ),
+                    ),
+                    Flexible(
+                      flex: 5,
+                      child: Text(
+                        "50",
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText1
+                            .copyWith(color: Colors.black),
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: <Widget>[
+                    Flexible(
+                      flex: 1,
+                      child: Radio(
+                        value: 5,
+                        groupValue: airvoFlowRateGroupValue,
+                        onChanged: (value) => airvoflowRateRadioTapped(value),
+                      ),
+                    ),
+                    Flexible(
+                      flex: 5,
+                      child: Text(
+                        "55",
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText1
+                            .copyWith(color: Colors.black),
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: <Widget>[
+                    Flexible(
+                      flex: 1,
+                      child: Radio(
+                        value: 6,
+                        groupValue: airvoFlowRateGroupValue,
+                        onChanged: (value) => airvoflowRateRadioTapped(value),
+                      ),
+                    ),
+                    Flexible(
+                      flex: 5,
+                      child: Text(
+                        "60",
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText1
+                            .copyWith(color: Colors.black),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+//   AIRVOSection() {
+//     return Card(
+//       child: Padding(
+//         padding: const EdgeInsets.all(10.0),
+//         child: Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: <Widget>[
+//             Text("AIRVO",
+//                 style: Theme.of(context).textTheme.headline6.copyWith(
+//                     fontWeight: FontWeight.bold, color: Colors.black54)),
+//             SizedBox(
+//               height: 20,
+//             ),
+//             TextFormField(
+//               /*
+// validator: (value) {
+//                 if (value.isEmpty) {
+//                   return 'Please enter some text';
+//                 }
+//                 return null;
+//               },*/
+//               style: Theme.of(context).textTheme.bodyText1,
+//               decoration: InputDecoration(
+//                 labelStyle: Theme.of(context)
+//                     .textTheme
+//                     .bodyText1
+//                     .copyWith(color: Colors.black),
+//                 //labelText: "AIRVO",
+//                 // hintText: "Event",
+//                 enabledBorder: OutlineInputBorder(
+//                     borderSide: BorderSide(color: Colors.grey[300])),
+//                 focusedBorder: OutlineInputBorder(
+//                     borderSide: BorderSide(color: Colors.grey[300])),
+//               ),
+//               onSaved: (String value) {
+//                 setState(() {
+//                   airvo = value;
+//                 });
+//               },
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
 
   // NIVSection() {
   //   return Card(
@@ -3073,7 +3225,7 @@ validator: (value) {
               SP02Section(),
               oxygenSection(),
               oxygenDeliverySection(),
-           //   FI02Section(),
+              //   FI02Section(),
               SputumColorQuantitySection(),
               ETC02Section(),
               DividerText("Other Parameters"),
@@ -3081,13 +3233,15 @@ validator: (value) {
               GRBSSection(),
               UrineOutputSection(),
               PositionSection(),
+              DividerText("AIRVO"),
+              AIRVOFi02Section(),
+              AIRVOFlowRateSection(),
               DividerText("Mechanical Ventilation"),
               RRSetActualSection(),
               ModeSection(),
               PeepSection(),
               TVe(),
               PPeakSection(),
-              AIRVOSection(),
               FI02VentilatorSection(),
               FlowRateSection(),
               // DividerText("Mechanical Ventilation"),
@@ -3127,95 +3281,103 @@ validator: (value) {
             children: <Widget>[
               PatientVitalsAddScreenBody(
                   Provider.of<Patients>(context, listen: true).selectedPatient),
-             MediaQuery.of(context).viewInsets.bottom == 0
+              MediaQuery.of(context).viewInsets.bottom == 0
                   ? Align(
-                alignment: Alignment.bottomCenter,
-                child: Container(
-                  margin: EdgeInsets.all(10),
-                  height: 60,
-                  width: MediaQuery.of(context).size.width,
-                  child: RaisedButton(
-                    color: Theme.of(context).accentColor,
-                    child:
-                        Provider.of<Patients>(context, listen: true).isUpdating
-                            ? CircularProgressIndicator(
-                                backgroundColor: Colors.white30,
-                              )
-                            : Text(
-                                "SAVE VITALS",
-                                style: Theme.of(context).textTheme.caption,
-                              ),
-                    onPressed: () async {
-                      if (formKey.currentState.validate()) {
-                        formKey.currentState.save();
-                        await Provider.of<Patients>(context, listen: false)
-                            .addVitalMeasurement(PatientVital(
-                          event: event,
-                          gcs_e: gcs_e,
-                          gcs_v: gcs_v,
-                          gcs_m: gcs_m,
-                          airvo: airvo,
-                          consciousness: consciousnessGroupValue != null
-                              ? consciousnessLevels[consciousnessGroupValue]
-                              : null,
-                          dbp: dbp,
-                          etc02: etc02,
-                          oxygenPerMin: oxygen,
-                          oxygenDeliverySelection: oxygenDeliveryGroupValue !=
-                                  null
-                              ? OxygenDeliveryTypes[oxygenDeliveryGroupValue]
-                              : null,
-                          // fi02: fi02GroupValue != null
-                          //     ? Fi02Levels[fi02GroupValue]
-                          //     : null,
-                          fi02ventilator: fi02VentilatorGroupValue != null
-                              ? Fi02Levels[fi02VentilatorGroupValue]
-                              : null,
-                          flowrate: flowRateGroupValue != null
-                              ? FlowRateLevels[flowRateGroupValue]
-                              : null,
-                          grbs: grbs,
-                          hr: hr,
-                          id: randomAlphaNumeric(20),
-                          left_pupil: left_pupil,
-                          right_pupil: right_pupil,
-                          mode: modeGroupValue != null
-                              ? ModeLevels[modeGroupValue]
-                              : null,
-                          peep: peep,
-                          peepepap: peepepap,
-                          periphery: peripheryGroupValue != null
-                              ? PeripheryLevels[peripheryGroupValue]
-                              : null,
-                          position: positionGroupValue != null
-                              ? PositionLevels[positionGroupValue]
-                              : null,
-                          ppeak: ppeak,
-                          psipap: psipap,
-                          rhythm: rhythmGroupValue != null
-                              ? RhythmLevels[rhythmGroupValue]
-                              : null,
-                          rr: rr,
-                          rrsetactual: rrsetactual,
-                          sbp: sbp,
-                          sp02: sp02,
-                          sputum_green: sputum_green,
-                          sputum_other: sputum_other,
-                          sputum_white: sputum_white,
-                          sputum_red: sputum_red,
-                          sputum_yellow: sputum_yellow,
-                          temperature: temperature,
-                          timestamp: DateTime.now(),
-                          tv: tv,
-                          tve: tve,
-                          urineOutput: urineOutput,
-                        ));
-                        Navigator.of(context).pop();
-                      }
-                    },
-                  ),
-                ),
-              ):Container(),
+                      alignment: Alignment.bottomCenter,
+                      child: Container(
+                        margin: EdgeInsets.all(10),
+                        height: 60,
+                        width: MediaQuery.of(context).size.width,
+                        child: RaisedButton(
+                          color: Theme.of(context).accentColor,
+                          child: Provider.of<Patients>(context, listen: true)
+                                  .isUpdating
+                              ? CircularProgressIndicator(
+                                  backgroundColor: Colors.white30,
+                                )
+                              : Text(
+                                  "SAVE VITALS",
+                                  style: Theme.of(context).textTheme.caption,
+                                ),
+                          onPressed: () async {
+                            if (formKey.currentState.validate()) {
+                              formKey.currentState.save();
+                              await Provider.of<Patients>(context,
+                                      listen: false)
+                                  .addVitalMeasurement(PatientVital(
+                                event: event,
+                                gcs_e: gcs_e,
+                                gcs_v: gcs_v,
+                                gcs_m: gcs_m,
+                                
+                                airvoFi02: isArvoFi02Enabled==true?airvoFi02.toString():null,
+                                airvoFlowRate: airvoFlowRateGroupValue != null
+                                    ? FlowRateLevels[airvoFlowRateGroupValue]
+                                    : null,
+                                consciousness: consciousnessGroupValue != null
+                                    ? consciousnessLevels[
+                                        consciousnessGroupValue]
+                                    : null,
+                                dbp: dbp,
+                                etc02: etc02,
+                                oxygenPerMin: oxygen,
+                                oxygenDeliverySelection:
+                                    oxygenDeliveryGroupValue != null
+                                        ? OxygenDeliveryTypes[
+                                            oxygenDeliveryGroupValue]
+                                        : null,
+                                // fi02: fi02GroupValue != null
+                                //     ? Fi02Levels[fi02GroupValue]
+                                //     : null,
+                                fi02ventilator: isVentilatorFi02Enabled == true
+                                    ? ventilatorFi02.toString()
+                                    : null,
+                                ventilatorFlowrate: flowRateGroupValue != null
+                                    ? FlowRateLevels[flowRateGroupValue]
+                                    : null,
+                                grbs: grbs,
+                                hr: hr,
+                                id: randomAlphaNumeric(20),
+                                left_pupil: left_pupil,
+                                right_pupil: right_pupil,
+                                mode: modeGroupValue != null
+                                    ? ModeLevels[modeGroupValue]
+                                    : null,
+                                peep: peep,
+                                peepepap: peepepap,
+                                periphery: peripheryGroupValue != null
+                                    ? PeripheryLevels[peripheryGroupValue]
+                                    : null,
+                                position: positionGroupValue != null
+                                    ? PositionLevels[positionGroupValue]
+                                    : null,
+                                ppeak: ppeak,
+                                psipap: psipap,
+                                rhythm: rhythmGroupValue != null
+                                    ? RhythmLevels[rhythmGroupValue]
+                                    : null,
+                                rr: rr,
+                                rrsetactual: rrsetactual,
+                                sbp: sbp,
+                                sp02: sp02,
+                                sputum_green: sputum_green,
+                                sputum_other: sputum_other,
+                                sputum_white: sputum_white,
+                                sputum_red: sputum_red,
+                                sputum_yellow: sputum_yellow,
+                                temperature: temperature,
+                                timestamp: DateTime.now(),
+                                tv: tv,
+                                tve: tve,
+                                urineOutput: urineOutput,
+                              ));
+                              Navigator.of(context).pop();
+                            }
+                          },
+                        ),
+                      ),
+                    )
+                  : Container(),
             ],
           )),
     );

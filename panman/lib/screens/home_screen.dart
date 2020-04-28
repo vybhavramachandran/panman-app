@@ -199,7 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (snapshot.connectionState != ConnectionState.done ||
               snapshot.hasError) {
             return Scaffold(
-                          body: Center(
+              body: Center(
                   child: CircularProgressIndicator(
                 backgroundColor: Colors.white,
               )),
@@ -279,7 +279,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 label: Text("Add Patient"),
                 onPressed: () async {
                   Navigator.of(context)
-                      .pushNamed('/patient_registration_screen');
+                      .pushNamed('/patient_registration_screen')
+                      .then((value) => setState(() {
+                            // refresh state
+                          }));
                   // setState(() {
                   //   newPatientID = randomAlphaNumeric(10);
                   // });

@@ -44,9 +44,10 @@ class PatientVital {
   String peep;
   String tve;
   String ppeak;
-  String airvo;
-  Fi02 fi02ventilator;
-  FlowRate flowrate;
+  String airvoFi02;
+  FlowRate airvoFlowRate;
+  String fi02ventilator;
+  FlowRate ventilatorFlowrate;
   String peepepap;
   String psipap;
   String tv;
@@ -54,7 +55,8 @@ class PatientVital {
   PatientVital(
       {this.id,
       this.timestamp,
-      this.airvo,
+      this.airvoFi02,
+      this.airvoFlowRate,
       this.consciousness,
       this.dbp,
       this.etc02,
@@ -63,7 +65,7 @@ class PatientVital {
       this.oxygenDeliverySelection,
       this.oxygenPerMin,
       this.fi02ventilator,
-      this.flowrate,
+      this.ventilatorFlowrate,
       this.gcs_e,
       this.gcs_m,
       this.gcs_v,
@@ -97,23 +99,24 @@ class PatientVital {
       : this(
           id: data['id'],
           timestamp: data['timestamp'].toDate(),
-          airvo: data['airvo'],
+          airvoFi02: data['airvoFi02'],
+          airvoFlowRate: data['airvoFlowRate'] != ""
+              ? FlowRate.fromMap(data['airvoFlowRate'])
+              : null,
           consciousness: data['consciousness'] != ""
               ? Consciousness.fromMap(data['consciousness'])
               : null,
           dbp: data['dbp'],
           etc02: data['etc02'],
           event: data['event'],
-          fi02: data['fi02'] != "" ? Fi02.fromMap(data['fi02']) : null,
+          //   fi02: data['fi02'] != "" ? Fi02.fromMap(data['fi02']) : null,
           oxygenPerMin: data['oxygenPerMin'],
           oxygenDeliverySelection: data['oxygenDeliverySelection'] != ""
               ? OxygenDelivery.fromMap(data['oxygenDeliverySelection'])
               : null,
-          fi02ventilator: data['fi02ventilator'] != ""
-              ? Fi02.fromMap(data['fi02ventilator'])
-              : null,
-          flowrate: data['flowrate'] != ""
-              ? FlowRate.fromMap(data['flowrate'])
+          fi02ventilator: data['fi02ventilator'],
+          ventilatorFlowrate: data['ventilatorFlowrate'] != ""
+              ? FlowRate.fromMap(data['ventilatorFlowrate'])
               : null,
           gcs_e: data['gcs_e'],
           gcs_m: data['gcs_m'],
@@ -121,6 +124,7 @@ class PatientVital {
           grbs: data['grbs'],
           hr: data['hr'],
           left_pupil: data['left_pupil'],
+          right_pupil: data['right_pupil'],
           mode: data['mode'] != "" ? Mode.fromMap(data['mode']) : null,
           peep: data['peep'],
           peepepap: data['peepepap'],
@@ -133,7 +137,6 @@ class PatientVital {
           ppeak: data['ppeak'],
           psipap: data['psipap'],
           rhythm: data['rhythm'] != "" ? Rhythm.fromMap(data['rhythm']) : null,
-          right_pupil: data['right_pupil'],
           rr: data['rr'],
           rrsetactual: data['rrsetactual'],
           sbp: data['sbp'],
@@ -315,9 +318,9 @@ class PatientVital {
           return 'Fi02 - Ventilator';
         }
         break;
-      case 'flowrate':
+      case 'ventilatorFlowrate':
         {
-          return 'Flow Rate';
+          return 'Ventilator Flow Rate';
         }
         break;
       case 'peepepap':
@@ -335,6 +338,16 @@ class PatientVital {
           return 'TV';
         }
         break;
+      case 'airvoFi02':
+        {
+          return 'AIRVO Fi02';
+        }
+        break;
+      case 'airvoFlowRate':
+        {
+          return 'AIRVO Flow Rate';
+        }
+        break;
     }
   }
 
@@ -342,46 +355,49 @@ class PatientVital {
     return {
       'id': id,
       'timestamp': Timestamp.fromDate(timestamp),
-      'airvo': airvo != null ? airvo : "",
-      'consciousness': consciousness != null ? consciousness.toMap() : "",
-      'dbp': dbp != null ? dbp : "",
-      'etc02': etc02 != null ? etc02 : "",
       'event': event != null ? event : "",
-      'fi02': fi02 != null ? fi02.toMap() : "",
+      'gcs_e': gcs_e != null ? gcs_e : "",
+      'gcs_m': gcs_m != null ? gcs_m : "",
+      'gcs_v': gcs_v != null ? gcs_v : "",
+      'left_pupil': left_pupil != null ? left_pupil : "",
+      'right_pupil': right_pupil != null ? right_pupil : "",
+      'consciousness': consciousness != null ? consciousness.toMap() : "",
+      'rhythm': rhythm != null ? rhythm.toMap() : "",
+      'hr': hr != null ? hr : "",
+      'sbp': sbp != null ? sbp : "",
+      'dbp': dbp != null ? dbp : "",
+      'periphery': periphery != null ? periphery.toMap() : "",
+      'rr': rr != null ? rr : "",
+      'sp02': sp02 != null ? sp02 : "",
       'oxygenPerMin': oxygenPerMin != null ? oxygenPerMin : "",
       'oxygenDeliverySelection': oxygenDeliverySelection != null
           ? oxygenDeliverySelection.toMap()
           : "",
-      'fi02ventilator': fi02ventilator != null ? fi02ventilator.toMap() : "",
-      'flowrate': flowrate != null ? flowrate.toMap() : "",
-      'gcs_e': gcs_e != null ? gcs_e : "",
-      'gcs_m': gcs_m != null ? gcs_m : "",
-      'gcs_v': gcs_v != null ? gcs_v : "",
-      'grbs': grbs != null ? grbs : "",
-      'hr': hr != null ? hr : "",
-      'left_pupil': left_pupil != null ? left_pupil : "",
-      'mode': mode != null ? mode.toMap() : "",
-      'peep': peep != null ? peep : "",
-      'peepepap': peepepap != null ? peepepap : "",
-      'periphery': periphery != null ? periphery.toMap() : "",
-      'position': position != null ? position.toMap() : "",
-      'ppeak': ppeak != null ? ppeak : "",
-      'psipap': psipap != null ? psipap : "",
-      'rhythm': rhythm != null ? rhythm.toMap() : "",
-      'right_pupil': right_pupil != null ? right_pupil : "",
-      'rr': rr != null ? rr : "",
-      'rrsetactual': rrsetactual != null ? rrsetactual : "",
-      'sbp': sbp != null ? sbp : "",
-      'sp02': sp02 != null ? sp02 : "",
       'sputum_green': sputum_green != null ? sputum_green : "",
       'sputum_other': sputum_other != null ? sputum_other : "",
       'sputum_red': sputum_red != null ? sputum_red : "",
       'sputum_white': sputum_white != null ? sputum_white : "",
       'sputum_yellow': sputum_yellow != null ? sputum_yellow : "",
+      'etc02': etc02 != null ? etc02 : "",
       'temperature': temperature != null ? temperature : "",
-      'tv': tv != null ? tv : "",
-      'tve': tve != null ? tve : "",
+      'grbs': grbs != null ? grbs : "",
       'urineOutput': urineOutput != null ? urineOutput : "",
+      'position': position != null ? position.toMap() : "",
+      'rrsetactual': rrsetactual != null ? rrsetactual : "",
+      'mode': mode != null ? mode.toMap() : "",
+      'peep': peep != null ? peep : "",
+      'tve': tve != null ? tve : "",
+      'ppeak': ppeak != null ? ppeak : "",
+
+      'airvoFi02': airvoFi02 != null ? airvoFi02 : "",
+      'airvoFlowRate': airvoFlowRate != null ? airvoFlowRate.toMap() : "",
+      // 'fi02': fi02 != null ? fi02.toMap() : "",
+      'fi02ventilator': fi02ventilator != null ? fi02ventilator : "",
+      'ventilatorFlowrate':
+          ventilatorFlowrate != null ? ventilatorFlowrate.toMap() : "",
+      'peepepap': peepepap != null ? peepepap : "",
+      'psipap': psipap != null ? psipap : "",
+      'tv': tv != null ? tv : "",
     };
   }
 }

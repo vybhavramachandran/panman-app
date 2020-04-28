@@ -5,7 +5,6 @@ class Test {
   bool isSelfInitiated;
   String id;
   DateTime resultDate;
-  DateTime requestedDate;
   String testCenterName;
   String result;
 
@@ -14,7 +13,6 @@ class Test {
       this.isSelfInitiated,
       this.testCenterName,
       this.result,
-      this.requestedDate,
       this.resultDate});
 
   Test.fromMap(Map data)
@@ -24,13 +22,11 @@ class Test {
           testCenterName: data['testCenterName'],
           result: data['result'],
           resultDate: data['resultDate'].toDate(),
-          requestedDate: data['requestedDate'].toDate(),
         );
 
   Map<String, dynamic> toMap() {
     return {
       'resultDate': Timestamp.fromDate(resultDate),
-      'requestedDate': Timestamp.fromDate(requestedDate),
       'testCenterName': testCenterName,
       'result': result,
       'isSelfInitiated': isSelfInitiated,

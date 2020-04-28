@@ -1410,6 +1410,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
         events: [],
         vitals: [],
         tests: [],
+        notes:[],
         phoneNumber: phoneNumber,
         emergencyContactFirstName: emergencyContactFirstNametest,
         emergencyContactLastName: emergencyContactLastName,
@@ -1456,6 +1457,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
         events: [],
         vitals: [],
         tests: [],
+        notes:[],
         phoneNumber: phoneNumber,
         emergencyContactFirstName: emergencyContactFirstNametest,
         emergencyContactLastName: emergencyContactLastName,
@@ -1471,7 +1473,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
           .fetchPatientsListFromServer(
               Provider.of<Hospitals>(context, listen: false)
                   .fetchedHospital
-                  .id);
+                  .id,[]);
 
       await Provider.of<Patients>(context, listen: false)
           .selectPatient(patientToBeCrated.id);
@@ -1526,7 +1528,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
       formKey2.currentState.save();
       await AddPatientAndScreen();
 
-      Navigator.of(context).push(MaterialPageRoute(
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (BuildContext context) => PatientScreeningScreen()));
     }
   }

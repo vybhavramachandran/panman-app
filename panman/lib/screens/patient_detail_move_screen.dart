@@ -126,7 +126,7 @@ class _PatientDetailMoveScreenState extends State<PatientDetailMoveScreen> {
                 ? new RaisedButton(
                     child: new Text("I understand. Continue"),
                     onPressed: () {
-                      return moveAndRemovePatient(oldState, newState);
+                      return movePatient(oldState, newState);
                     },
                   )
                 : CircularProgressIndicator(

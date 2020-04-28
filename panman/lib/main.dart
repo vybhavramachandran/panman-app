@@ -155,7 +155,7 @@ class MyApp extends StatelessWidget {
                                 fontSize: 20, fontWeight: FontWeight.bold),
                           )),
                       home: FutureBuilder<FirebaseUser>(
-                          future:  auth.tryAutoLogin(),
+                          future: auth.tryAutoLogin(),
                           builder: (ctx,
                               AsyncSnapshot<FirebaseUser> authResultSnapshot) {
                             print("Builder called $authResultSnapshot");

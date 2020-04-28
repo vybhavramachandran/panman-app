@@ -41,8 +41,8 @@ class Patients with ChangeNotifier {
 
   var patientSnapshot;
 
-  Future fetchPatientsListFromServer(String hospitalID) async {
-    print("fetchPatientsList Called");
+  Future fetchPatientsListFromServer(String hospitalID,List filters) async {
+    print("fetchPatientsList Called $filters");
 
     DelhiSpecificDetails dummyDetails = DelhiSpecificDetails(
       district: "",
@@ -85,6 +85,7 @@ class Patients with ChangeNotifier {
       fetchedPatientsList.clear();
       patientSnapshot = await patientsCollection
           .where('hospitalID', isEqualTo: hospitalID)
+          .where('locationInHospital',whereIn: filters)
           .getDocuments();
       print("PatientSnapshot retreived");
       patientSnapshot.documents.forEach((patient) async {
@@ -401,6 +402,8 @@ class Patients with ChangeNotifier {
   }
 
   selectPatient(String patientID) {
+    isUpdating=false;
+    notifyListeners();
     selectedPatient =
         fetchedPatientsList.firstWhere((patient) => patient.id == patientID);
     notifyListeners();
@@ -466,7 +469,7 @@ class Patients with ChangeNotifier {
       notifyListeners();
 
       if (newLocation == 7) {
-        selectedPatient.hospitalID = "";
+        // selectedPatient.hospitalID = "";
 
         await addEvent(
             eventType: "patient_death",
@@ -474,14 +477,14 @@ class Patients with ChangeNotifier {
             eventData: "${oldLocation}->${newLocation}");
         await updatePatientProfileInFirebase();
       } else if (newLocation == 6) {
-        selectedPatient.hospitalID = "";
+        // selectedPatient.hospitalID = "";
         await addEvent(
             eventType: "patient_transfer",
             eventTime: DateTime.now(),
             eventData: "${oldLocation}->${newLocation}");
         await updatePatientProfileInFirebase();
       } else if (newLocation == 0) {
-        selectedPatient.hospitalID = "";
+        // selectedPatient.hospitalID = "";
         await addEvent(
             eventType: "patient_discharged",
             eventTime: DateTime.now(),

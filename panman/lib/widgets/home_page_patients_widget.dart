@@ -19,15 +19,62 @@ class HomePagePatientsWidget extends StatefulWidget {
 class _HomePagePatientsWidgetState extends State<HomePagePatientsWidget> {
   bool _isLoading;
   var fetchFuture;
+  List<String> filters;
+  bool patientsInHospital;
+  bool filterScreening;
+  bool filterSuspectedIsolation;
+  bool filterConfirmedIsolation;
+  bool filterICU;
+  bool filterDischarged;
+  bool filterDeceased;
+  bool patientsDischarged;
+  bool filterTransferred;
   bool shouldSkip = false;
 
   TextEditingController searchTextController = new TextEditingController();
 
   initState() {
-        super.initState();
-
-    fetchFuture = refreshListOfPatients(context);
+    super.initState();
     shouldSkip = true;
+    filters = [];
+    patientsInHospital = true;
+    patientsDischarged = false;
+    filterScreening = true;
+    filterSuspectedIsolation = true;
+    filterConfirmedIsolation = true;
+    filterICU = true;
+    filterDischarged = false;
+    filterTransferred = false;
+    filterDeceased = false;
+    fetchFuture = refreshListOfPatients(context);
+  }
+
+  List returnFilterList() {
+    List filterList = [];
+    if (filterDischarged == true) {
+      filterList.add(0);
+    }
+    if (filterScreening == true) {
+      filterList.add(2);
+    }
+    if (filterSuspectedIsolation == true) {
+      filterList.add(3);
+    }
+    if (filterConfirmedIsolation == true) {
+      filterList.add(4);
+    }
+    if (filterICU == true) {
+      filterList.add(5);
+    }
+    if (filterTransferred == true) {
+      filterList.add(6);
+    }
+    if (filterDeceased == true) {
+      filterList.add(7);
+    }
+    print("returnFilterList called $filterList");
+
+    return filterList;
   }
 
   Future refreshListOfPatients(BuildContext context) async {
@@ -37,7 +84,7 @@ class _HomePagePatientsWidgetState extends State<HomePagePatientsWidget> {
 
     print("refreshListOfPatients called");
     return await Provider.of<Patients>(context, listen: false)
-        .fetchPatientsListFromServer(hospitalID);
+        .fetchPatientsListFromServer(hospitalID, returnFilterList());
   }
 
   @override
@@ -58,18 +105,154 @@ class _HomePagePatientsWidgetState extends State<HomePagePatientsWidget> {
     // }
   }
 
+  didChan() {}
+
   @override
   Widget build(BuildContext context) {
     return Container(
       height: MediaQuery.of(context).size.height,
       child: Column(
         children: <Widget>[
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  Text("Filter : ",
+                      style: Theme.of(context)
+                          .textTheme
+                          .caption
+                          .copyWith(color: Colors.black)),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    child: FilterChip(
+                        selectedColor: Theme.of(context).accentColor,
+                        showCheckmark: false,
+                        labelStyle: filterScreening == true
+                            ? Theme.of(context)
+                                .textTheme
+                                .bodyText2
+                                .copyWith(color: Colors.white)
+                            : Theme.of(context).textTheme.bodyText2,
+                        label: Text("Screening"),
+                        selected: filterScreening,
+                        onSelected: (bool value) async {
+                          setState(() {
+                            filterScreening = value;
+                          });
+                          refreshListOfPatients(context);
+                        }),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    child: FilterChip(
+                        selectedColor: Theme.of(context).accentColor,
+                        showCheckmark: false,
+                        labelStyle: filterSuspectedIsolation == true
+                            ? Theme.of(context)
+                                .textTheme
+                                .bodyText2
+                                .copyWith(color: Colors.white)
+                            : Theme.of(context).textTheme.bodyText2,
+                        label: Text("Suspected Isolation"),
+                        selected: filterSuspectedIsolation,
+                        onSelected: (bool value) {
+                          setState(() {
+                            filterSuspectedIsolation = value;
+                          });
+                          refreshListOfPatients(context);
+                        }),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    child: FilterChip(
+                        selectedColor: Theme.of(context).accentColor,
+                        showCheckmark: false,
+                        labelStyle: filterConfirmedIsolation == true
+                            ? Theme.of(context)
+                                .textTheme
+                                .bodyText2
+                                .copyWith(color: Colors.white)
+                            : Theme.of(context).textTheme.bodyText2,
+                        label: Text("Confirmed Isolation"),
+                        selected: filterConfirmedIsolation,
+                        onSelected: (bool value) {
+                          setState(() {
+                            filterConfirmedIsolation = value;
+                          });
+                          refreshListOfPatients(context);
+                        }),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    child: FilterChip(
+                        selectedColor: Theme.of(context).accentColor,
+                        showCheckmark: false,
+                        labelStyle: filterICU == true
+                            ? Theme.of(context)
+                                .textTheme
+                                .bodyText2
+                                .copyWith(color: Colors.white)
+                            : Theme.of(context).textTheme.bodyText2,
+                        label: Text("ICU"),
+                        selected: filterICU,
+                        onSelected: (bool value) {
+                          setState(() {
+                            filterICU = value;
+                          });
+                          refreshListOfPatients(context);
+                        }),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    child: FilterChip(
+                        selectedColor: Theme.of(context).accentColor,
+                        showCheckmark: false,
+                        labelStyle: filterDischarged == true
+                            ? Theme.of(context)
+                                .textTheme
+                                .bodyText2
+                                .copyWith(color: Colors.white)
+                            : Theme.of(context).textTheme.bodyText2,
+                        label: Text("Discharged"),
+                        selected: filterDischarged,
+                        onSelected: (bool value) {
+                          setState(() {
+                            filterDischarged = value;
+                          });
+                          refreshListOfPatients(context);
+                        }),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    child: FilterChip(
+                        selectedColor: Theme.of(context).accentColor,
+                        showCheckmark: false,
+                        labelStyle: filterDeceased == true
+                            ? Theme.of(context)
+                                .textTheme
+                                .bodyText2
+                                .copyWith(color: Colors.white)
+                            : Theme.of(context).textTheme.bodyText2,
+                        label: Text("Deceased"),
+                        selected: filterDeceased,
+                        onSelected: (bool value) {
+                          setState(() {
+                            filterDeceased = value;
+                          });
+                          refreshListOfPatients(context);
+                        }),
+                  ),
+                ],
+              ),
+            ),
+          ),
           Container(
-           // height:100,
+            // height:100,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
-                
                 controller: searchTextController,
                 onChanged: (String value) {
                   return Provider.of<Patients>(context, listen: false)
@@ -77,12 +260,17 @@ class _HomePagePatientsWidgetState extends State<HomePagePatientsWidget> {
                 },
                 // controller: editingController,
                 decoration: InputDecoration(
-                    labelText: "Search",
-                    hintText: "Search",
-                    prefixIcon: Icon(Icons.search,color: Colors.black54,),
-                    enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
-                    focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
-                   ),
+                  labelText: "Search",
+                  hintText: "Search",
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: Colors.black54,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black)),
+                  focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black)),
+                ),
               ),
             ),
           ),
