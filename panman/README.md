@@ -1,16 +1,20 @@
-# panman
+# PanMan
 
-PanMan
+## About PanMan
 
-## Getting Started
+PanMan is a COVID-19 patient management platform. It provides an intuitive mobile app that allows doctors to manage COVID-19 patients, track their health, move them in the hospital & ensure optimal patient care.
 
-This project is a starting point for a Flutter application.
+It also allows hospitals to manage inventory of beds & supplies.
 
-A few resources to get you started if this is your first Flutter project:
+## Tech
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+Mobile app written in Flutter
+Firebase functions serverless backend
+Firestore as the NoSQL database
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Video Walkthrough
+https://www.youtube.com/watch?v=oUCLB6A6xZ8
+
+## License
+
+It's opensource and it's covered by the Apache 2.0 license. Feel free to fork!
